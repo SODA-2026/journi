@@ -1,4 +1,4 @@
-# Sprintar
+# Sprintar och lite annat
 
 Varje sprint får en egen mapp med fyra filer.
 
