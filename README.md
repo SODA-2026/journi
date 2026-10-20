@@ -28,3 +28,6 @@ Retron ligger före planeringen, så att det ni bestämmer på retron påverkar 
 | `standup.md` | Varje dag | Alla skriver sin egen rad |
 | `review.md` | Före och efter reviewn | Hela teamet |
 | `retro.md` | Måndag, direkt efter reviewn | Hela teamet, SM leder |
+
+hejehje
+
