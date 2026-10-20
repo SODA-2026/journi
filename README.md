@@ -29,5 +29,5 @@ Retron ligger före planeringen, så att det ni bestämmer på retron påverkar 
 | `review.md` | Före och efter reviewn | Hela teamet |
 | `retro.md` | Måndag, direkt efter reviewn | Hela teamet, SM leder |
 
-hejehje
+hejehje2
 
