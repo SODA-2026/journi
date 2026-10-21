@@ -48,7 +48,6 @@ CREATE TABLE invitations (
     UNIQUE KEY uq_invitations_trip_invitee (trip_id, invitee_id),
     KEY ix_invitations_inviter_id (inviter_id),
     KEY ix_invitations_invitee_status (invitee_id, status),
-    CONSTRAINT ck_invitations_different_users CHECK (inviter_id <> invitee_id),
     CONSTRAINT fk_invitations_trip
         FOREIGN KEY (trip_id) REFERENCES trips (id)
         ON UPDATE CASCADE ON DELETE CASCADE,
@@ -98,12 +97,10 @@ CREATE TABLE suggestions (
     KEY ix_suggestions_parent (parent_suggestion_id),
     CONSTRAINT ck_suggestions_type_fields CHECK (
         (type = 'DESTINATION'
-            AND parent_suggestion_id IS NULL
             AND destination_kind IS NOT NULL
             AND country IS NOT NULL)
         OR
         (type = 'ACTIVITY'
-            AND parent_suggestion_id IS NOT NULL
             AND destination_kind IS NULL
             AND category IS NOT NULL)
     ),
