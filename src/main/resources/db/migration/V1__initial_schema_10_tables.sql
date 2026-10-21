@@ -48,7 +48,6 @@ CREATE TABLE invitations (
     UNIQUE KEY uq_invitations_trip_invitee (trip_id, invitee_id),
     KEY ix_invitations_inviter_id (inviter_id),
     KEY ix_invitations_invitee_status (invitee_id, status),
-    CONSTRAINT ck_invitations_different_users CHECK (inviter_id <> invitee_id),
     CONSTRAINT fk_invitations_trip
         FOREIGN KEY (trip_id) REFERENCES trips (id)
         ON UPDATE CASCADE ON DELETE CASCADE,
@@ -98,12 +97,10 @@ CREATE TABLE suggestions (
     KEY ix_suggestions_parent (parent_suggestion_id),
     CONSTRAINT ck_suggestions_type_fields CHECK (
         (type = 'DESTINATION'
-            AND parent_suggestion_id IS NULL
             AND destination_kind IS NOT NULL
             AND country IS NOT NULL)
         OR
         (type = 'ACTIVITY'
-            AND parent_suggestion_id IS NOT NULL
             AND destination_kind IS NULL
             AND category IS NOT NULL)
     ),
@@ -225,8 +222,10 @@ CREATE TABLE password_reset_tokens (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- Application/service rules that cannot be expressed as simple MySQL CHECKs:
--- 1. A suggestion with type ACTIVITY must reference a parent suggestion
---    whose type is DESTINATION.
+-- MySQL does not allow CHECK constraints to reference columns used by
+-- cascading foreign keys, so these relationship rules must be validated here.
+-- 1. DESTINATION suggestions have no parent; ACTIVITY suggestions reference a
+--    parent suggestion whose type is DESTINATION.
 -- 2. trip_destinations.source_suggestion_id must reference DESTINATION.
 -- 3. activities.source_suggestion_id must reference ACTIVITY.
 -- 4. When activity_date is present, it must fall between the parent trip's
@@ -262,6 +261,7 @@ CREATE TABLE password_reset_tokens (
 --     DESTINATION, and for activities -> ACTIVITY.
 -- 16. This is a proposed initial schema; run SQL against MySQL 8.0.16+
 --     and validate migration/versioning strategy before team approval.
+-- 17. invitations.inviter_id and invitee_id must differ.
 
 -- suggestion.image_url example: /images/destinations/paris.jpg
 -- Files are served by the frontend; no suggestion_images table is used.
