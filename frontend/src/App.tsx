@@ -1,18 +1,38 @@
+import { fetchAllUsers } from './api/fetchData'
 import './App.css'
-
 import { useEffect, useState } from 'react'
 
+
 function App() {
-  const [message, setMessage] = useState('Laddar...')
+  const [users, setUsers] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/test')
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch(() => setMessage('Kunde inte nå backend'))
+    const fetchData = async () => {
+      try {
+        const data = await fetchAllUsers()
+        setUsers(data)
+      } catch (err) {
+        setError('Kunde inte nå backend: ' + err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
   }, [])
 
-  return <h1>{message}</h1>
+  if (loading) return <p>Laddar...</p>
+  if (error) return <p>{error}</p>
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.name}>{user.name}</li>
+      ))}
+    </ul>
+  )
 }
 
 export default App
