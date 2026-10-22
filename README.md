@@ -1,33 +1,64 @@
-# Sprintar
+<!--
+  INSTRUKTION
+  Det här är projektets startsida. Ersätt allt i den här filen med information om ert projekt.
+  Kommentarer som den här syns bara när man redigerar filen, inte på GitHub. Ta bort dem när ni är klara.
+-->
 
-Varje sprint får en egen mapp med fyra filer.
+# Projektnamn
 
-## Så gör ni vid varje ny sprint
+<!-- En eller två meningar: vad gör applikationen och för vem? -->
 
-1. Kopiera mappen `sprint-mall/` och döp kopian till `sprint-1/`, `sprint-2/` osv.
-2. Fyll i `planning.md` under sprint planning på måndagen.
-3. Fyll i `standup.md` varje dag.
-4. Fyll i `review.md` inför reviewn med läraren, och komplettera efteråt med feedbacken.
-5. Fyll i `retro.md` direkt efter reviewn.
+> **Exempel (Sysslo):** En webbapp där studenter som delar lägenhet fördelar och bockar av hushållssysslor.
 
-Gör det här i en egen branch och pull request, precis som med kod.
+## Teamet
 
-## Måndagens ordning
+| Namn | GitHub |
+|---|---|
+| | |
+| | |
+| | |
+| | |
 
+## Teknik
+
+<!-- Frontend, backend, databas och eventuella större bibliotek. Motivera valet i docs/beslutslogg.md. -->
+
+| Del | Teknik |
+|---|---|
+| Frontend | |
+| Backend | |
+| Databas | |
+
+## Kom igång
+
+<!--
+  Steg för steg: hur startar man projektet lokalt från ett nytt klonat repo?
+  Testa instruktionen själva på en annan dator. Om den inte fungerar där fungerar den inte för läraren heller.
+-->
+
+```bash
+git clone <repo-url>
+cd <projektmapp>
+# installera beroenden
+# starta databasen
+# starta backend
+# starta frontend
 ```
-Review (sprint N)  →  Retro (sprint N)  →  Planning (sprint N+1)
-```
 
-Retron ligger före planeringen, så att det ni bestämmer på retron påverkar nästa sprint direkt.
+## Dokumentation
 
-## Filerna
+| Dokument | Innehåll |
+|---|---|
+| [Gruppkontrakt](docs/gruppkontrakt.md) | Hur vi samarbetar |
+| [Definition of Done](docs/definition-of-done.md) | När en story räknas som klar |
+| [MVP](docs/mvp.md) | Vad som ingår i första versionen |
+| [Databasschema](docs/databasschema.md) | Tabeller och relationer |
+| [Beslutslogg](docs/beslutslogg.md) | Viktiga beslut och varför |
+| [Sprintar](docs/sprintar/) | Planning, standups, review och retro per sprint |
+| [Individuella reflektioner](docs/reflektioner/) | En per person, lämnas in vecka 8 |
 
-| Fil | När | Vem |
-|---|---|---|
-| `planning.md` | Måndag, i början av sprinten | Hela teamet, PO leder |
-| `standup.md` | Varje dag | Alla skriver sin egen rad |
-| `review.md` | Före och efter reviewn | Hela teamet |
-| `retro.md` | Måndag, direkt efter reviewn | Hela teamet, SM leder |
+## Board
 
-hejehje3
+<!-- Länk till ert projekt i GitHub Projects. -->
 
+[Länk till boarden]()
