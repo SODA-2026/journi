@@ -1,4 +1,4 @@
-# Sprint planning: sprint N
+# Sprint planning: sprint 1
 
 <!--
   INSTRUKTION
@@ -11,16 +11,16 @@
   Det är bättre att ta in för lite och plocka in mer än att ta in för mycket.
 -->
 
-**Datum:**
-**Deltagare:**
-**Product Owner denna sprint:**
-**Scrum Master denna sprint:**
+**Datum: 27/10/2026**  
+**Deltagare: Anders Arvid Dhannea Olena Sam**  
+**Product Owner denna sprint: Dhannea**  
+**Scrum Master denna sprint: Sam**  
 
 ## Sprintmål
 
 <!-- En mening. Vad ska vara möjligt efter sprinten som inte var det innan? -->
 
-> **Exempel:** En användare kan skapa ett hushåll och lägga till sysslor som sparas.
+Man ska kunna skapa en resa och kunna välja ett land och eller en stad samt något visuell representaion.
 
 
 
@@ -30,42 +30,36 @@
 
 > **Exempel:** Jonas är borta torsdag. Lina har tandläkare onsdag förmiddag.
 
+Alla tillgängliga tills slutet av sprinten. 
 
 
 ## Från förra retron
 
 <!-- Vilka åtgärder från förra retron tar vi med oss in i sprinten? -->
 
-> **Exempel:** PR:er ska granskas inom 24 timmar. Amir påminner på standupen.
+N/A
 
--
+
 
 ## Valda stories
 
 <!-- Länka issues med #nummer. Storlek: S, M eller L. -->
 
-> **Exempel:**
->
-> | Issue | Story | Storlek | Ansvarig |
-> |---|---|---|---|
-> | #3 | Skapa ett hushåll | M | Sara |
-> | #4 | Lägga till en syssla | M | Lina |
-> | #7 | Visa lista med sysslor | S | Jonas |
-> | #9 | Projektskelett och databas | M | Amir |
 
 | Issue | Story | Storlek | Ansvarig |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
+| #24 | Som användare vill jag kunna skapa en resa | L | Olena |
+| #29 | Som användare vill jag kunna lägga till flera destinationer på en resa så att jag kan planera en rundresa. | M | N/A |
+| #31 | Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe | M | N/A |
+| #67 | Som användare ska man skapa kunna skapa ett konto | M | Tillsammans |
 
-**Totalt:** _ S, _ M, _ L
+
+
+**Totalt:** 0 S, 3 M, 1 L
 <!-- Jämför med förra sprinten: hur mycket blev klart då? -->
 
 ## Risker och osäkerheter
 
 <!-- Något ni inte vet hur man gör? Beroenden mellan stories? -->
 
-> **Exempel:** Ingen av oss har kopplat React till ett Express-API förut. Lina och Jonas sätter sig tillsammans tisdag.
-
--
+Flödet i arbetsproccesen som vi löser genom att göra issue 67 tillsammans.
