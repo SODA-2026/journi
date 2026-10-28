@@ -20,7 +20,7 @@
 
 <!-- En mening. Vad ska vara möjligt efter sprinten som inte var det innan? -->
 
-Man ska kunna skapa en resa och kunna välja ett land och eller en stad samt något visuell representaion.
+Man ska kunna skapa en resa och kunna välja ett land och/eller en stad samt någon visuell representaion.
 
 
 
@@ -28,7 +28,7 @@ Man ska kunna skapa en resa och kunna välja ett land och eller en stad samt nå
 
 <!-- Är någon borta eller har mindre tid den här veckan? -->
 
-> **Exempel:** Jonas är borta torsdag. Lina har tandläkare onsdag förmiddag.
+
 
 Alla tillgängliga tills slutet av sprinten. 
 
@@ -51,7 +51,7 @@ N/A
 | #24 | Som användare vill jag kunna skapa en resa | L | Olena |
 | #29 | Som användare vill jag kunna lägga till flera destinationer på en resa så att jag kan planera en rundresa. | M | N/A |
 | #31 | Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe | M | N/A |
-| #67 | Som användare ska man skapa kunna skapa ett konto | M | Tillsammans |
+| #67 | Som användare ska man kunna skapa ett konto | M | Tillsammans |
 
 
 
