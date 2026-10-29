@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -37,10 +36,16 @@ public class TripDestinationController {
     @ResponseStatus(HttpStatus.CREATED)
     public TripDestinationResponse createDestination(
             @PathVariable("tripId") @Positive Long tripId,
-            @Valid @RequestBody CreateTripDestinationRequest request,
-            Principal principal
+            @Valid @RequestBody CreateTripDestinationRequest request
     ) {
-        return service.createDestination(tripId, request, principal);
+        // Временно: пользователь 1, как в создающем поездку TripController Сэма.
+        // TODO после подключения входа:
+        // 1. Добавить java.security.Principal principal в параметры этого метода.
+        // 2. Включить перегрузку с Principal в TripDestinationService (ниже в его файле).
+        // 3. Заменить следующий return на:
+        // return service.createDestination(tripId, request, principal);
+        // ID пользователя не принимать из JSON или URL.
+        return service.createDestination(tripId, request, 1L);
     }
 }
 

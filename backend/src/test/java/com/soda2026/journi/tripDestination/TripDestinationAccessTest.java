@@ -10,16 +10,10 @@ import com.soda2026.journi.tripMember.TripMemberModel;
 import com.soda2026.journi.tripMember.TripMemberRole;
 import com.soda2026.journi.user.UserModel;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,40 +25,26 @@ class TripDestinationAccessTest {
             repository, entityManager, new TripDestinationMapper()
     );
     private final CreateTripDestinationRequest request = new CreateTripDestinationRequest(4L, 0);
-    private final Principal principal = () -> "editor@example.com";
-
-    @Test
-    void rejectsAnonymousUser() {
-        assertStatus(HttpStatus.UNAUTHORIZED, null);
-        verifyNoInteractions(entityManager, repository);
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" "})
-    void rejectsMissingPrincipalName(String name) {
-        assertStatus(HttpStatus.UNAUTHORIZED, () -> name);
-        verifyNoInteractions(entityManager, repository);
-    }
+    private final Long userId = 7L;
 
     @Test
     void rejectsUnknownUser() {
         stubCurrentUser(null);
-        assertStatus(HttpStatus.UNAUTHORIZED, principal);
+        assertStatus(HttpStatus.NOT_FOUND, userId);
         verifyNoInteractions(repository);
     }
 
     @Test
     void rejectsMissingTrip() {
         stubCurrentUser(user());
-        assertStatus(HttpStatus.NOT_FOUND, principal);
+        assertStatus(HttpStatus.NOT_FOUND, userId);
         verifyNoInteractions(repository);
     }
 
     @Test
     void rejectsNonMember() {
         stubTripAndUser();
-        assertStatus(HttpStatus.FORBIDDEN, principal);
+        assertStatus(HttpStatus.FORBIDDEN, userId);
         verifyNoInteractions(repository);
     }
 
@@ -73,7 +53,7 @@ class TripDestinationAccessTest {
         TripModel trip = stubTripAndUser();
         when(entityManager.find(TripMemberModel.class, new TripMemberId(10L, 7L)))
                 .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.VIEWER));
-        assertStatus(HttpStatus.FORBIDDEN, principal);
+        assertStatus(HttpStatus.FORBIDDEN, userId);
         verifyNoInteractions(repository);
     }
 
@@ -83,7 +63,7 @@ class TripDestinationAccessTest {
         trip.setOwnerId(7L);
         stubDestination();
 
-        var response = service.createDestination(10L, request, principal);
+        var response = service.createDestination(10L, request, userId);
 
         assertEquals(Long.valueOf(10L), response.tripId());
         assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
@@ -98,14 +78,14 @@ class TripDestinationAccessTest {
                 .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.EDITOR));
         stubDestination();
 
-        var response = service.createDestination(10L, request, principal);
+        var response = service.createDestination(10L, request, userId);
 
         assertEquals(Long.valueOf(10L), response.tripId());
         assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
         verify(repository).save(any(TripDestinationModel.class));
     }
 
-    private void assertStatus(HttpStatus expected, Principal requester) {
+    private void assertStatus(HttpStatus expected, Long requester) {
         var exception = assertThrows(ResponseStatusException.class,
                 () -> service.createDestination(10L, request, requester));
         assertEquals(expected, exception.getStatusCode());
@@ -117,14 +97,8 @@ class TripDestinationAccessTest {
         return user;
     }
 
-    @SuppressWarnings("unchecked")
     private void stubCurrentUser(UserModel user) {
-        TypedQuery<UserModel> query = mock(TypedQuery.class);
-        when(entityManager.createQuery(
-                "select u from UserModel u where u.email = :email", UserModel.class
-        )).thenReturn(query);
-        when(query.setParameter("email", principal.getName())).thenReturn(query);
-        when(query.getResultStream()).thenAnswer(invocation -> Stream.ofNullable(user));
+        when(entityManager.find(UserModel.class, userId)).thenReturn(user);
     }
 
     private TripModel stubTripAndUser() {

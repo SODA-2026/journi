@@ -10,7 +10,6 @@ import com.soda2026.journi.user.UserModel;
 import com.soda2026.journi.tripMember.TripMemberId;
 import com.soda2026.journi.tripMember.TripMemberModel;
 import com.soda2026.journi.tripMember.TripMemberRole;
-import java.security.Principal;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -49,13 +48,47 @@ public class TripDestinationService {
                 .toList();
     }
 
+    /*
+     * TODO после подключения входа: включить эту перегрузку и переключить контроллер
+     * с 1L на Principal. Пример предполагает email в principal.getName(); это нужно
+     * согласовать с реализацией входа. Проверки владельца/EDITOR остаются в методе с userId.
+     * Отсутствующий Principal должен давать 401, без подстановки пользователя 1.
+     *
     @Transactional
     public TripDestinationResponse createDestination(
             @NotNull @Positive Long tripId,
             @NotNull @Valid CreateTripDestinationRequest request,
-            Principal principal
+            java.security.Principal principal
     ) {
-        UserModel user = getCurrentUser(principal);
+        if (principal == null || principal.getName() == null
+                || principal.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        UserModel user = entityManager.createQuery(
+                        "select u from UserModel u where u.email = :email", UserModel.class)
+                .setParameter("email", principal.getName())
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+
+        return createDestination(tripId, request, user.getId());
+    }
+     */
+
+    @Transactional
+    public TripDestinationResponse createDestination(
+            @NotNull @Positive Long tripId,
+            @NotNull @Valid CreateTripDestinationRequest request,
+            @NotNull @Positive Long userId
+    ) {
+        UserModel user = entityManager.find(UserModel.class, userId);
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User not found"
+            );
+        }
 
         TripModel trip = entityManager.find(TripModel.class, tripId);
         if (trip == null) {
@@ -202,29 +235,6 @@ public class TripDestinationService {
         }
     }
 
-    private UserModel getCurrentUser(Principal principal) {
-        if (principal == null
-                || principal.getName() == null
-                || principal.getName().isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Authentication required"
-            );
-        }
-
-        return entityManager.createQuery(
-                        "select u from UserModel u where u.email = :email",
-                        UserModel.class
-                )
-                .setParameter("email", principal.getName())
-                .getResultStream()
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "Authenticated user not found"
-                ));
-    }
-
     private String normalizePlaceName(String placeName) {
         if (placeName == null) {
             return null;
@@ -248,7 +258,7 @@ public class TripDestinationService {
  * Ogiltiga kataloguppgifter ger 422. Destinationen sparas inom samma transaktion.
  * normalizePlaceName tar bort omgivande blanksteg och ersätter tomma namn med null.
  * Förutsätter getType(), getDestinationKind(), getCountry() och getName() i SuggestionModel.
- * POST kräver Principal med användarens e-post; endast ägaren eller EDITOR får lägga till.
+ * POST använder tills vidare användare 1; endast ägaren eller EDITOR får lägga till.
  * createFirstDestination anropas av TripService efter dess användarkontroll i samma transaktion.
  *
  * Назначение сервиса
@@ -262,6 +272,6 @@ public class TripDestinationService {
  * Некорректные данные каталога дают 422. Сохранение выполняется в одной транзакции.
  * normalizePlaceName убирает пробелы по краям и заменяет пустое название на null.
  * Ожидает getType(), getDestinationKind(), getCountry() и getName() в SuggestionModel.
- * POST требует Principal с email; добавление разрешено владельцу или EDITOR.
+ * POST временно использует пользователя 1; добавление разрешено владельцу или EDITOR.
  * createFirstDestination вызывает TripService после проверки пользователя в общей транзакции.
  */
