@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -36,9 +37,10 @@ public class TripDestinationController {
     @ResponseStatus(HttpStatus.CREATED)
     public TripDestinationResponse createDestination(
             @PathVariable("tripId") @Positive Long tripId,
-            @Valid @RequestBody CreateTripDestinationRequest request
+            @Valid @RequestBody CreateTripDestinationRequest request,
+            Principal principal
     ) {
-        return service.createDestination(tripId, request);
+        return service.createDestination(tripId, request, principal);
     }
 }
 

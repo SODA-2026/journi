@@ -6,6 +6,11 @@ import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.suggestion.SuggestionModel;
 import com.soda2026.journi.suggestion.DestinationKind;
 import com.soda2026.journi.suggestion.SuggestionType;
+import com.soda2026.journi.user.UserModel;
+import com.soda2026.journi.tripMember.TripMemberId;
+import com.soda2026.journi.tripMember.TripMemberModel;
+import com.soda2026.journi.tripMember.TripMemberRole;
+import java.security.Principal;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Validated
@@ -45,6 +51,23 @@ public class TripDestinationService {
 
     @Transactional
     public TripDestinationResponse createDestination(
+            @NotNull @Positive Long tripId,
+            @NotNull @Valid CreateTripDestinationRequest request,
+            Principal principal
+    ) {
+        UserModel user = getCurrentUser(principal);
+
+        TripModel trip = entityManager.find(TripModel.class, tripId);
+        if (trip == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip not found");
+        }
+
+        requireCanEdit(trip, user);
+        return createDestination(tripId, request);
+    }
+
+    @Transactional
+    TripDestinationResponse createDestination(
             @NotNull @Positive Long tripId,
             @NotNull @Valid CreateTripDestinationRequest request
     ) {
@@ -161,6 +184,47 @@ public class TripDestinationService {
     }
 
 
+    private void requireCanEdit(TripModel trip, UserModel user) {
+        if (Objects.equals(trip.getOwnerId(), user.getId())) {
+            return;
+        }
+
+        TripMemberModel member = entityManager.find(
+                TripMemberModel.class,
+                new TripMemberId(trip.getId(), user.getId())
+        );
+
+        if (member == null || member.getRole() != TripMemberRole.EDITOR) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only the trip owner or an editor may add destinations"
+            );
+        }
+    }
+
+    private UserModel getCurrentUser(Principal principal) {
+        if (principal == null
+                || principal.getName() == null
+                || principal.getName().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication required"
+            );
+        }
+
+        return entityManager.createQuery(
+                        "select u from UserModel u where u.email = :email",
+                        UserModel.class
+                )
+                .setParameter("email", principal.getName())
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Authenticated user not found"
+                ));
+    }
+
     private String normalizePlaceName(String placeName) {
         if (placeName == null) {
             return null;
@@ -184,7 +248,7 @@ public class TripDestinationService {
  * Ogiltiga kataloguppgifter ger 422. Destinationen sparas inom samma transaktion.
  * normalizePlaceName tar bort omgivande blanksteg och ersätter tomma namn med null.
  * Förutsätter getType(), getDestinationKind(), getCountry() och getName() i SuggestionModel.
- * TODO: Kontrollera behörighet vid tillägg via POST.
+ * POST kräver Principal med användarens e-post; endast ägaren eller EDITOR får lägga till.
  * createFirstDestination anropas av TripService efter dess användarkontroll i samma transaktion.
  *
  * Назначение сервиса
@@ -198,6 +262,6 @@ public class TripDestinationService {
  * Некорректные данные каталога дают 422. Сохранение выполняется в одной транзакции.
  * normalizePlaceName убирает пробелы по краям и заменяет пустое название на null.
  * Ожидает getType(), getDestinationKind(), getCountry() и getName() в SuggestionModel.
- * TODO: Проверить права при добавлении через POST.
+ * POST требует Principal с email; добавление разрешено владельцу или EDITOR.
  * createFirstDestination вызывает TripService после проверки пользователя в общей транзакции.
  */
