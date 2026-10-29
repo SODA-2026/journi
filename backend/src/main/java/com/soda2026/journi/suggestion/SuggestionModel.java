@@ -17,12 +17,10 @@ public class SuggestionModel {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Lob
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", nullable = false, columnDefinition = "ENUM('DESTINATION','ACTIVITY')")
     private String type;
 
-    @Lob
-    @Column(name = "destination_kind")
+    @Column(name = "destination_kind", columnDefinition = "ENUM('COUNTRY','CITY','REGION','PLACE')")
     private String destinationKind;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,8 +43,7 @@ public class SuggestionModel {
     @Column(name = "short_description", nullable = false, length = 500)
     private String shortDescription;
 
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "best_travel_time", length = 150)

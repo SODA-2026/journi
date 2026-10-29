@@ -31,6 +31,10 @@
 
 ## Kom igång
 
+För att testa att skapa en resa utan inloggning, följ
+[instruktionen för lokal demo](docs/local-trip-demo.md). Starta demo-backend
+från projektets rot med `bash demo.sh`.
+
 <!--
   Steg för steg: hur startar man projektet lokalt från ett nytt klonat repo?
   Testa instruktionen själva på en annan dator. Om den inte fungerar där fungerar den inte för läraren heller.
