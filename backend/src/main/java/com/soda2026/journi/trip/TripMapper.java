@@ -12,12 +12,16 @@ public class TripMapper {
     }
 
     public TripModel toEntity(CreateTripRequestDTO createTripRequestDTO) {
+
+        if (createTripRequestDTO == null) {
+            return null;
+        }
+
         TripModel trip = new TripModel();
 
         trip.setTitle(createTripRequestDTO.getTitle());
         trip.setStartDate(createTripRequestDTO.getStartDate());
         trip.setEndDate(createTripRequestDTO.getEndDate());
-
 
         return trip;
     }
