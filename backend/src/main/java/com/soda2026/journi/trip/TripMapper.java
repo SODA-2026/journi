@@ -10,4 +10,15 @@ public class TripMapper {
                 trip.getTitle()
         );
     }
+
+    public TripModel toEntity(CreateTripRequestDTO createTripRequestDTO) {
+        TripModel trip = new TripModel();
+
+        trip.setTitle(createTripRequestDTO.getTitle());
+        trip.setStartDate(createTripRequestDTO.getStartDate());
+        trip.setEndDate(createTripRequestDTO.getEndDate());
+
+
+        return trip;
+    }
 }
