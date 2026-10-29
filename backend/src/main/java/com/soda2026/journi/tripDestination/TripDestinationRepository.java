@@ -10,6 +10,11 @@ public interface TripDestinationRepository
             Long tripId
     );
 
+    boolean existsByTrip_IdAndOrderIndex(
+            Long tripId,
+            Integer orderIndex
+    );
+
 }
 
 /*
