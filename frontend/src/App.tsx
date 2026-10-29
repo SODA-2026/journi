@@ -1,14 +1,15 @@
-import './App.css'
+import "./App.css";
 
-import { AddUserForm } from './components/AddUserForm'
+import { AddUserForm } from "./components/AddUserForm";
+import { DestinationSelect } from "./components/DestinationSelect";
 
 function App() {
-
-  return (
-
-    <AddUserForm></AddUserForm>
-
-  )
+    return (
+        <>
+            <AddUserForm></AddUserForm>
+            <DestinationSelect></DestinationSelect>
+        </>
+    );
 }
 
-export default App
+export default App;
