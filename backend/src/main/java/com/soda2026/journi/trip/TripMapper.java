@@ -9,6 +9,7 @@ public class TripMapper {
 
     public TripResponse toDto(TripModel trip){
         return new TripResponse(
+                trip.getId(),
                 trip.getTitle()
         );
     }
