@@ -38,7 +38,14 @@ public class TripDestinationController {
             @PathVariable("tripId") @Positive Long tripId,
             @Valid @RequestBody CreateTripDestinationRequest request
     ) {
-        return service.createDestination(tripId, request);
+        // Временно: пользователь 1, как в создающем поездку TripController Сэма.
+        // TODO после подключения входа:
+        // 1. Добавить java.security.Principal principal в параметры этого метода.
+        // 2. Включить перегрузку с Principal в TripDestinationService (ниже в его файле).
+        // 3. Заменить следующий return на:
+        // return service.createDestination(tripId, request, principal);
+        // ID пользователя не принимать из JSON или URL.
+        return service.createDestination(tripId, request, 1L);
     }
 }
 

@@ -1,5 +1,8 @@
 package com.soda2026.journi.suggestion;
 
+import com.soda2026.journi.suggestion.dto.CityDTO;
+import com.soda2026.journi.suggestion.dto.CountryDTO;
+import com.soda2026.journi.suggestion.dto.SuggestionDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,17 +28,27 @@ public class SuggestionController {
     }
 
     @GetMapping
-    public List<SuggestionDTO> findAll(
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String destinationKind,
+    public ResponseEntity<List<SuggestionDTO>> findAll(
+            @RequestParam(required = false) SuggestionType type,
+            @RequestParam(required = false) DestinationKind destinationKind,
             @RequestParam(required = false) Long parentId
     ) {
-        return suggestionService.findAll(type, destinationKind, parentId);
+        return ResponseEntity.ok(suggestionService.findAll(type, destinationKind, parentId));
+    }
+
+    @GetMapping("/countries")
+    public ResponseEntity<List<CountryDTO>> findCountries() {
+        return ResponseEntity.ok(suggestionService.findCountries());
+    }
+
+    @GetMapping("/countries/{countryId}/cities")
+    public ResponseEntity<List<CityDTO>> findCitiesByCountry(@PathVariable("countryId") Long countryId) {
+        return ResponseEntity.ok(suggestionService.findCitiesByCountry(countryId));
     }
 
     @GetMapping("/{id}")
-    public SuggestionDTO findById(@PathVariable Long id) {
-        return suggestionService.findById(id);
+    public ResponseEntity<SuggestionDTO> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(suggestionService.findById(id));
     }
 
     @PostMapping
@@ -49,8 +62,8 @@ public class SuggestionController {
     }
 
     @PutMapping("/{id}")
-    public SuggestionDTO update(@PathVariable Long id, @RequestBody SuggestionDTO dto) {
-        return suggestionService.update(id, dto);
+    public ResponseEntity<SuggestionDTO> update(@PathVariable Long id, @RequestBody SuggestionDTO dto) {
+        return ResponseEntity.ok(suggestionService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
