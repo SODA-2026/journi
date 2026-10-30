@@ -1,5 +1,7 @@
 package com.soda2026.journi.trip;
 
+import com.soda2026.journi.trip.dto.CreateTripRequest;
+import com.soda2026.journi.trip.dto.TripResponse;
 import com.soda2026.journi.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +22,15 @@ public class TripController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TripResponseDTO>> getAll() {
+    public ResponseEntity<List<TripResponse>> getAll() {
         return
                 ResponseEntity.ok(tripService.getAll());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<TripResponseDTO> createTrip(@RequestBody CreateTripRequestDTO createTripRequestDTO) {
+    public ResponseEntity<TripResponse> createTrip(@RequestBody CreateTripRequest createTripRequest) {
 //        1L = 1 Long
-        return ResponseEntity.status(HttpStatus.CREATED).body(tripService.createTrip(createTripRequestDTO, 1L));
+        return ResponseEntity.status(HttpStatus.CREATED).body(tripService.createTrip(createTripRequest, 1L));
     }
 
 }

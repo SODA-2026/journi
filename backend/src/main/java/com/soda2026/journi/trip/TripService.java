@@ -1,6 +1,7 @@
 package com.soda2026.journi.trip;
 
-import com.soda2026.journi.user.UserModel;
+import com.soda2026.journi.trip.dto.CreateTripRequest;
+import com.soda2026.journi.trip.dto.TripResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +17,15 @@ public class TripService {
         this.tripMapper = tripMapper;
     }
 
-    public List<TripResponseDTO> getAll() {
+    public List<TripResponse> getAll() {
         return tripRepository.findAll().stream()
                 .map(tripMapper::toDto)
                 .toList();
     }
 
-    public TripResponseDTO createTrip(CreateTripRequestDTO createTripRequestDTO, Long ownerId){
+    public TripResponse createTrip(CreateTripRequest createTripRequest, Long ownerId){
 
-        TripModel trip = tripMapper.toEntity(createTripRequestDTO);
+        TripModel trip = tripMapper.toEntity(createTripRequest);
         trip.setOwnerId(ownerId);
         TripModel savedTrip = tripRepository.save(trip);
 

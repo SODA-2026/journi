@@ -1,10 +1,10 @@
-package com.soda2026.journi.trip;
+package com.soda2026.journi.trip.dto;
 
-public class TripResponseDTO {
+public class TripResponse {
 
     private String title;
 
-    public TripResponseDTO(String title) {
+    public TripResponse(String title) {
         this.title = title;
     }
 

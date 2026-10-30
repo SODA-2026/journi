@@ -1,12 +1,11 @@
-package com.soda2026.journi.trip;
+package com.soda2026.journi.trip.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-public class CreateTripRequestDTO {
+public class CreateTripRequest {
 
     private String title;
 
@@ -18,13 +17,13 @@ public class CreateTripRequestDTO {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate endDate;
 
-    public CreateTripRequestDTO(String title, LocalDate startDate, LocalDate endDate) {
+    public CreateTripRequest(String title, LocalDate startDate, LocalDate endDate) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public CreateTripRequestDTO() {
+    public CreateTripRequest() {
     }
 
     public String getTitle() {
