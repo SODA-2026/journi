@@ -1,6 +1,6 @@
 package com.soda2026.journi.suggestion;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public record SuggestionDTO(
         Long id,
@@ -15,7 +15,7 @@ public record SuggestionDTO(
         String description,
         String bestTravelTime,
         String imageUrl,
-        Instant createdAt,
-        Instant updatedAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }

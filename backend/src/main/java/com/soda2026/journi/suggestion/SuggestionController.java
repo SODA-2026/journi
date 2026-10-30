@@ -26,11 +26,21 @@ public class SuggestionController {
 
     @GetMapping
     public List<SuggestionDTO> findAll(
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String destinationKind,
+            @RequestParam(required = false) Enum type,
+            @RequestParam(required = false) Enum destinationKind,
             @RequestParam(required = false) Long parentId
     ) {
         return suggestionService.findAll(type, destinationKind, parentId);
+    }
+
+    @GetMapping("/countries")
+    public List<CountryDTO> findCountries() {
+        return suggestionService.findCountries();
+    }
+
+    @GetMapping("/countries/{countryId}/cities")
+    public List<CityDTO> findCitiesByCountry(@PathVariable("countryId") Long countryId) {
+        return suggestionService.findCitiesByCountry(countryId);
     }
 
     @GetMapping("/{id}")

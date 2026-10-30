@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SuggestionModelRepository extends JpaRepository<SuggestionModel, Long> {
     @Query("""
@@ -14,8 +15,18 @@ public interface SuggestionModelRepository extends JpaRepository<SuggestionModel
               AND (:parentId IS NULL OR s.parentSuggestion.id = :parentId)
             """)
     List<SuggestionModel> search(
-            @Param("type") String type,
-            @Param("destinationKind") String destinationKind,
+            @Param("type") Enum type,
+            @Param("destinationKind") Enum destinationKind,
             @Param("parentId") Long parentId
     );
+
+    // Länder och städer: destination_kind är alltid satt för destinationer och aldrig för aktiviteter.
+    List<SuggestionModel> findAllByDestinationKindOrderByNameAscIdAsc(DestinationKind destinationKind);
+
+    List<SuggestionModel> findAllByDestinationKindAndParentSuggestion_IdOrderByNameAsc(
+            DestinationKind destinationKind,
+            Long parentSuggestionId
+    );
+
+    Optional<SuggestionModel> findByIdAndDestinationKind(Long id, DestinationKind destinationKind);
 }
