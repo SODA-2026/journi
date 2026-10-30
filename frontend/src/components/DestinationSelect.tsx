@@ -1,6 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { countries, cities } from "../testDataSuggestion";
+import type { Country } from "../types/destination";
+import { getCountries } from "../api/DestinationApi";
+
 export function DestinationSelect() {
+    useEffect(() => {
+        getCountries()
+            .then((data) => setCountries1(data))
+            .catch((error) => console.error(error));
+    }, []);
+
+    const [countries1, setCountries1] = useState<Country[]>([]);
     const [countryId, setCountryId] = useState(0);
     const [cityId, setCityId] = useState(0);
     function handleCitySelect(e: React.ChangeEvent<HTMLSelectElement>) {
