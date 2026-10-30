@@ -4,8 +4,8 @@ import java.time.Instant;
 
 public record SuggestionDTO(
         Long id,
-        String type,
-        String destinationKind,
+        SuggestionType type,
+        DestinationKind destinationKind,
         Long parentSuggestionId,
         String name,
         String country,

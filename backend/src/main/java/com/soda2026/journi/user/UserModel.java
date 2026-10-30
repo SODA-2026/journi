@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -27,17 +28,27 @@ public class UserModel {
     private String profileImage;
 
     @Column(name = "last_login")
-    private Instant lastLogin;
+    private LocalDateTime lastLogin;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     public UserModel() {
+    }
+
+    public UserModel(LocalDateTime createdAt, String email, LocalDateTime lastLogin, String name,  String passwordHash, String profileImage, LocalDateTime updatedAt) {
+        this.createdAt = createdAt;
+        this.email = email;
+        this.lastLogin = lastLogin;
+        this.name = name;
+        this.passwordHash = passwordHash;
+        this.profileImage = profileImage;
+        this.updatedAt = updatedAt;
     }
 
     public Long getId() {
@@ -80,29 +91,28 @@ public class UserModel {
         this.profileImage = profileImage;
     }
 
-    public Instant getLastLogin() {
+
+    public LocalDateTime getLastLogin() {
         return lastLogin;
     }
 
-    public void setLastLogin(Instant lastLogin) {
+    public void setLastLogin(LocalDateTime lastLogin) {
         this.lastLogin = lastLogin;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-
 }

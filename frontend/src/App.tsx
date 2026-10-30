@@ -1,18 +1,14 @@
 import './App.css'
 
-import { useEffect, useState } from 'react'
+import { AddUserForm } from './components/AddUserForm'
 
 function App() {
-  const [message, setMessage] = useState('Laddar...')
 
-  useEffect(() => {
-    fetch('/api/test')
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch(() => setMessage('Kunde inte nå backend'))
-  }, [])
+  return (
 
-  return <h1>{message}</h1>
+    <AddUserForm></AddUserForm>
+
+  )
 }
 
 export default App

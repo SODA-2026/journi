@@ -17,13 +17,13 @@ public class SuggestionModel {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private SuggestionType type;
 
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "destination_kind")
-    private String destinationKind;
+    private DestinationKind destinationKind;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -45,7 +45,6 @@ public class SuggestionModel {
     @Column(name = "short_description", nullable = false, length = 500)
     private String shortDescription;
 
-    @Lob
     @Column(name = "description")
     private String description;
 
@@ -66,6 +65,9 @@ public class SuggestionModel {
     @OneToMany(mappedBy = "parentSuggestion")
     private Set<SuggestionModel> suggestions = new LinkedHashSet<>();
 
+    public SuggestionModel() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -74,20 +76,13 @@ public class SuggestionModel {
         this.id = id;
     }
 
-    public String getType() {
+
+    public SuggestionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(SuggestionType type) {
         this.type = type;
-    }
-
-    public String getDestinationKind() {
-        return destinationKind;
-    }
-
-    public void setDestinationKind(String destinationKind) {
-        this.destinationKind = destinationKind;
     }
 
     public SuggestionModel getParentSuggestion() {
@@ -186,4 +181,11 @@ public class SuggestionModel {
         this.suggestions = suggestions;
     }
 
+    public DestinationKind getDestinationKind() {
+        return destinationKind;
+    }
+
+    public void setDestinationKind(DestinationKind destinationKind) {
+        this.destinationKind = destinationKind;
+    }
 }
