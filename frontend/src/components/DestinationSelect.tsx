@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
-import { countries, cities } from "../testDataSuggestion";
-import type { Country } from "../types/destination";
-import { getCountries } from "../api/DestinationApi";
+
+import type { City, Country } from "../types/destination";
+import { getCities, getCountries } from "../api/DestinationApi";
 
 export function DestinationSelect() {
-    const [countries1, setCountries1] = useState<Country[]>([]);
+    const [cities, setCities] = useState<City[]>([]);
+    const [countries, setCountries] = useState<Country[]>([]);
     const [countryId, setCountryId] = useState(0);
     const [cityId, setCityId] = useState(0);
+
+    useEffect(() => {
+        if (countryId === 0) {
+            setCities([]);
+            return;
+        }
+        getCities(countryId)
+            .then((data) => setCities(data))
+            .catch((error) => console.error(error));
+    }, [countryId]);
+
     useEffect(() => {
         getCountries()
-            .then((data) => setCountries1(data))
+            .then((data) => setCountries(data))
             .catch((error) => console.error(error));
     }, []);
 
