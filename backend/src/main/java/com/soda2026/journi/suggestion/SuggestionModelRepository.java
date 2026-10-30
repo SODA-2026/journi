@@ -15,8 +15,8 @@ public interface SuggestionModelRepository extends JpaRepository<SuggestionModel
               AND (:parentId IS NULL OR s.parentSuggestion.id = :parentId)
             """)
     List<SuggestionModel> search(
-            @Param("type") Enum type,
-            @Param("destinationKind") Enum destinationKind,
+            @Param("type") SuggestionType type,
+            @Param("destinationKind") DestinationKind destinationKind,
             @Param("parentId") Long parentId
     );
 

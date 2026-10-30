@@ -1,4 +1,7 @@
-package com.soda2026.journi.suggestion;
+package com.soda2026.journi.suggestion.dto;
+
+import com.soda2026.journi.suggestion.DestinationKind;
+import com.soda2026.journi.suggestion.SuggestionType;
 
 import java.time.LocalDateTime;
 

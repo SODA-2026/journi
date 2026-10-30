@@ -1,5 +1,8 @@
 package com.soda2026.journi.suggestion;
 
+import com.soda2026.journi.suggestion.dto.CityDTO;
+import com.soda2026.journi.suggestion.dto.CountryDTO;
+import com.soda2026.journi.suggestion.dto.SuggestionDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,22 +17,21 @@ import java.util.Map;
 @Service
 public class SuggestionService {
     private final SuggestionModelRepository suggestionModelRepository;
+    private final SuggestionMapper suggestionMapper;
 
-    public SuggestionService(SuggestionModelRepository suggestionModelRepository) {
+    public SuggestionService(SuggestionModelRepository suggestionModelRepository, SuggestionMapper suggestionMapper) {
         this.suggestionModelRepository = suggestionModelRepository;
+        this.suggestionMapper = suggestionMapper;
     }
 
     @Transactional(readOnly = true)
-    public List<SuggestionDTO> findAll(Enum type, Enum destinationKind, Long parentId) {
-        return suggestionModelRepository.search(type, destinationKind, parentId)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+    public List<SuggestionDTO> findAll(SuggestionType type, DestinationKind destinationKind, Long parentId) {
+        return suggestionMapper.toDtos(suggestionModelRepository.search(type, destinationKind, parentId));
     }
 
     @Transactional(readOnly = true)
     public SuggestionDTO findById(Long id) {
-        return toDTO(getSuggestion(id));
+        return suggestionMapper.toDto(getSuggestion(id));
     }
 
     @Transactional
@@ -40,7 +42,7 @@ public class SuggestionService {
         LocalDateTime now = LocalDateTime.now();
         suggestion.setCreatedAt(now);
         suggestion.setUpdatedAt(now);
-        return toDTO(suggestionModelRepository.save(suggestion));
+        return suggestionMapper.toDto(suggestionModelRepository.save(suggestion));
     }
 
     @Transactional
@@ -48,7 +50,7 @@ public class SuggestionService {
         SuggestionModel suggestion = getSuggestion(id);
         apply(dto, suggestion);
         suggestion.setUpdatedAt(LocalDateTime.now());
-        return toDTO(suggestionModelRepository.save(suggestion));
+        return suggestionMapper.toDto(suggestionModelRepository.save(suggestion));
     }
 
     @Transactional
@@ -61,7 +63,7 @@ public class SuggestionService {
         Map<String, CountryDTO> uniqueByName = new LinkedHashMap<>();
         for (SuggestionModel country : suggestionModelRepository
                 .findAllByDestinationKindOrderByNameAscIdAsc(DestinationKind.COUNTRY)) {
-            uniqueByName.putIfAbsent(country.getName().strip().toLowerCase(Locale.ROOT), toCountryDTO(country));
+            uniqueByName.putIfAbsent(country.getName().strip().toLowerCase(Locale.ROOT), suggestionMapper.toCountryDto(country));
         }
         return List.copyOf(uniqueByName.values());
     }
@@ -72,7 +74,7 @@ public class SuggestionService {
         return suggestionModelRepository
                 .findAllByDestinationKindAndParentSuggestion_IdOrderByNameAsc(DestinationKind.CITY, countryId)
                 .stream()
-                .map(city -> toCityDTO(city, countryId))
+                .map(city -> suggestionMapper.toCityDto(city, countryId))
                 .toList();
     }
 
@@ -113,14 +115,6 @@ public class SuggestionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
     }
 
-    private CountryDTO toCountryDTO(SuggestionModel country) {
-        return new CountryDTO(country.getId(), country.getName());
-    }
-
-    private CityDTO toCityDTO(SuggestionModel city, Long countryId) {
-        return new CityDTO(city.getId(), countryId, city.getName());
-    }
-
     private void apply(SuggestionDTO dto, SuggestionModel suggestion) {
         if (dto.type() == null || dto.name() == null || dto.name().isBlank()
                 || dto.shortDescription() == null || dto.shortDescription().isBlank()) {
@@ -130,11 +124,8 @@ public class SuggestionService {
             );
         }
 
-        boolean isDestination = "DESTINATION".equals(dto.type());
-        boolean isActivity = "ACTIVITY".equals(dto.type());
-        if (!isDestination && !isActivity) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type must be DESTINATION or ACTIVITY");
-        }
+        boolean isDestination = dto.type() == SuggestionType.DESTINATION;
+        boolean isActivity = dto.type() == SuggestionType.ACTIVITY;
         if (isDestination && (dto.destinationKind() == null || dto.country() == null || dto.country().isBlank())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -148,18 +139,11 @@ public class SuggestionService {
                     "Activities require a category and parent destination, and cannot have a destination kind"
             );
         }
-        if (dto.destinationKind() != null && !List.of("COUNTRY", "CITY", "REGION", "PLACE")
-                .contains(dto.destinationKind())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Destination kind must be COUNTRY, CITY, REGION, or PLACE"
-            );
-        }
 
         SuggestionModel parent = null;
         if (dto.parentSuggestionId() != null) {
             parent = getSuggestion(dto.parentSuggestionId());
-            if (!"DESTINATION".equals(parent.getType())) {
+            if (parent.getType() != SuggestionType.DESTINATION) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "A parent suggestion must be a destination"
@@ -167,35 +151,6 @@ public class SuggestionService {
             }
         }
 
-        suggestion.setType(dto.type());
-        suggestion.setDestinationKind(dto.destinationKind());
-        suggestion.setParentSuggestion(parent);
-        suggestion.setName(dto.name());
-        suggestion.setCountry(dto.country());
-        suggestion.setRegion(dto.region());
-        suggestion.setCategory(dto.category());
-        suggestion.setShortDescription(dto.shortDescription());
-        suggestion.setDescription(dto.description());
-        suggestion.setBestTravelTime(dto.bestTravelTime());
-        suggestion.setImageUrl(dto.imageUrl());
-    }
-
-    private SuggestionDTO toDTO(SuggestionModel suggestion) {
-        return new SuggestionDTO(
-                suggestion.getId(),
-                suggestion.getType(),
-                suggestion.getDestinationKind(),
-                suggestion.getParentSuggestion() == null ? null : suggestion.getParentSuggestion().getId(),
-                suggestion.getName(),
-                suggestion.getCountry(),
-                suggestion.getRegion(),
-                suggestion.getCategory(),
-                suggestion.getShortDescription(),
-                suggestion.getDescription(),
-                suggestion.getBestTravelTime(),
-                suggestion.getImageUrl(),
-                suggestion.getCreatedAt(),
-                suggestion.getUpdatedAt()
-        );
+        suggestionMapper.updateEntity(dto, parent, suggestion);
     }
 }
