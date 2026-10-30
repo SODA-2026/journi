@@ -4,15 +4,15 @@ import type { Country } from "../types/destination";
 import { getCountries } from "../api/DestinationApi";
 
 export function DestinationSelect() {
+    const [countries1, setCountries1] = useState<Country[]>([]);
+    const [countryId, setCountryId] = useState(0);
+    const [cityId, setCityId] = useState(0);
     useEffect(() => {
         getCountries()
             .then((data) => setCountries1(data))
             .catch((error) => console.error(error));
     }, []);
 
-    const [countries1, setCountries1] = useState<Country[]>([]);
-    const [countryId, setCountryId] = useState(0);
-    const [cityId, setCityId] = useState(0);
     function handleCitySelect(e: React.ChangeEvent<HTMLSelectElement>) {
         setCityId(Number(e.target.value));
     }
