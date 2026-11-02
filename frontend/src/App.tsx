@@ -1,15 +1,25 @@
 import "./App.css";
+import { useState } from "react";
 
 import { AddUserForm } from "./components/AddUserForm";
 import { DestinationSelect } from "./components/DestinationSelect";
+import { TripForm } from "./components/TripForm";
 
 function App() {
-    return (
-        <>
-            <AddUserForm></AddUserForm>
-            <DestinationSelect></DestinationSelect>
-        </>
-    );
+  const [, setCountryId] = useState(0);
+  const [, setCityId] = useState(0);
+
+  return (
+    <>
+      <AddUserForm />
+      <TripForm />
+      <DestinationSelect
+        showErrors={false}
+        onCountryChange={setCountryId}
+        onCityChange={setCityId}
+      />
+    </>
+  );
 }
 
 export default App;
