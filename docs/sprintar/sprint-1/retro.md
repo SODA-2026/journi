@@ -11,21 +11,17 @@
   Skriv ärligt. Det här är bra underlag för er individuella reflektion.
 -->
 
-**Datum:**
-**Deltagare:**
-**Leds av:**
+**Datum: 02-11-2026**
+**Deltagare: Anders, Arvid, Dhannea, Olena och Sam**
+**Leds av: Sam**
 
 ## Förra retrons åtgärder
 
-> **Exempel:**
->
-> | Åtgärd | Blev den av? | Hjälpte den? |
-> |---|---|---|
-> | PR:er granskas inom 24 timmar | Ja, nästan alltid | Ja, mycket färre PR:er som låg och väntade |
 
 | Åtgärd | Blev den av? | Hjälpte den? |
 |---|---|---|
-| | | |
+|  |  |  |
+ingen förra retro 
 
 ## Vad gick bra?
 
@@ -34,6 +30,9 @@
 > - Lina och Jonas parprogrammerade API-kopplingen och båda förstår den nu.
 
 -
+- Vi uppnåde målet med sprinten.
+- Vi lyckades dela upp arbetet och jobba på separata bitar och koppla ihop det tillsammans.
+- Kommunikations villiga.
 -
 
 ## Vad gick mindre bra?
@@ -44,29 +43,28 @@
 > - Ingen visste att Amir satt fast med Docker förrän torsdag.
 
 -
+- Svårt att gemensammat få fram beslut
+- vi tog inte tid för att bygga egen databas, göra det själva och inte bara generara allt
+- otydlig backlog
+- delning av arbete
 -
 
 ## Åtgärder till nästa sprint
 
 <!-- Högst 2–3. Konkreta, med ansvarig. "Bli bättre på att kommunicera" är inte en åtgärd. -->
 
-> **Exempel:**
->
-> | Åtgärd | Ansvarig |
-> |---|---|
-> | PR:er granskas inom 24 timmar. | Amir påminner på standupen |
-> | Den som sitter fast mer än en timme säger till i Discord. | Alla |
-> | Vi tar in en story mindre än förra sprinten. | Sara (PO) |
+
 
 | Åtgärd | Ansvarig |
 |---|---|
-| | |
-| | |
+| för små frågor. rösta. För större frågor, anordna möte nästa dag - så att vi inte slösar tid | Alla |
+| Vi frågar AI om datbasen kan göras mer simpel och går därefter igenom den | Alla |
+| Mer backlogg refinmen | PO tillsammans med alla |
 
 ## Ändringar i Definition of Done eller gruppkontrakt
 
 <!-- Om ni ändrar något: uppdatera dokumentet och skriv här vad och varför. -->
 
-> **Exempel:** Ny punkt i gruppkontraktet: "Pull requests granskas inom 24 timmar."
-
+-
+I beslutslogg ändring så att PR ska godkännas av 2 personer.
 -
