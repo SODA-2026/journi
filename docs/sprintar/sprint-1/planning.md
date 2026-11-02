@@ -40,7 +40,6 @@ Alla tillgängliga tills slutet av sprinten.
 N/A
 
 
-
 ## Valda stories
 
 <!-- Länka issues med #nummer. Storlek: S, M eller L. -->

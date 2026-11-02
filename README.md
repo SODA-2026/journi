@@ -4,20 +4,20 @@
   Kommentarer som den här syns bara när man redigerar filen, inte på GitHub. Ta bort dem när ni är klara.
 -->
 
-# Projektnamn
+# Journi
 
-<!-- En eller två meningar: vad gör applikationen och för vem? -->
-
-> **Exempel (Sysslo):** En webbapp där studenter som delar lägenhet fördelar och bockar av hushållssysslor.
+Journi är en webbapplikation för personer som planerar resor tillsammans. Användare kan skapa resor, lägga till destinationer och aktiviteter samt samarbeta med andra resenärer i samma reseplan.
 
 ## Teamet
 
 | Namn | GitHub |
 |---|---|
-| | |
-| | |
-| | |
-| | |
+| Dhannea | [GitHub-profil](https://github.com/dhannea-pearl) |
+| Olena | [GitHub-profil](https://github.com/olenavitkovska86-ops) |
+| Sam | [GitHub-profil](https://github.com/samshaalan) |
+| Anders | [GitHub-profil](https://github.com/Andoorz) |
+| Arvid | [GitHub-profil](https://github.com/arvideriksson28-hub) |
+
 
 ## Teknik
 
@@ -25,25 +25,57 @@
 
 | Del | Teknik |
 |---|---|
-| Frontend | |
-| Backend | |
-| Databas | |
+| Frontend | React, TypeScript, Tailwind och Vite |
+| Backend | Java 25 och Spring Boot |
+| Databas | MySQL med Spring Data JPA och Flyway |
 
 ## Kom igång
 
-<!--
-  Steg för steg: hur startar man projektet lokalt från ett nytt klonat repo?
-  Testa instruktionen själva på en annan dator. Om den inte fungerar där fungerar den inte för läraren heller.
--->
+### Förutsättningar
+
+- Java 25
+- Maven
+- Node.js och npm
+- MySQL
+
+### Klona projektet
 
 ```bash
 git clone <repo-url>
-cd <projektmapp>
-# installera beroenden
-# starta databasen
-# starta backend
-# starta frontend
+cd journi
 ```
+#### Starta databasen
+Skapa en MySQL-databas och konfigurera miljövariablerna i backend/.env:
+
+```bash
+DB_URL=jdbc:mysql://localhost:3306/<databasnamn>
+DB_USERNAME=<användarnamn>
+DB_PASSWORD=<lösenord>
+```
+
+#### Starta backend  
+Från projektets rotmapp:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+På Windows används:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+#### Starta frontend  
+Öppna en ny terminal:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend startas därefter av Vite på den lokala adress som visas i terminalen.
 
 ## Dokumentation
 
@@ -61,4 +93,4 @@ cd <projektmapp>
 
 <!-- Länk till ert projekt i GitHub Projects. -->
 
-[Länk till boarden]()
+[Länk till boarden](https://andershansson91.atlassian.net/jira/software/projects/KAN/boards/2?filter=&groupBy=none&atlOrigin=eyJpIjoiMmVkMDdhYTQ0MmM4NDhiMmFhZDE2ZThiODQzNGRlNDkiLCJwIjoiaiJ9)
