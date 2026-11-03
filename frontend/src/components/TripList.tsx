@@ -48,10 +48,10 @@ export function TripList() {
                 </p>
 
                 <Link
-                    to={"/trips/new"}
+                    to="/trips/new"
                     className="rounded-lg bg-[#235e4f] px-6 py-3 text-lg text-white hover:bg-[#1d4237]"
                 >
-                    skapa resa
+                    Skapa din första resa
                 </Link>
             </div>
         );
