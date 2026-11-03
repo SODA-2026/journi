@@ -4,6 +4,12 @@ import com.soda2026.journi.tripDestination.dto.CreateTripDestinationRequest;
 import com.soda2026.journi.tripDestination.dto.TripDestinationResponse;
 import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.suggestion.SuggestionModel;
+import com.soda2026.journi.suggestion.DestinationKind;
+import com.soda2026.journi.suggestion.SuggestionType;
+import com.soda2026.journi.user.UserModel;
+import com.soda2026.journi.tripMember.TripMemberId;
+import com.soda2026.journi.tripMember.TripMemberModel;
+import com.soda2026.journi.tripMember.TripMemberRole;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,31 +21,86 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Validated
 public class TripDestinationService {
     private final TripDestinationRepository repository;
     private final EntityManager entityManager;
+    private final TripDestinationMapper mapper;
 
     public TripDestinationService(
             TripDestinationRepository repository,
-            EntityManager entityManager
+            EntityManager entityManager,
+            TripDestinationMapper mapper
     ) {
         this.repository = repository;
         this.entityManager = entityManager;
+        this.mapper = mapper;
     }
 
     @Transactional(readOnly = true)
     public List<TripDestinationResponse> getDestinations(Long tripId) {
         return repository.findAllByTrip_IdOrderByOrderIndexAsc(tripId)
                 .stream()
-                .map(TripDestinationResponse::from)
+                .map(mapper::toDto)
                 .toList();
     }
 
+    /*
+     * TODO после подключения входа: включить эту перегрузку и переключить контроллер
+     * с 1L на Principal. Пример предполагает email в principal.getName(); это нужно
+     * согласовать с реализацией входа. Проверки владельца/EDITOR остаются в методе с userId.
+     * Отсутствующий Principal должен давать 401, без подстановки пользователя 1.
+     *
     @Transactional
     public TripDestinationResponse createDestination(
+            @NotNull @Positive Long tripId,
+            @NotNull @Valid CreateTripDestinationRequest request,
+            java.security.Principal principal
+    ) {
+        if (principal == null || principal.getName() == null
+                || principal.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        UserModel user = entityManager.createQuery(
+                        "select u from UserModel u where u.email = :email", UserModel.class)
+                .setParameter("email", principal.getName())
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+
+        return createDestination(tripId, request, user.getId());
+    }
+     */
+
+    @Transactional
+    public TripDestinationResponse createDestination(
+            @NotNull @Positive Long tripId,
+            @NotNull @Valid CreateTripDestinationRequest request,
+            @NotNull @Positive Long userId
+    ) {
+        UserModel user = entityManager.find(UserModel.class, userId);
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User not found"
+            );
+        }
+
+        TripModel trip = entityManager.find(TripModel.class, tripId);
+        if (trip == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip not found");
+        }
+
+        requireCanEdit(trip, user);
+        return createDestination(tripId, request);
+    }
+
+    @Transactional
+    TripDestinationResponse createDestination(
             @NotNull @Positive Long tripId,
             @NotNull @Valid CreateTripDestinationRequest request
     ) {
@@ -47,7 +108,12 @@ public class TripDestinationService {
         if (trip == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip not found");
         }
-
+        if (repository.existsByTrip_IdAndOrderIndex(tripId, request.orderIndex())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Destination order index is already occupied"
+            );
+        }
         SuggestionModel sourceSuggestion = entityManager.find(
                 SuggestionModel.class, request.sourceSuggestionId()
         );
@@ -87,7 +153,86 @@ public class TripDestinationService {
         );
 
         TripDestinationModel savedDestination = repository.save(destination);
-        return TripDestinationResponse.from(savedDestination);
+        return mapper.toDto(savedDestination);
+    }
+
+    @Transactional
+    public TripDestinationResponse createFirstDestination(
+            @NotNull TripModel trip,
+            @NotNull @Positive Long countryId,
+            @NotNull @Positive Long cityId
+    ) {
+        if (trip.getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Trip must be saved before adding a destination"
+            );
+        }
+        SuggestionModel country = entityManager.find(
+                SuggestionModel.class, countryId
+        );
+        if (country == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Country not found"
+            );
+        }
+
+        SuggestionModel city = entityManager.find(
+                SuggestionModel.class, cityId
+        );
+        if (city == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "City not found"
+            );
+        }
+
+        if (country.getType() != SuggestionType.DESTINATION
+                || country.getDestinationKind() != DestinationKind.COUNTRY) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Selected country must be a country destination"
+            );
+        }
+
+        if (city.getType() != SuggestionType.DESTINATION
+                || city.getDestinationKind() != DestinationKind.CITY) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Selected city must be a city destination"
+            );
+        }
+
+        if (city.getParentSuggestion() == null
+                || !countryId.equals(city.getParentSuggestion().getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Selected city does not belong to selected country"
+            );
+        }
+
+        return createDestination(
+                trip.getId(),
+                new CreateTripDestinationRequest(cityId, 0)
+        );
+    }
+
+
+    private void requireCanEdit(TripModel trip, UserModel user) {
+        if (Objects.equals(trip.getOwnerId(), user.getId())) {
+            return;
+        }
+
+        TripMemberModel member = entityManager.find(
+                TripMemberModel.class,
+                new TripMemberId(trip.getId(), user.getId())
+        );
+
+        if (member == null || member.getRole() != TripMemberRole.EDITOR) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only the trip owner or an editor may add destinations"
+            );
+        }
     }
 
     private String normalizePlaceName(String placeName) {
@@ -113,7 +258,8 @@ public class TripDestinationService {
  * Ogiltiga kataloguppgifter ger 422. Destinationen sparas inom samma transaktion.
  * normalizePlaceName tar bort omgivande blanksteg och ersätter tomma namn med null.
  * Förutsätter getType(), getDestinationKind(), getCountry() och getName() i SuggestionModel.
- * TODO: Kontrollera behörighet och hantera upptagen ordningsposition.
+ * POST använder tills vidare användare 1; endast ägaren eller EDITOR får lägga till.
+ * createFirstDestination anropas av TripService efter dess användarkontroll i samma transaktion.
  *
  * Назначение сервиса
  * Spring передаёт репозиторий и EntityManager. @Validated включает проверку аргументов.
@@ -126,5 +272,6 @@ public class TripDestinationService {
  * Некорректные данные каталога дают 422. Сохранение выполняется в одной транзакции.
  * normalizePlaceName убирает пробелы по краям и заменяет пустое название на null.
  * Ожидает getType(), getDestinationKind(), getCountry() и getName() в SuggestionModel.
- * TODO: Проверить права и обработать занятую позицию.
+ * POST временно использует пользователя 1; добавление разрешено владельцу или EDITOR.
+ * createFirstDestination вызывает TripService после проверки пользователя в общей транзакции.
  */
