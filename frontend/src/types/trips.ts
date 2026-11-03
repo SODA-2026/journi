@@ -7,13 +7,11 @@ export interface CreateTripRequest {
     cityId: number;
 }
 
-
 export interface TripResponse {
     title: string;
 }
 
-export type TripFormData = CreateTripRequest
-
+export type TripFormData = CreateTripRequest;
 
 // export interface TripFormData {
 //     title: string;
@@ -29,4 +27,11 @@ export interface TripFormErrors {
     endDate?: string;
     countryId?: string;
     cityId?: string;
+}
+
+export interface TripSummary {
+    tripId: number;
+    title: string;
+    createdAt: string;
+    updatedAt: string;
 }

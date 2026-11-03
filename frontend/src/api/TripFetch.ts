@@ -1,7 +1,12 @@
-import type { CreateTripRequest, TripResponse } from '../types/trips';
+import type {
+    CreateTripRequest,
+    TripResponse,
+    TripSummary,
+} from "../types/trips";
+const apiUrl = "http://localhost:8080/trips";
 
 export async function createTrip(
-    data: CreateTripRequest,
+    data: CreateTripRequest
 ): Promise<TripResponse> {
     const response = await fetch("http://localhost:8080/trips/create", {
         method: "POST",
@@ -15,5 +20,15 @@ export async function createTrip(
         throw new Error(`Server error: ${response.status}`);
     }
 
+    return response.json();
+}
+
+export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
+    const response = await fetch(`${apiUrl}/${ownerId}`, {
+        method: "GET",
+    });
+    if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+    }
     return response.json();
 }
