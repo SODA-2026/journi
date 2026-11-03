@@ -53,4 +53,14 @@ public class TripService {
         return tripMapper.toDto(savedTrip);
 
     }
+
+    public void delete(Long id, Long currentUserId) {
+        TripModel trip = tripRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (!trip.getOwnerId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        tripRepository.delete(trip);
+    }
 }
