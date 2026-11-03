@@ -2,6 +2,7 @@ package com.soda2026.journi.trip;
 
 import com.soda2026.journi.trip.dto.CreateTripRequest;
 import com.soda2026.journi.trip.dto.TripResponse;
+import com.soda2026.journi.trip.dto.TripSummaryDTO;
 import com.soda2026.journi.tripDestination.TripDestinationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -52,5 +53,12 @@ public class TripService {
 
         return tripMapper.toDto(savedTrip);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<TripSummaryDTO> findTripsByOwnerId(Long ownerId){
+        return tripRepository.findAllByOwnerIdOrderByUpdatedAtDesc(ownerId).stream()
+                .map(tripMapper::toTripSummaryDTO)
+                .toList();
     }
 }
