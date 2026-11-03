@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: Verify source branch
         run: |
-          if [ "${{ github.head_ref }}" != "main-dev" ]; then
-            echo "Only main-dev can merge into main!"
+          if [ "${{ github.head_ref }}" != "main-developement" ]; then
+            echo "Only main-developement can merge into main!"
             exit 1
           fi
 
