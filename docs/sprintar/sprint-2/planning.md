@@ -27,7 +27,8 @@ Som användare kan man logga in och se sina resor på frontend samt lägga till 
 
 <!-- Är någon borta eller har mindre tid den här veckan? -->
 
-- Olena borta 14-17 tisdag 
+- Olena borta 14-17 tisdag är tillgänglig efter 17 vid behov
+- Dhannea borta 13-15 tisdag
 
 
 

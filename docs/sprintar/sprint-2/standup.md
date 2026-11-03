@@ -35,10 +35,11 @@
 
 | Namn | Närvaro | Igår | Idag | Hinder |
 |---|---|---|---|---|
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
+| Anders | Distans | Sprint Planning | KAN-29, rundresa | - |
+| Dhannea | Distans | Sprint Planning | KAN-30, skapa, hämta aktiviteter | - |
+| Arvid | Distans | Sprint Planning | KAN-48, spara lista resor | - |
+| Sam | Distans | Sprint Planning | KAN-28, ta bort resa | - |
+| Olena | Distans | Sprint Planning | Inloggning/se över kort i JIRA | - |
 
 ## Onsdag ÅÅÅÅ-MM-DD
 
