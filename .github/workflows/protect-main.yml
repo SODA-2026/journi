@@ -1,0 +1,22 @@
+
+name: Protect main branch
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-source-branch:
+    name: Check source branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify source branch
+        run: |
+          if [ "${{ github.head_ref }}" != "main-dev" ]; then
+            echo "Only main-dev can merge into main!"
+            exit 1
+          fi
+
+          echo "Source branch is main-dev. Approved!"
