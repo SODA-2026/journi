@@ -1,12 +1,4 @@
-export interface CreateTripRequest {
-    title: string;
-    startDate: string;
-    endDate: string;
-}
-
-export interface TripResponse {
-    title: string;
-}
+import type { CreateTripRequest, TripResponse } from '../types/trips';
 
 export async function createTrip(
     data: CreateTripRequest,

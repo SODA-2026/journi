@@ -13,11 +13,6 @@ function App() {
     <>
       <AddUserForm />
       <TripForm />
-      <DestinationSelect
-        showErrors={false}
-        onCountryChange={setCountryId}
-        onCityChange={setCityId}
-      />
     </>
   );
 }
