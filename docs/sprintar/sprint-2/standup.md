@@ -45,10 +45,11 @@
 
 | Namn | Närvaro | Igår | Idag | Hinder |
 |---|---|---|---|---|
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
+| Anders | Distans | ruleset github | rundresa KAN-29 | - |
+| Dhannea | Distans | backend kan-30-aktiviter | frontend kan30+33 | - |
+| Arvid | Distans | KAN-48, routing-frontend | lägga till kan-48, potentiellt kan-27 | - |
+| Sam | Distans | backend-kan-28 + frontend ta bort resa | implementera knapp på rätt ställe | - |
+| Olena | Distans | 41+42 o 74, 42 är aktuellt sammanslaget | förbereda delarna i KAN-42 så gruppen kan fortsätta framåt | main-dev problem |
 
 ## Torsdag ÅÅÅÅ-MM-DD
 
