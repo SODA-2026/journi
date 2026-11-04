@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { TripSummary } from "../types/trips";
 import { getTripsByOwner } from "../api/TripFetch";
+import { Link } from "react-router";
 //TODO: ersätt med inloggad användare när spring security är på plats
 const CURRENT_USER_ID = 2;
 
@@ -45,13 +46,13 @@ export function TripList() {
                 <p className="text-lg text-[#1d4237]">
                     Du har inga sparade resor än
                 </p>
-                {/* TODO: koppla till formuläret när routern är på plats */}
-                <button
-                    type="button"
+
+                <Link
+                    to="/trips/new"
                     className="rounded-lg bg-[#235e4f] px-6 py-3 text-lg text-white hover:bg-[#1d4237]"
                 >
                     Skapa din första resa
-                </button>
+                </Link>
             </div>
         );
     }
