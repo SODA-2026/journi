@@ -55,10 +55,11 @@
 
 | Namn | Närvaro | Igår | Idag | Hinder |
 |---|---|---|---|---|
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
+| Anders | Distans | projektdiskussion | db-planering | - |
+| Dhannea | Distans | projektdiskussion | db-planering | - |
+| Arvid | Distans | projektdiskussion | db-planering | - |
+| Sam | Distans | projektdiskussion | db-planering | - |
+| Olena | Distans | projektdiskussion | db-planering | - |
 
 ## Fredag ÅÅÅÅ-MM-DD
 
