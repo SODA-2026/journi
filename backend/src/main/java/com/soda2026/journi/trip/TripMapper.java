@@ -1,40 +1,40 @@
-package com.soda2026.journi.trip;
-
-import com.soda2026.journi.trip.dto.CreateTripRequest;
-import com.soda2026.journi.trip.dto.TripResponse;
-import com.soda2026.journi.trip.dto.TripSummaryDTO;
-import org.springframework.stereotype.Component;
-
-@Component
-public class TripMapper {
-
-    public TripResponse toDto(TripModel trip){
-        return new TripResponse(
-                trip.getId(),
-                trip.getTitle()
-        );
-    }
-
-    public TripModel toEntity(CreateTripRequest createTripRequest) {
-
-        if (createTripRequest == null) {
-            return null;
-        }
-
-        TripModel trip = new TripModel();
-
-        trip.setTitle(createTripRequest.getTitle());
-        trip.setStartDate(createTripRequest.getStartDate());
-        trip.setEndDate(createTripRequest.getEndDate());
-
-        return trip;
-    }
-
-    public TripSummaryDTO toTripSummaryDTO(TripModel trip){
-        return new TripSummaryDTO(
-                trip.getId(),
-                trip.getTitle(),
-                trip.getCreatedAt(),
-                trip.getUpdatedAt());
-    }
-}
+// package com.soda2026.journi.trip;
+// 
+// import com.soda2026.journi.trip.dto.CreateTripRequest;
+// import com.soda2026.journi.trip.dto.TripResponse;
+// import com.soda2026.journi.trip.dto.TripSummaryDTO;
+// import org.springframework.stereotype.Component;
+// 
+// @Component
+// public class TripMapper {
+// 
+//     public TripResponse toDto(TripModel trip){
+//         return new TripResponse(
+//                 trip.getId(),
+//                 trip.getTitle()
+//         );
+//     }
+// 
+//     public TripModel toEntity(CreateTripRequest createTripRequest) {
+// 
+//         if (createTripRequest == null) {
+//             return null;
+//         }
+// 
+//         TripModel trip = new TripModel();
+// 
+//         trip.setTitle(createTripRequest.getTitle());
+//         trip.setStartDate(createTripRequest.getStartDate());
+//         trip.setEndDate(createTripRequest.getEndDate());
+// 
+//         return trip;
+//     }
+// 
+//     public TripSummaryDTO toTripSummaryDTO(TripModel trip){
+//         return new TripSummaryDTO(
+//                 trip.getId(),
+//                 trip.getTitle(),
+//                 trip.getCreatedAt(),
+//                 trip.getUpdatedAt());
+//     }
+// }
