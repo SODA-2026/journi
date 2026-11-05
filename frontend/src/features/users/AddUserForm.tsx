@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createUser, type UserRequestDTO } from '../api/UserFetch';
+import { createUser, type UserRequestDTO } from "./UserFetch";
 
 
 export function AddUserForm() {

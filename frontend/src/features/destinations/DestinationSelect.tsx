@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import type { City, Country } from "../types/destination";
-import { getCities, getCountries } from "../api/DestinationApi";
+import type { City, Country } from "./destination";
+import { getCities, getCountries } from "./DestinationApi";
 
 type DestinationSelectProps = {
     showErrors: boolean;

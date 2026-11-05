@@ -1,5 +1,5 @@
 // Trip form types and validation
-import type { TripFormData, TripFormErrors } from "../types/trips";
+import type { TripFormData, TripFormErrors } from "./trips";
 
 export function validate(values: TripFormData): TripFormErrors {
     const errors: TripFormErrors = {};

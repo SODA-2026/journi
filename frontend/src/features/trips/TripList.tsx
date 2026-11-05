@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { TripSummary } from "../types/trips";
-import { getTripsByOwner } from "../api/TripFetch";
+import type { TripSummary } from "./trips";
+import { getTripsByOwner } from "./TripFetch";
 import { Link } from "react-router";
 //TODO: ersätt med inloggad användare när spring security är på plats
-const CURRENT_USER_ID = 2;
+const CURRENT_USER_ID = 1;
 
 function formatDate(isoString: string): string {
     return new Date(isoString).toLocaleDateString("sv-SE", {

@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { createTrip } from "../api/TripFetch.ts";
-import { validate } from "../utils/TripValidation";
-import type { TripFormData, TripFormErrors } from "../types/trips.ts";
-import { DestinationSelect } from "./DestinationSelect.tsx";
+import { useRef, useState, type FormEvent } from "react";
+import { createTrip } from "./TripFetch.ts";
+import { validate } from "./TripValidation";
+import type { TripFormData, TripFormErrors } from "./trips.ts";
+import { DestinationSelect } from "../destinations/DestinationSelect.tsx";
 
 const emptyForm: TripFormData = {
     title: "",

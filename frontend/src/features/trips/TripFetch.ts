@@ -2,7 +2,7 @@ import type {
     CreateTripRequest,
     TripResponse,
     TripSummary,
-} from "../types/trips";
+} from "./trips";
 const apiUrl = "http://localhost:8080/trips";
 
 export async function createTrip(

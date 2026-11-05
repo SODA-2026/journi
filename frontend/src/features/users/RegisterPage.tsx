@@ -1,4 +1,4 @@
-import { AddUserForm } from "../components/AddUserForm";
+import { AddUserForm } from "./AddUserForm";
 
 export function CreateAccountPage() {
     return <AddUserForm></AddUserForm>;

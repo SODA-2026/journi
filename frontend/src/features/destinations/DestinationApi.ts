@@ -1,4 +1,4 @@
-import type { Country, City } from "../types/destination";
+import type { Country, City } from "./destination";
 const apiUrl = "http://localhost:8080/suggestions";
 
 export async function getCountries(): Promise<Country[]> {
