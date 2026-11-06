@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { TripSummary } from "./trips";
-import { getTripsByOwner } from "./TripFetch";
+import type { TripSummary } from "../trips";
+import { getTripsByOwner } from "../TripFetch";
 import { Link } from "react-router";
 //TODO: ersätt med inloggad användare när spring security är på plats
 const CURRENT_USER_ID = 1;

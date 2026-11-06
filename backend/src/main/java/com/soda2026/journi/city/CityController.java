@@ -1,8 +1,12 @@
 package com.soda2026.journi.city;
 
-import com.soda2026.journi.country.CountryService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/cities")
@@ -12,5 +16,10 @@ public class CityController {
 
     public CityController(CityService cityService) {
         this.cityService = cityService;
+    }
+
+    @GetMapping("/{countryId}")
+    public ResponseEntity<List<CityResponseDTO>> getAll(@PathVariable Long countryId) {
+        return ResponseEntity.ok(cityService.getAllByCountry(countryId));
     }
 }

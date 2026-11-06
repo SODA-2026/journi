@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router";
 import { HomePage } from "./HomePage";
-import { CreateTripPage } from "../features/trips/CreateTripPage";
-import { MyTripsPage } from "../features/trips/MyTripsPage";
+import { CreateTripPage } from "../pages/CreateTripPage";
+import { MyTripsPage } from "../pages/MyTripsPage";
 import { CreateAccountPage } from "../features/users/RegisterPage";
 
 export function AppRoutes() {
