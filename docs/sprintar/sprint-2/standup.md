@@ -65,7 +65,8 @@
 
 | Namn | Närvaro | Igår | Idag | Hinder |
 |---|---|---|---|---|
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
+| Anders | Distans | db-planering | Backend-korrigering | - |
+| Dhannea | Distans | db-planering | Backend-korrigering | - |
+| Arvid | Distans | db-planering | Backend-korrigering | - |
+| Sam | Distans | db-planering | Backend-korrigering | - |
+| Olena | Distans |  db-planering| Backend-korrigering | - |
