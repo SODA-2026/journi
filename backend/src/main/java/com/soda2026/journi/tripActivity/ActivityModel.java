@@ -1,12 +1,6 @@
-package com.soda2026.journi.activity;
+package com.soda2026.journi.tripActivity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 @Table(name = "trip_activities")
