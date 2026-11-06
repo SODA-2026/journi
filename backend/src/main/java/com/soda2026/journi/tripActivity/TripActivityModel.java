@@ -2,7 +2,6 @@ package com.soda2026.journi.tripActivity;
 
 import com.soda2026.journi.place.PlaceModel;
 import com.soda2026.journi.tripDestination.TripDestinationModel;
-import com.soda2026.journi.activity.TripActivityStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 

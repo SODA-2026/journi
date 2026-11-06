@@ -2,7 +2,7 @@
 
  import java.time.LocalDate;
  import java.time.LocalTime;
- import com.soda2026.journi.activity.TripActivityStatus;
+ import com.soda2026.journi.tripActivity.TripActivityStatus;
 
  public record TripActivityResponseDTO(
          Long id,
