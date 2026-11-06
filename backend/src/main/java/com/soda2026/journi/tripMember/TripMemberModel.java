@@ -10,67 +10,60 @@ import java.util.Objects;
 @Entity
 @Table(name = "trip_members")
 public class TripMemberModel {
-//
-//    @EmbeddedId
-//    private TripMemberId id;
-//
-//    @MapsId("tripId")
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "trip_id", nullable = false)
-//    private TripModel trip;
-//
-//    @MapsId("userId")
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private UserModel user;
-//
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "role", nullable = false)
-//    private TripMemberRole role = TripMemberRole.EDITOR;
-//
-//    @Column(name = "joined_at", nullable = false, insertable = false, updatable = false)
-//    private LocalDateTime joinedAt;
-//
-//    @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
-//    private LocalDateTime updatedAt;
-//
-//    protected TripMemberModel() {
-//    }
-//
-//    public TripMemberModel(TripModel trip, UserModel user, TripMemberRole role) {
-//        this.trip = Objects.requireNonNull(trip, "Trip is required");
-//        this.user = Objects.requireNonNull(user, "User is required");
-//        this.id = new TripMemberId(trip.getId(), user.getId());
-//        this.role = Objects.requireNonNull(role, "Role is required");
-//    }
-//
-//    public TripMemberId getId() {
-//        return id;
-//    }
-//
-//    public TripModel getTrip() {
-//        return trip;
-//    }
-//
-//    public UserModel getUser() {
-//        return user;
-//    }
-//
-//    public TripMemberRole getRole() {
-//        return role;
-//    }
-//
-//    public LocalDateTime getJoinedAt() {
-//        return joinedAt;
-//    }
-//
-//    public LocalDateTime getUpdatedAt() {
-//        return updatedAt;
-//    }
-//
-//    public void setRole(TripMemberRole role) {
-//        this.role = Objects.requireNonNull(role, "Role is required");
-//    }
+
+    @EmbeddedId
+    private TripMemberId id;
+
+    @MapsId("tripId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "trip_id", nullable = false)
+    private TripModel trip;
+
+    @MapsId("userId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserModel user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private TripMemberRole role = TripMemberRole.EDITOR;
+
+    @Column(name = "joined_at", nullable = false, insertable = false, updatable = false)
+    private LocalDateTime joinedAt;
+
+    protected TripMemberModel() {
+    }
+
+    public TripMemberModel(TripModel trip, UserModel user, TripMemberRole role) {
+        this.trip = Objects.requireNonNull(trip, "Trip is required");
+        this.user = Objects.requireNonNull(user, "User is required");
+        this.id = new TripMemberId(trip.getId(), user.getId());
+        this.role = Objects.requireNonNull(role, "Role is required");
+    }
+
+    public TripMemberId getId() {
+        return id;
+    }
+
+    public TripModel getTrip() {
+        return trip;
+    }
+
+    public UserModel getUser() {
+        return user;
+    }
+
+    public TripMemberRole getRole() {
+        return role;
+    }
+
+    public LocalDateTime getJoinedAt() {
+        return joinedAt;
+    }
+
+    public void setRole(TripMemberRole role) {
+        this.role = Objects.requireNonNull(role, "Role is required");
+    }
 }
 
 /*
