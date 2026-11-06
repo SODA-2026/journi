@@ -1,5 +1,5 @@
 import type { Country, City } from "./destination";
-const apiUrl = "http://localhost:8080/suggestions";
+const apiUrl = "http://localhost:8080";
 
 export async function getCountries(): Promise<Country[]> {
     const response = await fetch(`${apiUrl}/countries`, {
@@ -13,7 +13,7 @@ export async function getCountries(): Promise<Country[]> {
 }
 
 export async function getCities(countryId: number): Promise<City[]> {
-    const response = await fetch(`${apiUrl}/countries/${countryId}/cities`, {
+    const response = await fetch(`${apiUrl}/cities/${countryId}`, {
         method: "GET",
     });
     if (!response.ok) {

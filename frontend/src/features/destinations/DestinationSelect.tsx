@@ -88,7 +88,7 @@ export function DestinationSelect({
                     {cities
                         .filter((c) => c.countryId === countryId)
                         .map((c) => (
-                            <option key={c.cityId} value={c.cityId}>
+                            <option key={c.id} value={c.id}>
                                 {c.name}
                             </option>
                         ))}
