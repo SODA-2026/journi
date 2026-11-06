@@ -10,11 +10,7 @@
          return new TripDestinationResponse(
                  destination.getId(),
                  destination.getTrip().getId(),
-                 destination.getSourceSuggestion() == null
-                         ? null
-                         : destination.getSourceSuggestion().getId(),
-                 destination.getCountry(),
-                 destination.getPlaceName(),
+                 destination.getCity().getId(),
                  destination.getOrderIndex()
          );
      }

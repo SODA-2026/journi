@@ -2,7 +2,6 @@
 
  import org.springframework.stereotype.Service;
 
- import java.time.LocalDateTime;
  import java.util.List;
 
  @Service
@@ -24,13 +23,10 @@
 
      public UserResponseDTO createUser(UserRequestDTO userRequestDTO){
          UserModel userModel = new UserModel(
-                 LocalDateTime.now(),
                  userRequestDTO.getEmail(),
-                 LocalDateTime.now(),
                  userRequestDTO.getName(),
                  userRequestDTO.getPassword(),
-                 userRequestDTO.getProfileImage(),
-                 LocalDateTime.now()
+                 userRequestDTO.getProfileImage()
          );
 
 

@@ -1,9 +1,7 @@
 package com.soda2026.journi.user;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +16,7 @@ public class UserModel {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password_hash", nullable = false)
@@ -30,25 +28,27 @@ public class UserModel {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at", nullable = false)
+    @Column(
+            name = "created_at",
+            nullable = false,
+            insertable = false,
+            updatable = false
+    )
     private LocalDateTime createdAt;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     public UserModel() {
     }
 
-    public UserModel(LocalDateTime createdAt, String email, LocalDateTime lastLogin, String name,  String passwordHash, String profileImage, LocalDateTime updatedAt) {
-        this.createdAt = createdAt;
+    public UserModel(
+            String email,
+            String name,
+            String passwordHash,
+            String profileImage
+        ) {
         this.email = email;
-        this.lastLogin = lastLogin;
         this.name = name;
         this.passwordHash = passwordHash;
         this.profileImage = profileImage;
-        this.updatedAt = updatedAt;
     }
 
     public Long getId() {
@@ -102,17 +102,5 @@ public class UserModel {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

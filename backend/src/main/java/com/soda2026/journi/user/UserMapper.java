@@ -2,8 +2,6 @@
 
  import org.springframework.stereotype.Component;
 
- import java.time.LocalDateTime;
-
  @Component
  public class UserMapper {
 
@@ -15,13 +13,10 @@
 
      public UserModel toEntity(UserRequestDTO userRequestDTO) {
          return new UserModel(
-                 LocalDateTime.now(),
                  userRequestDTO.getEmail(),
-                 LocalDateTime.now(),
                  userRequestDTO.getName(),
                  userRequestDTO.getPassword(),
-                 userRequestDTO.getProfileImage(),
-                 LocalDateTime.now()
+                 userRequestDTO.getProfileImage()
                  );
      }
  }
