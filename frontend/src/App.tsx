@@ -2,19 +2,21 @@ import "./App.css";
 import { useState } from "react";
 
 import { AddUserForm } from "./components/AddUserForm";
-import { DestinationSelect } from "./components/DestinationSelect";
 import { TripForm } from "./components/TripForm";
+import { TripList } from "./components/TripList";
+import { NavBar } from "./components/NavBar";
+import { AppRoutes } from "./routes/AppRoutes";
 
 function App() {
-  const [, setCountryId] = useState(0);
-  const [, setCityId] = useState(0);
+    const [, setCountryId] = useState(0);
+    const [, setCityId] = useState(0);
 
-  return (
-    <>
-      <AddUserForm />
-      <TripForm />
-    </>
-  );
+    return (
+        <>
+            <NavBar></NavBar>
+            <AppRoutes></AppRoutes>
+        </>
+    );
 }
 
 export default App;
