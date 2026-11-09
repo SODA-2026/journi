@@ -1,8 +1,7 @@
 package com.soda2026.journi.tripDestination;
 
-import com.soda2026.journi.suggestion.DestinationKind;
-import com.soda2026.journi.suggestion.SuggestionModel;
-import com.soda2026.journi.suggestion.SuggestionType;
+import com.soda2026.journi.city.CityModel;
+import com.soda2026.journi.country.CountryModel;
 import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.tripDestination.dto.CreateTripDestinationRequest;
 import com.soda2026.journi.tripMember.TripMemberId;
@@ -66,23 +65,18 @@ class TripDestinationAccessTest {
         var response = service.createDestination(10L, request, userId);
 
         assertEquals(Long.valueOf(10L), response.tripId());
-        assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
+        assertEquals(Long.valueOf(4L), response.cityId());
         verify(repository).save(any(TripDestinationModel.class));
         verify(entityManager, never()).find(eq(TripMemberModel.class), any());
     }
 
     @Test
-    void allowsEditor() {
+    void rejectsEditorUnderCurrentOwnerOnlyPolicy() {
         TripModel trip = stubTripAndUser();
         when(entityManager.find(TripMemberModel.class, new TripMemberId(10L, 7L)))
                 .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.EDITOR));
-        stubDestination();
-
-        var response = service.createDestination(10L, request, userId);
-
-        assertEquals(Long.valueOf(10L), response.tripId());
-        assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
-        verify(repository).save(any(TripDestinationModel.class));
+        assertStatus(HttpStatus.FORBIDDEN, userId);
+        verifyNoInteractions(repository);
     }
 
     private void assertStatus(HttpStatus expected, Long requester) {
@@ -111,13 +105,14 @@ class TripDestinationAccessTest {
     }
 
     private void stubDestination() {
-        SuggestionModel city = new SuggestionModel();
+        CountryModel country = new CountryModel();
+        country.setId(1L);
+        country.setName("Sverige");
+        CityModel city = new CityModel();
         city.setId(4L);
-        city.setType(SuggestionType.DESTINATION);
-        city.setDestinationKind(DestinationKind.CITY);
-        city.setCountry("Sverige");
+        city.setCountry(country);
         city.setName("Malmö");
-        when(entityManager.find(SuggestionModel.class, 4L)).thenReturn(city);
+        when(entityManager.find(CityModel.class, 4L)).thenReturn(city);
         when(repository.save(any(TripDestinationModel.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }
