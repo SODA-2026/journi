@@ -58,8 +58,16 @@ Som användare kan man logga in och se sina resor på frontend samt lägga till 
 
 > **Exempel:** Läraren frågade hur man vet vem som ska göra nästa disk. I deras kollektiv turas man om varje vecka i stället för att tilldela.
 
--
--
+- inlogg är bra att repetera hur man bygger
+- ge ett riktigt intryck i slutet av projektet, visuellt
+- vill ha fler möjligheter till att skapa resa
+- se mer av den visuella resan
+- liten grej, förslah på matställen, museeum och liknande
+- kalendervy visuellt
+- inspirationsflöde, ex. i lund finns detta matstället eller denna platsen att besöka. kunna välja en plats och gå vidare.
+- jaga low hanging fruit, småsaker som ger värde
+- interaktiv karta?
+- side note - password reset token i db, behövs den?
 
 ### Ändringar i backloggen
 
@@ -67,4 +75,4 @@ Som användare kan man logga in och se sina resor på frontend samt lägga till 
 
 > **Exempel:** Ny story #15 "Turordning per vecka" som Must. "Tilldela en syssla" (#5) sänks till Should.
 
--
+- KAN-84 lades till, öppna ett kort med detaljerad info om en resa

@@ -11,62 +11,49 @@
   Skriv ärligt. Det här är bra underlag för er individuella reflektion.
 -->
 
-**Datum:**
-**Deltagare:**
+**Datum:** *2026-11-09*  
+**Deltagare:** *Anders, Dhannea, Arvid, Sam, Olena*  
 **Leds av:**
 
 ## Förra retrons åtgärder
 
-> **Exempel:**
->
-> | Åtgärd | Blev den av? | Hjälpte den? |
-> |---|---|---|
-> | PR:er granskas inom 24 timmar | Ja, nästan alltid | Ja, mycket färre PR:er som låg och väntade |
 
 | Åtgärd | Blev den av? | Hjälpte den? |
 |---|---|---|
-| | | |
+| för små frågor. rösta. För större frågor, anordna möte nästa dag - så att vi inte slösar tid | delvis | ja |
+| Vi frågar AI om datbasen kan göras mer simpel och går därefter igenom den | ja | ja |
+| Mer backlogg refinement | nej | lyfte tankar om backlog |
 
 ## Vad gick bra?
 
-> **Exempel:**
-> - Standupen tog aldrig mer än 10 minuter.
-> - Lina och Jonas parprogrammerade API-kopplingen och båda förstår den nu.
-
--
--
+- standup dag 1 och 2 kändes smidiga att arbeta runt när vi väl började
+- bra samarbete runt db och backend torsdag, fredag
+- Alla är jättebra på att kommunicera fram sina egna åsikter och förslag
+- vi tog bra stora beslut 
+- Jag tycker att vi har kommit väldigt långt i vår gemensamma förståelse för produktens övergripande idé och hur den är tänkt att fungera
+- Refaktoreringen av databasen var nyttig
+- vi har gått igenom processen tillsammans och att hela gruppen känner sig bekväm med lösningen
+- Vi delade in i roller så alla får testa de olika rollerna
 
 ## Vad gick mindre bra?
 
-> **Exempel:**
-> - PR:er låg ogranskade i upp till två dagar.
-> - Vi tog in för mycket. Två stories blev inte klara.
-> - Ingen visste att Amir satt fast med Docker förrän torsdag.
-
--
--
+- disskusioner kan få en tendens att spirala bort från huvudpunkten
+- respektera majoritetsbeslut och allmänn flexibilitet
+- Försökte med att rösta fram gällande större beslut och sedan är det majoriteten som vinner. Men resultatet av röster följdes inte av dagen efter
+- Vissa vägrar följa majoritet ibland.
+- behöver bli bättre på att sätta tidsramar för våra diskussioner och hålla oss till dem
 
 ## Åtgärder till nästa sprint
 
-<!-- Högst 2–3. Konkreta, med ansvarig. "Bli bättre på att kommunicera" är inte en åtgärd. -->
-
-> **Exempel:**
->
-> | Åtgärd | Ansvarig |
-> |---|---|
-> | PR:er granskas inom 24 timmar. | Amir påminner på standupen |
-> | Den som sitter fast mer än en timme säger till i Discord. | Alla |
-> | Vi tar in en story mindre än förra sprinten. | Sara (PO) |
-
 | Åtgärd | Ansvarig |
 |---|---|
-| | |
-| | |
+| motivera beslut och respektera majoritet | Team |
+| vid helhetsändringar, dokumentera eller förmedla till team | den som ändrade |
 
 ## Ändringar i Definition of Done eller gruppkontrakt
 
-<!-- Om ni ändrar något: uppdatera dokumentet och skriv här vad och varför. -->
+- gamla kontraktet:
+sa PO avgör vid röstning.
 
-> **Exempel:** Ny punkt i gruppkontraktet: "Pull requests granskas inom 24 timmar."
-
--
+ny version:
+Om vi inte kommer överens röstar vi. Motivation presenteras, majoritet bestämmer
