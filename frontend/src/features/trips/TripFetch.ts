@@ -1,34 +1,6 @@
-import type {
-    CreateTripRequest,
-    TripResponse,
-    TripSummary,
-} from "./trips";
-const apiUrl = "http://localhost:8080/trips";
-
-export async function createTrip(
-    data: CreateTripRequest
-): Promise<TripResponse> {
-    const response = await fetch("http://localhost:8080/trips/create", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-    }
-
-    return response.json();
+import { api } from "../../api/ApiClient";
+import type { CreateTripRequest, TripResponse, TripSummary } from "./trips";
+export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
+    return api("/trips/create", { method: "POST", body: JSON.stringify(data) });
 }
-
-export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
-    const response = await fetch(`${apiUrl}/${ownerId}`, {
-        method: "GET",
-    });
-    if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-    }
-    return response.json();
-}
+export function getMyTrips(): Promise<TripSummary[]> { return api("/trips/mine"); }

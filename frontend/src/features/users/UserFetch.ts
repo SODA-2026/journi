@@ -1,3 +1,5 @@
+import { api } from "../../api/ApiClient";
+
 export interface UserRequestDTO {
   email: string;
   name: string;
@@ -6,26 +8,13 @@ export interface UserRequestDTO {
 }
 
 export interface UserResponseDTO {
-  id?: number;
+  id: number;
   email: string;
   name: string;
-  profileImage: string;
 }
-
-
-
-export async function createUser(data: UserRequestDTO): Promise<UserResponseDTO> {
-  const response = await fetch(`http://localhost:8080/users/create`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+export function createUser(data: UserRequestDTO): Promise<UserResponseDTO> {
+  return api("/api/auth/register", {
+    method: "POST",
     body: JSON.stringify(data),
   });
-
-  if (!response.ok) {
-    throw new Error(`Server error: ${response.status}`);
-  }
-
-  return response.json();
 }
