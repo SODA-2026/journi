@@ -31,9 +31,6 @@ public class TripMemberModel {
     @Column(name = "joined_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime joinedAt;
 
-    @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
-    private LocalDateTime updatedAt;
-
     protected TripMemberModel() {
     }
 
@@ -62,10 +59,6 @@ public class TripMemberModel {
 
     public LocalDateTime getJoinedAt() {
         return joinedAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public void setRole(TripMemberRole role) {

@@ -1,7 +1,7 @@
-package com.soda2026.journi.trip.dto;
+ package com.soda2026.journi.trip.dto;
 
-import java.time.Instant;
-import java.time.LocalDate;
+ import java.time.Instant;
+ import java.time.LocalDate;
 
-public record TripSummaryDTO(Long tripId, String title, Instant createdAt, Instant updatedAt) {
-}
+ public record TripSummaryDTO(Long tripId, String title, Instant createdAt, LocalDate startDate) {
+ }
