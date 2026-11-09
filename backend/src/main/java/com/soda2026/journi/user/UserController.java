@@ -1,31 +1,32 @@
- package com.soda2026.journi.user;
+package com.soda2026.journi.user;
 
 
- import org.springframework.http.HttpStatus;
- import org.springframework.http.ResponseEntity;
- import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
- import java.util.List;
+import java.util.List;
+import jakarta.validation.Valid;
 
- @RestController
- @RequestMapping("/users")
- public class UserController {
+@RestController
+@RequestMapping("/users")
+public class UserController {
 
-     private final UserService userService;
+    private final UserService userService;
 
 
-     public UserController(UserService userService) {
-         this.userService = userService;
-     }
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-     @GetMapping
-     public ResponseEntity<List<UserResponseDTO>> getAll() {
-         return
-                 ResponseEntity.ok(userService.getAll());
-     }
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        return
+                ResponseEntity.ok(userService.getAll());
+    }
 
-     @PostMapping("/create")
-     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequestDTO){
-         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequestDTO));
-     }
- }
+    @PostMapping("/create")
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequestDTO));
+    }
+}
