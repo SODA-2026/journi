@@ -3,7 +3,8 @@ import type { TripSummary } from "../trips";
 import { getTripsByOwner } from "../TripFetch";
 import { Link } from "react-router";
 import { DeleteTripButton } from "./DeleteTripButton";
-//TODO: ersätt med inloggad användare när spring security är på plats
+
+// TODO: replace with the logged-in user once Spring Security is in place
 const CURRENT_USER_ID = 1;
 
 function formatDate(isoString: string): string {
@@ -29,6 +30,10 @@ export function TripList() {
             .finally(() => setIsLoading(false));
     }, []);
 
+    function handleTripDeleted(tripId: number) {
+        setTrips((current) => current.filter((trip) => trip.tripId !== tripId));
+    }
+
     if (isLoading) {
         return <p className="text-lg text-[#1d4237]/70">Laddar resor...</p>;
     }
@@ -44,10 +49,7 @@ export function TripList() {
     if (trips.length === 0) {
         return (
             <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-[#9fb0aa] px-6 py-10 text-center">
-                <p className="text-lg text-[#1d4237]">
-                    Du har inga sparade resor än
-                </p>
-
+                <p className="text-lg text-[#1d4237]">Du har inga sparade resor än</p>
                 <Link
                     to="/trips/new"
                     className="rounded-lg bg-[#235e4f] px-6 py-3 text-lg text-white hover:bg-[#1d4237]"
@@ -58,12 +60,6 @@ export function TripList() {
         );
     }
 
-    function handleTripDeleted(tripId: number) {
-    setTrips((currentTrips) =>
-        currentTrips.filter((trip) => trip.tripId !== tripId)
-    );
-}
-
     return (
         <div className="flex flex-col gap-4">
             <h2 className="text-2xl font-bold text-[#1d4237]">Mina resor</h2>
@@ -73,16 +69,14 @@ export function TripList() {
                         key={t.tripId}
                         className="rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f] hover:shadow-sm"
                     >
-                        <p className="text-lg font-semibold text-[#1d4237]">
-                            {t.title}
-                        </p>
+                        <p className="text-lg font-semibold text-[#1d4237]">{t.title}</p>
                         <p className="text-sm text-[#1d4237]/70">
-                            Ändrad {formatDate(t.updatedAt)} · Skapad{" "}
-                            {formatDate(t.createdAt)}
+                            Avresa {formatDate(t.startDate)} · Skapad {formatDate(t.createdAt)}
                         </p>
-                        <DeleteTripButton 
-                            tripId={t.tripId} 
-                            onDeleted={handleTripDeleted} 
+                        <DeleteTripButton
+                            tripId={t.tripId}
+                            title={t.title}
+                            onDeleted={handleTripDeleted}
                         />
                     </li>
                 ))}
