@@ -1,4 +1,6 @@
-import { Link, NavLink } from "react-router";
+import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router";
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
     return isActive
@@ -7,6 +9,9 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
 }
 
 export function NavBar() {
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const [error, setError] = useState("");
     return (
         <header className="border-b border-[#9fb0aa]/50 bg-white">
             <nav className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4">
@@ -21,9 +26,13 @@ export function NavBar() {
                     <NavLink to="/trips/new" className={navLinkClass}>
                         Skapa resa
                     </NavLink>
+                    {user ? <button onClick={() => { logout().then(() => navigate("/")).catch(() => setError("Kunde inte logga ut")); }}>Logga ut ({user.name})</button> : <>
+                    <NavLink to="/login" className={navLinkClass}>Logga in</NavLink>
                     <NavLink to="/register" className={navLinkClass}>
                         Skapa konto
                     </NavLink>
+                    </>}
+                    {error && <p role="alert">{error}</p>}
                 </div>
             </nav>
         </header>
