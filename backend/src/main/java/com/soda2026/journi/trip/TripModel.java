@@ -32,10 +32,6 @@ public class TripModel {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
-
     public TripModel() {
     }
 
@@ -87,12 +83,6 @@ public class TripModel {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
 }

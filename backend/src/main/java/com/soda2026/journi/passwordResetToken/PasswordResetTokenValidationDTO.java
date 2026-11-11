@@ -1,4 +1,4 @@
-package com.soda2026.journi.passwordResetToken;
+ package com.soda2026.journi.passwordResetToken;
 
-public record PasswordResetTokenValidationDTO(boolean valid) {
-}
+ public record PasswordResetTokenValidationDTO(boolean valid) {
+ }

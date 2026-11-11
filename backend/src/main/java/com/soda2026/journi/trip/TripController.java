@@ -1,12 +1,13 @@
 package com.soda2026.journi.trip;
 
-import com.soda2026.journi.trip.dto.CreateTripRequest;
-import com.soda2026.journi.trip.dto.TripResponse;
-import com.soda2026.journi.user.UserService;
-import jakarta.validation.Valid;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+ import com.soda2026.journi.trip.dto.CreateTripRequest;
+ import com.soda2026.journi.trip.dto.TripResponse;
+ import com.soda2026.journi.trip.dto.TripSummaryDTO;
+ import com.soda2026.journi.user.UserService;
+ import jakarta.validation.Valid;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,3 +42,9 @@ public class TripController {
         return ResponseEntity.noContent().build();
     }
 }
+     @GetMapping("/{ownerId}")
+     public ResponseEntity<List<TripSummaryDTO>> findTripsByOwnerId(@PathVariable Long ownerId){
+         return ResponseEntity.ok(tripService.findTripsByOwnerId(ownerId));
+     }
+
+ }
