@@ -32,7 +32,7 @@ export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
     }
     return response.json();
 
-    
+
 }
 
 export async function deleteTrip(id: number): Promise<void> {
@@ -44,3 +44,4 @@ export async function deleteTrip(id: number): Promise<void> {
         throw new Error(`Server error: ${response.status}`);
     }
 }
+export function getMyTrips(): Promise<TripSummary[]> { return api("/trips/mine"); }

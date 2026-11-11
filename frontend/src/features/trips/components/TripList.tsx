@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import type { TripSummary } from "../trips";
-import { getTripsByOwner } from "../TripFetch";
+import { getMyTrips } from "../TripFetch";
 import { Link } from "react-router";
 import { DeleteTripButton } from "./DeleteTripButton";
-
-// TODO: replace with the logged-in user once Spring Security is in place
-const CURRENT_USER_ID = 1;
 
 function formatDate(isoString: string): string {
     return new Date(isoString).toLocaleDateString("sv-SE", {
@@ -21,7 +18,7 @@ export function TripList() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        getTripsByOwner(CURRENT_USER_ID)
+        getMyTrips()
             .then((data) => setTrips(data))
             .catch((err) => {
                 console.error(err);
@@ -49,7 +46,10 @@ export function TripList() {
     if (trips.length === 0) {
         return (
             <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-[#9fb0aa] px-6 py-10 text-center">
-                <p className="text-lg text-[#1d4237]">Du har inga sparade resor än</p>
+                <p className="text-lg text-[#1d4237]">
+                    Du har inga sparade resor än
+                </p>
+
                 <Link
                     to="/trips/new"
                     className="rounded-lg bg-[#235e4f] px-6 py-3 text-lg text-white hover:bg-[#1d4237]"

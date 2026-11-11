@@ -14,6 +14,8 @@
  import org.springframework.web.bind.annotation.RestController;
 
  import java.util.List;
+ import com.soda2026.journi.security.UserPrincipal;
+ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
  @RestController
  @RequestMapping("/api/trips/{tripId}/destinations")
@@ -36,16 +38,10 @@
      @ResponseStatus(HttpStatus.CREATED)
      public TripDestinationResponse createDestination(
              @PathVariable("tripId") @Positive Long tripId,
-             @Valid @RequestBody CreateTripDestinationRequest request
+             @Valid @RequestBody CreateTripDestinationRequest request,
+             @AuthenticationPrincipal UserPrincipal user
      ) {
-         // Временно: пользователь 1, как в создающем поездку TripController Сэма.
-         // TODO после подключения входа:
-         // 1. Добавить java.security.Principal principal в параметры этого метода.
-         // 2. Включить перегрузку с Principal в TripDestinationService (ниже в его файле).
-         // 3. Заменить следующий return на:
-         // return service.createDestination(tripId, request, principal);
-         // ID пользователя не принимать из JSON или URL.
-         return service.createDestination(tripId, request, 1L);
+         return service.createDestination(tripId, request, user.getId());
      }
  }
 
