@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { TripSummary } from "../trips";
 import { getTripsByOwner } from "../TripFetch";
 import { Link } from "react-router";
+import { DeleteTripButton } from "./DeleteTripButton";
 //TODO: ersätt med inloggad användare när spring security är på plats
 const CURRENT_USER_ID = 1;
 
@@ -57,6 +58,12 @@ export function TripList() {
         );
     }
 
+    function handleTripDeleted(tripId: number) {
+    setTrips((currentTrips) =>
+        currentTrips.filter((trip) => trip.tripId !== tripId)
+    );
+}
+
     return (
         <div className="flex flex-col gap-4">
             <h2 className="text-2xl font-bold text-[#1d4237]">Mina resor</h2>
@@ -73,6 +80,10 @@ export function TripList() {
                             Ändrad {formatDate(t.updatedAt)} · Skapad{" "}
                             {formatDate(t.createdAt)}
                         </p>
+                        <DeleteTripButton 
+                            tripId={t.tripId} 
+                            onDeleted={handleTripDeleted} 
+                        />
                     </li>
                 ))}
             </ul>

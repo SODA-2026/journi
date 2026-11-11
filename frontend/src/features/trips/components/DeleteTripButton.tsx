@@ -1,8 +1,8 @@
-import { deleteTrip } from "../api/TripFetch"
+import { deleteTrip } from "../TripFetch";
 
 type DeleteTripButtonProps = {
     tripId: number;
-    onDeleted: () => void;
+    onDeleted: (tripId: number) => void;
 };
 
 export function DeleteTripButton({
@@ -20,7 +20,7 @@ export function DeleteTripButton({
 
         try {
             await deleteTrip(tripId);
-            onDeleted();
+            onDeleted(tripId);
         } catch (error) {
             console.error("Failed to delete trip:", error);
             window.alert("Could not delete the trip.");
@@ -28,7 +28,11 @@ export function DeleteTripButton({
     }
 
   return (
-        <button type="button" onClick={handleDelete}>
+        <button
+            type="button"
+            onClick={handleDelete}
+            className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+        >
             Delete
         </button>
     );

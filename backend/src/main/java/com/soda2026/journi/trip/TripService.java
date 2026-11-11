@@ -64,8 +64,6 @@ package com.soda2026.journi.trip;
 
         tripRepository.delete(trip);
     }
-}
-     }
 
      @Transactional(readOnly = true)
      public List<TripSummaryDTO> findTripsByOwnerId(Long ownerId){
