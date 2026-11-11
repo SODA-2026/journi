@@ -28,7 +28,7 @@ export function DeleteTripButton({ tripId, title, onDeleted }: DeleteTripButtonP
     }
 
     return (
-        <div className="mt-4">
+        <div className="shrink=0">
             <button
                 type="button"
                 onClick={handleDelete}
