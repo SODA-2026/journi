@@ -1,7 +1,6 @@
 package com.soda2026.journi.trip.dto;
 
-import com.soda2026.journi.activity.dto.ActivitySummaryDTO;
-import com.soda2026.journi.note.Dto.NoteSummaryDTO;
+
 import com.soda2026.journi.tripDestination.dto.TripDestinationSummaryDTO;
 
 import java.time.Instant;
@@ -14,7 +13,5 @@ public record TripInfoDTO(
         LocalDate startDate,
         LocalDate endDate,
         Instant createdAt,
-        Instant updatedAt,
-        List<TripDestinationSummaryDTO> destinations,
-        List<ActivitySummaryDTO> activities,
-        List<NoteSummaryDTO> notes) {}
+        List<TripDestinationSummaryDTO> destinations
+        ) {}
