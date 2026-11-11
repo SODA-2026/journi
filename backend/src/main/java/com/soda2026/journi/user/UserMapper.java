@@ -1,22 +1,15 @@
- package com.soda2026.journi.user;
+package com.soda2026.journi.user;
 
- import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component;
 
- @Component
- public class UserMapper {
+@Component
+public class UserMapper {
 
-     public UserResponseDTO toDto(UserModel user){
-         return new UserResponseDTO(
-                 user.getName()
-         );
-     }
-
-     public UserModel toEntity(UserRequestDTO userRequestDTO) {
-         return new UserModel(
-                 userRequestDTO.getEmail(),
-                 userRequestDTO.getName(),
-                 userRequestDTO.getPassword(),
-                 userRequestDTO.getProfileImage()
-                 );
-     }
- }
+    public UserResponseDTO toDto(UserModel user){
+        return new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+    }
+}

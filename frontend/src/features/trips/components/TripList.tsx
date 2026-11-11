@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import type { TripSummary } from "../trips";
-import { getTripsByOwner } from "../TripFetch";
+import { getMyTrips } from "../TripFetch";
 import { Link } from "react-router";
-//TODO: ersätt med inloggad användare när spring security är på plats
-const CURRENT_USER_ID = 1;
 
 function formatDate(isoString: string): string {
     return new Date(isoString).toLocaleDateString("sv-SE", {
@@ -19,7 +17,7 @@ export function TripList() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        getTripsByOwner(CURRENT_USER_ID)
+        getMyTrips()
             .then((data) => setTrips(data))
             .catch((err) => {
                 console.error(err);
