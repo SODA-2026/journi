@@ -23,14 +23,14 @@
      private final TripDestinationService tripDestinationService;
      private final TripDestinationRepository tripDestinationRepository;
      private final TripMapper tripMapper;
-     private final TripDestinationMapper tripDestinationMapper;
 
-     public TripService(TripRepository tripRepository, TripMapper tripMapper, TripDestinationService tripDestinationService, TripDestinationRepository tripDestinationRepository, TripDestinationMapper tripDestinationMapper) {
+
+     public TripService(TripRepository tripRepository, TripMapper tripMapper, TripDestinationService tripDestinationService, TripDestinationRepository tripDestinationRepository) {
          this.tripRepository = tripRepository;
          this.tripMapper = tripMapper;
          this.tripDestinationService = tripDestinationService;
          this.tripDestinationRepository = tripDestinationRepository;
-         this.tripDestinationMapper = tripDestinationMapper;
+
      }
 
      public List<TripResponse> getAll() {
