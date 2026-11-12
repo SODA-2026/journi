@@ -2,14 +2,7 @@ import { useEffect, useState } from "react";
 import type { TripSummary } from "../trips";
 import { getMyTrips } from "../TripFetch";
 import { Link } from "react-router";
-
-function formatDate(isoString: string): string {
-    return new Date(isoString).toLocaleDateString("sv-SE", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
-}
+import { formatDate } from "../../../shared/formatDate";
 
 export function TripList() {
     const [trips, setTrips] = useState<TripSummary[]>([]);
@@ -60,17 +53,19 @@ export function TripList() {
             <h2 className="text-2xl font-bold text-[#1d4237]">Mina resor</h2>
             <ul className="flex flex-col gap-3">
                 {trips.map((t) => (
-                    <li
-                        key={t.tripId}
-                        className="rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f] hover:shadow-sm"
-                    >
-                        <p className="text-lg font-semibold text-[#1d4237]">
-                            {t.title}
-                        </p>
-                        <p className="text-sm text-[#1d4237]/70">
-                            Ändrad {formatDate(t.updatedAt)} · Skapad{" "}
-                            {formatDate(t.createdAt)}
-                        </p>
+                    <li key={t.tripId}>
+                        <Link
+                            to={`/trips/${t.tripId}`}
+                            className="block rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f] hover:shadow-sm"
+                        >
+                            <p className="text-lg font-semibold text-[#1d4237]">
+                                {t.title}
+                            </p>
+                            <p className="text-sm text-[#1d4237]/70">
+                                Ändrad {formatDate(t.updatedAt)} · Skapad{" "}
+                                {formatDate(t.createdAt)}
+                            </p>
+                        </Link>
                     </li>
                 ))}
             </ul>
