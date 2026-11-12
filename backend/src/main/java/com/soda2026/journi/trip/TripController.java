@@ -40,6 +40,12 @@
          return ResponseEntity.ok(tripService.findTripsByOwnerId(user.getId()));
      }
 
+     @DeleteMapping("/{id}")
+     public ResponseEntity<Void> deleteTrip(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal user) {
+         tripService.delete(id, user.getId());
+         return ResponseEntity.noContent().build();
+     }
+
      @GetMapping("/{ownerId}")
      public ResponseEntity<List<TripSummaryDTO>> findTripsByOwnerId(@PathVariable Long ownerId, @AuthenticationPrincipal UserPrincipal user){
          if (!ownerId.equals(user.getId())) {

@@ -33,5 +33,5 @@ export interface TripSummary {
     tripId: number;
     title: string;
     createdAt: string;
-    updatedAt: string;
+    startDate: string;
 }

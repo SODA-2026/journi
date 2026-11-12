@@ -1,4 +1,4 @@
- package com.soda2026.journi.trip;
+package com.soda2026.journi.trip;
 
  import com.soda2026.journi.trip.dto.CreateTripRequest;
  import com.soda2026.journi.trip.dto.TripResponse;
@@ -14,46 +14,56 @@
  @Service
  public class TripService {
 
-     private final TripRepository tripRepository;
-     private final TripMapper tripMapper;
-     private final TripDestinationService tripDestinationService;
+    private final TripRepository tripRepository;
+    private final TripMapper tripMapper;
+    private final TripDestinationService tripDestinationService;
 
-     public TripService(TripRepository tripRepository, TripMapper tripMapper, TripDestinationService tripDestinationService) {
-         this.tripRepository = tripRepository;
-         this.tripMapper = tripMapper;
-         this.tripDestinationService = tripDestinationService;
-     }
+    public TripService(TripRepository tripRepository, TripMapper tripMapper, TripDestinationService tripDestinationService) {
+        this.tripRepository = tripRepository;
+        this.tripMapper = tripMapper;
+        this.tripDestinationService = tripDestinationService;
+    }
 
-     public List<TripResponse> getAll() {
-         return tripRepository.findAll().stream()
-                 .map(tripMapper::toDto)
-                 .toList();
-     }
+    public List<TripResponse> getAll() {
+        return tripRepository.findAll().stream()
+                .map(tripMapper::toDto)
+                .toList();
+    }
 
-     @Transactional
-     public TripResponse createTrip(CreateTripRequest createTripRequest, Long ownerId){
+    @Transactional
+    public TripResponse createTrip(CreateTripRequest createTripRequest, Long ownerId){
 
-         if(createTripRequest.getEndDate().isBefore(createTripRequest.getStartDate())) {
-             throw new ResponseStatusException(
-                     HttpStatus.BAD_REQUEST,
-                     "End date must not be before start date"
-             );
-         }
+        if(createTripRequest.getEndDate().isBefore(createTripRequest.getStartDate())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "End date must not be before start date"
+            );
+        }
 
-         TripModel trip = tripMapper.toEntity(createTripRequest);
-         trip.setOwnerId(ownerId);
+        TripModel trip = tripMapper.toEntity(createTripRequest);
+        trip.setOwnerId(ownerId);
 
-         TripModel savedTrip = tripRepository.save(trip);
+        TripModel savedTrip = tripRepository.save(trip);
 
-         tripDestinationService.createFirstDestination(
-                 savedTrip,
-                 createTripRequest.getCountryId(),
-                 createTripRequest.getCityId()
-         );
+        tripDestinationService.createFirstDestination(
+                savedTrip,
+                createTripRequest.getCountryId(),
+                createTripRequest.getCityId()
+        );
 
-         return tripMapper.toDto(savedTrip);
+        return tripMapper.toDto(savedTrip);
 
-     }
+    }
+
+    public void delete(Long id, Long currentUserId) {
+        TripModel trip = tripRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (!trip.getOwnerId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        tripRepository.delete(trip);
+    }
 
      @Transactional(readOnly = true)
      public List<TripSummaryDTO> findTripsByOwnerId(Long ownerId){

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { TripSummary } from "../trips";
 import { getMyTrips } from "../TripFetch";
 import { Link } from "react-router";
+import { DeleteTripButton } from "./DeleteTripButton";
 
 function formatDate(isoString: string): string {
     return new Date(isoString).toLocaleDateString("sv-SE", {
@@ -25,6 +26,10 @@ export function TripList() {
             })
             .finally(() => setIsLoading(false));
     }, []);
+
+    function handleTripDeleted(tripId: number) {
+        setTrips((current) => current.filter((trip) => trip.tripId !== tripId));
+    }
 
     if (isLoading) {
         return <p className="text-lg text-[#1d4237]/70">Laddar resor...</p>;
@@ -62,15 +67,19 @@ export function TripList() {
                 {trips.map((t) => (
                     <li
                         key={t.tripId}
-                        className="rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f] hover:shadow-sm"
+                        className="flex items-center justify-between gap-4 rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f] hover:shadow-sm"
                     >
-                        <p className="text-lg font-semibold text-[#1d4237]">
-                            {t.title}
-                        </p>
-                        <p className="text-sm text-[#1d4237]/70">
-                            Ändrad {formatDate(t.updatedAt)} · Skapad{" "}
-                            {formatDate(t.createdAt)}
-                        </p>
+                        <div>
+                            <p className="text-lg font-semibold text-[#1d4237]">{t.title}</p>
+                            <p className="text-sm text-[#1d4237]/70">
+                                Avresa {formatDate(t.startDate)} · Skapad {formatDate(t.createdAt)}
+                            </p>
+                        </div>
+                        <DeleteTripButton
+                            tripId={t.tripId}
+                            title={t.title}
+                            onDeleted={handleTripDeleted}
+                        />
                     </li>
                 ))}
             </ul>
