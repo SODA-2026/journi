@@ -35,3 +35,18 @@ export interface TripSummary {
     createdAt: string;
     startDate: string;
 }
+
+export interface TripDestination {
+    id: number;
+    city: string;
+    country: string;
+}
+
+export interface TripInfoType {
+    id: number;
+    title: string;
+    startDate: string;
+    endDate: string;
+    createdAt: string;
+    destinations: TripDestination[];
+}

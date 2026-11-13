@@ -1,9 +1,16 @@
 import { api } from "../../api/ApiClient";
 import type {
     CreateTripRequest,
+    TripInfoType,
     TripResponse,
     TripSummary,
 } from "./trips";
+
+
+export function getTripInfo(tripId: number): Promise<TripInfoType> {
+    return api(`/trips/mine/${tripId}`);
+}
+  
 const apiUrl = "http://localhost:8080/trips";
 
 export function createTrip(data: CreateTripRequest): Promise<TripResponse> {

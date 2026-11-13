@@ -2,15 +2,10 @@ import { useEffect, useState } from "react";
 import type { TripSummary } from "../trips";
 import { getMyTrips } from "../TripFetch";
 import { Link } from "react-router";
+import { formatDate } from "../../../shared/formatDate";
 import { DeleteTripButton } from "./DeleteTripButton";
 
-function formatDate(isoString: string): string {
-    return new Date(isoString).toLocaleDateString("sv-SE", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
-}
+
 
 export function TripList() {
     const [trips, setTrips] = useState<TripSummary[]>([]);
@@ -67,19 +62,27 @@ export function TripList() {
                 {trips.map((t) => (
                     <li
                         key={t.tripId}
-                        className="flex items-center justify-between gap-4 rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f] hover:shadow-sm"
-                    >
-                        <div>
-                            <p className="text-lg font-semibold text-[#1d4237]">{t.title}</p>
-                            <p className="text-sm text-[#1d4237]/70">
+                        className="relative flex items-center justify-between gap-4 rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f]"
+                     >
+                            <div>
+                              <Link
+                                to={`/trips/${t.tripId}`}
+                                className="text-lg font-semibold text-[#1d4237] after:absolute after:inset-0"
+                              >        
+                                {t.title}
+                              </Link>
+                              <p className="text-sm text-[#1d4237]/70">
                                 Avresa {formatDate(t.startDate)} · Skapad {formatDate(t.createdAt)}
-                            </p>
-                        </div>
-                        <DeleteTripButton
-                            tripId={t.tripId}
-                            title={t.title}
-                            onDeleted={handleTripDeleted}
-                        />
+                              </p>
+                            </div>
+
+                            <div className="relative z-10">
+                              <DeleteTripButton
+                                tripId={t.tripId}
+                                title={t.title}
+                                onDeleted={handleTripDeleted}
+                              />
+                            </div>      
                     </li>
                 ))}
             </ul>
