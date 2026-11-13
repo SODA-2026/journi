@@ -1,8 +1,8 @@
  package com.soda2026.journi.tripMember;
 
  public enum TripMemberRole {
-     EDITOR,
-     VIEWER
+     OWNER,
+     MEMBER
  }
 
  /*

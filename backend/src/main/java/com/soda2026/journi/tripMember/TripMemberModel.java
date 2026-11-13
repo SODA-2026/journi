@@ -26,7 +26,7 @@ public class TripMemberModel {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private TripMemberRole role = TripMemberRole.EDITOR;
+    private TripMemberRole role = TripMemberRole.MEMBER;
 
     @Column(name = "joined_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime joinedAt;

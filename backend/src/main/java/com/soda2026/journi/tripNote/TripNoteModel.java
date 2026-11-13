@@ -1,14 +1,16 @@
-package com.soda2026.journi.note;
+package com.soda2026.journi.tripNote;
 
 import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.user.UserModel;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "trip_notes")
-public class NoteModel {
+public class TripNoteModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,17 +27,19 @@ public class NoteModel {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
 
-    public NoteModel() {
+    public TripNoteModel() {
     }
 
-    public NoteModel(TripModel trip, UserModel author, String content) {
+    public TripNoteModel(TripModel trip, UserModel author, String content) {
         this.trip = trip;
         this.author = author;
         this.content = content;

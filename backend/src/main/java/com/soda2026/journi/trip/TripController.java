@@ -18,16 +18,9 @@
  public class TripController {
 
      private final TripService tripService;
-     private final UserService userService;
 
-     public TripController(TripService tripService, UserService userService) {
+     public TripController(TripService tripService) {
          this.tripService = tripService;
-         this.userService = userService;
-     }
-
-     @GetMapping
-     public ResponseEntity<List<TripSummaryDTO>> getAll(@AuthenticationPrincipal UserPrincipal user) {
-         return ResponseEntity.ok(tripService.findTripsByOwnerId(user.getId()));
      }
 
      @PostMapping("/create")
@@ -44,14 +37,6 @@
      public ResponseEntity<Void> deleteTrip(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal user) {
          tripService.delete(id, user.getId());
          return ResponseEntity.noContent().build();
-     }
-
-     @GetMapping("/{ownerId}")
-     public ResponseEntity<List<TripSummaryDTO>> findTripsByOwnerId(@PathVariable Long ownerId, @AuthenticationPrincipal UserPrincipal user){
-         if (!ownerId.equals(user.getId())) {
-             throw new org.springframework.web.server.ResponseStatusException(HttpStatus.FORBIDDEN);
-         }
-         return ResponseEntity.ok(tripService.findTripsByOwnerId(ownerId));
      }
 
  }

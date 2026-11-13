@@ -51,7 +51,7 @@ class TripDestinationAccessTest {
     void rejectsViewer() {
         TripModel trip = stubTripAndUser();
         when(entityManager.find(TripMemberModel.class, new TripMemberId(10L, 7L)))
-                .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.VIEWER));
+                .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.MEMBER));
         assertStatus(HttpStatus.FORBIDDEN, userId);
         verifyNoInteractions(repository);
     }
@@ -74,7 +74,7 @@ class TripDestinationAccessTest {
     void rejectsEditorUnderCurrentOwnerOnlyPolicy() {
         TripModel trip = stubTripAndUser();
         when(entityManager.find(TripMemberModel.class, new TripMemberId(10L, 7L)))
-                .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.EDITOR));
+                .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.OWNER));
         assertStatus(HttpStatus.FORBIDDEN, userId);
         verifyNoInteractions(repository);
     }
