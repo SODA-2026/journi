@@ -1,6 +1,7 @@
  package com.soda2026.journi.trip;
 
  import com.soda2026.journi.trip.dto.CreateTripRequest;
+ import com.soda2026.journi.trip.dto.TripInfoDTO;
  import com.soda2026.journi.trip.dto.TripResponse;
  import com.soda2026.journi.trip.dto.TripSummaryDTO;
  import com.soda2026.journi.user.UserService;
@@ -52,6 +53,11 @@
              throw new org.springframework.web.server.ResponseStatusException(HttpStatus.FORBIDDEN);
          }
          return ResponseEntity.ok(tripService.findTripsByOwnerId(ownerId));
+     }
+
+     @GetMapping("/mine/{tripId}")
+     public ResponseEntity<TripInfoDTO> getTripInfo(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long tripId){
+         return ResponseEntity.ok(tripService.getTripInfo(tripId, user.getId()));
      }
 
  }

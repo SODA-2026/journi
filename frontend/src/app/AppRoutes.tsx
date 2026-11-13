@@ -5,6 +5,7 @@ import { HomePage } from "./HomePage";
 import { CreateTripPage } from "../pages/CreateTripPage";
 import { MyTripsPage } from "../pages/MyTripsPage";
 import { CreateAccountPage } from "../features/users/RegisterPage";
+import { TripDetailsPage } from "../pages/TripDetailsPage";
 
 function Protected() {
     const { user, loading, error } = useAuth();
@@ -17,17 +18,15 @@ export function AppRoutes() {
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route element={<Protected />}>
-            <Route
-                path="/trips/new"
-                element={<CreateTripPage />}
-            />
-            <Route path="/trips" element={<MyTripsPage />} />
+                <Route path="/trips/new" element={<CreateTripPage />} />
+                <Route path="/trips" element={<MyTripsPage />} />
             </Route>
             <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<CreateAccountPage />} />
             <Route
-                path="/register"
-                element={<CreateAccountPage />}
-            />
+                path="/trips/:id"
+                element={<TripDetailsPage></TripDetailsPage>}
+            ></Route>
         </Routes>
     );
 }
