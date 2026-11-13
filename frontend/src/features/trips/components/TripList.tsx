@@ -66,7 +66,7 @@ export function TripList() {
                      >
                             <div>
                               <Link
-                                to={/trips/${t.tripId}}
+                                to={`/trips/${t.tripId}`}
                                 className="text-lg font-semibold text-[#1d4237] after:absolute after:inset-0"
                               >        
                                 {t.title}
