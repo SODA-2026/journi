@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 class TripDestinationServiceTest {
     private final TripDestinationRepository repository = mock(TripDestinationRepository.class);
     private final EntityManager entityManager = mock(EntityManager.class);
-    private final TripDestinationService service = new TripDestinationService(repository, entityManager, new TripDestinationMapper());
+    private final TripDestinationService service = new TripDestinationService(repository, entityManager, new TripDestinationMapper(), mock(com.soda2026.journi.trip.TripAccessService.class));
 
     @Test void rejectsCityFromAnotherCountry() {
         TripModel trip = trip();
