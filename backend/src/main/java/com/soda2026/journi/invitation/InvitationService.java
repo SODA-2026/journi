@@ -14,6 +14,7 @@ import com.soda2026.journi.user.UserModel;
 import com.soda2026.journi.user.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,15 +51,17 @@ public class InvitationService {
         this.tripDestinationRepository = tripDestinationRepository;
     }
 
-    @Transactional
-    public InvitationResponseDto invite(InvitationRequestDto request, Long userId) {
-        tripAccessService.requireTripOwner(request.tripId(), userId);
+    // After waiting for the trip lock, duplicate checks must see the latest committed invitations.
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public InvitationResponseDto sendInvitation(InvitationRequestDto invitationRequest, Long userId) {
+        tripAccessService.requireTripOwner(invitationRequest.tripId(), userId);
 
         // Serialize invitations for a trip, including duplicate requests from different tabs.
-        TripModel trip = tripRepository.findForUpdate(request.tripId())
+        TripModel trip = tripRepository.findForUpdate(invitationRequest.tripId())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Trip not found"));
-        UserModel invitee = userRepository.findByEmail(request.email().trim())
+
+        UserModel invitee = userRepository.findByEmail(invitationRequest.email().trim())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Registered user not found"));
 
@@ -75,10 +78,11 @@ public class InvitationService {
                 .orElse(null);
 
         if (invitation != null) {
-            if (invitation.getStatus() != InvitationStatus.DECLINED) {
+            if (invitation.getStatus() == InvitationStatus.PENDING) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already been invited");
             }
 
+            // No membership exists; the renewed invitation must be accepted before access is granted.
             invitation.setStatus(InvitationStatus.PENDING);
             invitation.setRespondedAt(null);
         } else {
@@ -92,7 +96,7 @@ public class InvitationService {
         return toDto(savedInvitation);
     }
 
-    public List<InvitationResponseDto> incoming(Long userId) {
+    public List<InvitationResponseDto> getIncomingInvitations(Long userId) {
         return invitationRepository
                 .findAllByInvitee_IdAndStatusOrderByCreatedAtDesc(userId, InvitationStatus.PENDING)
                 .stream()
@@ -101,7 +105,7 @@ public class InvitationService {
     }
 
     @Transactional
-    public InvitationResponseDto respond(Long invitationId, Long userId, boolean accept) {
+    public InvitationResponseDto respondToInvitation(Long invitationId, Long userId, boolean accept) {
         InvitationModel invitation = invitationRepository.findForUpdate(invitationId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Invitation not found"));
@@ -129,7 +133,8 @@ public class InvitationService {
 
     private InvitationResponseDto toDto(InvitationModel invitation) {
         Long tripId = invitation.getTrip().getId();
-        List<TripDestinationModel> destinations = tripDestinationRepository.findAllByTrip_IdOrderByOrderIndexAsc(tripId);
+        List<TripDestinationModel> destinations = tripDestinationRepository
+                .findAllByTrip_IdOrderByOrderIndexAsc(tripId);
         return invitationMapper.toDto(invitation, destinations);
     }
 }

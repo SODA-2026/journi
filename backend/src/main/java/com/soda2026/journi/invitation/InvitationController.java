@@ -28,16 +28,16 @@ public class InvitationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public InvitationResponseDto invite(
-            @Valid @RequestBody InvitationRequestDto request,
+    public InvitationResponseDto sendInvitation(
+            @Valid @RequestBody InvitationRequestDto invitationRequest,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        return invitationService.invite(request, user.getId());
+        return invitationService.sendInvitation(invitationRequest, user.getId());
     }
 
     @GetMapping("/mine")
-    public List<InvitationResponseDto> incoming(@AuthenticationPrincipal UserPrincipal user) {
-        return invitationService.incoming(user.getId());
+    public List<InvitationResponseDto> getIncomingInvitations(@AuthenticationPrincipal UserPrincipal user) {
+        return invitationService.getIncomingInvitations(user.getId());
     }
 
     @PostMapping("/{id}/accept")
@@ -45,7 +45,7 @@ public class InvitationController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        return invitationService.respond(id, user.getId(), true);
+        return invitationService.respondToInvitation(id, user.getId(), true);
     }
 
     @PostMapping("/{id}/decline")
@@ -53,6 +53,6 @@ public class InvitationController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        return invitationService.respond(id, user.getId(), false);
+        return invitationService.respondToInvitation(id, user.getId(), false);
     }
 }

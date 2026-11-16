@@ -1,55 +1,93 @@
 package com.soda2026.journi.invitation;
 
 import com.soda2026.journi.invitation.Dto.InvitationRequestDto;
-import com.soda2026.journi.trip.*;
-import com.soda2026.journi.tripDestination.*;
-import com.soda2026.journi.tripMember.*;
-import com.soda2026.journi.user.*;
+import com.soda2026.journi.trip.TripAccessService;
+import com.soda2026.journi.trip.TripModel;
+import com.soda2026.journi.trip.TripRepository;
+import com.soda2026.journi.tripDestination.TripDestinationMapper;
+import com.soda2026.journi.tripDestination.TripDestinationModel;
+import com.soda2026.journi.tripDestination.TripDestinationRepository;
+import com.soda2026.journi.tripMember.TripMemberId;
+import com.soda2026.journi.tripMember.TripMemberRepository;
+import com.soda2026.journi.user.UserModel;
+import com.soda2026.journi.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 class InvitationServiceTest {
-    final InvitationRepository invitations = mock(InvitationRepository.class);
-    final TripRepository trips = mock(TripRepository.class);
-    final UserRepository users = mock(UserRepository.class);
-    final TripMemberRepository members = mock(TripMemberRepository.class);
-    final TripDestinationRepository destinations = mock(TripDestinationRepository.class);
-    final TripAccessService access = new TripAccessService(trips, members);
-    final InvitationService service = new InvitationService(invitations, new InvitationMapper(new TripDestinationMapper()), trips, users, members, access, destinations);
-    final TripModel trip = new TripModel();
-    final UserModel owner = new UserModel("owner@example.com", "Owner", "hash", null);
-    final UserModel recipient = new UserModel("guest@example.com", "Guest", "hash", null);
-    InvitationModel invitation;
 
-    @BeforeEach void setup() {
-        trip.setId(10L); trip.setOwnerId(1L); trip.setTitle("Paris");
-        owner.setId(1L); recipient.setId(2L);
+    private final InvitationRepository invitationRepository = mock(InvitationRepository.class);
+    private final TripRepository tripRepository = mock(TripRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final TripMemberRepository tripMemberRepository = mock(TripMemberRepository.class);
+    private final TripDestinationRepository tripDestinationRepository = mock(TripDestinationRepository.class);
+    private final TripAccessService tripAccessService = new TripAccessService(tripRepository, tripMemberRepository);
+    private final InvitationService invitationService = new InvitationService(
+            invitationRepository,
+            new InvitationMapper(new TripDestinationMapper()),
+            tripRepository,
+            userRepository,
+            tripMemberRepository,
+            tripAccessService,
+            tripDestinationRepository
+    );
+    private final TripModel trip = new TripModel();
+    private final UserModel owner = new UserModel("owner@example.com", "Owner", "hash", null);
+    private final UserModel recipient = new UserModel("guest@example.com", "Guest", "hash", null);
+    private InvitationModel invitation;
+
+    @BeforeEach
+    void setup() {
+        trip.setId(10L);
+        trip.setOwnerId(1L);
+        trip.setTitle("Paris");
+        owner.setId(1L);
+        recipient.setId(2L);
         invitation = new InvitationModel(trip, owner, recipient);
-        when(trips.findById(10L)).thenReturn(Optional.of(trip));
-        when(trips.findForUpdate(10L)).thenReturn(Optional.of(trip));
-        when(users.findById(1L)).thenReturn(Optional.of(owner));
-        when(users.findByEmail("guest@example.com")).thenReturn(Optional.of(recipient));
-        when(invitations.save(any())).thenAnswer(call -> call.getArgument(0));
-        when(invitations.findForUpdate(20L)).thenReturn(Optional.of(invitation));
+
+        when(tripRepository.findById(10L)).thenReturn(Optional.of(trip));
+        when(tripRepository.findForUpdate(10L)).thenReturn(Optional.of(trip));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
+        when(userRepository.findByEmail("guest@example.com")).thenReturn(Optional.of(recipient));
+        when(invitationRepository.save(any())).thenAnswer(call -> call.getArgument(0));
+        when(invitationRepository.findForUpdate(20L)).thenReturn(Optional.of(invitation));
     }
 
-    @Test void incomingIncludesTripPreviewBeforeAcceptanceWithoutGrantingAccess() {
-        trip.setStartDate(java.time.LocalDate.of(2026, 12, 1));
-        trip.setEndDate(java.time.LocalDate.of(2026, 12, 5));
+    @Test
+    void incomingIncludesTripPreviewBeforeAcceptanceWithoutGrantingAccess() {
+        trip.setStartDate(LocalDate.of(2026, 12, 1));
+        trip.setEndDate(LocalDate.of(2026, 12, 5));
         TripDestinationModel destination = mock(TripDestinationModel.class, RETURNS_DEEP_STUBS);
         when(destination.getId()).thenReturn(30L);
         when(destination.getCity().getName()).thenReturn("Paris");
         when(destination.getCity().getCountry().getName()).thenReturn("France");
-        when(destinations.findAllByTrip_IdOrderByOrderIndexAsc(10L)).thenReturn(java.util.List.of(destination));
-        when(invitations.findAllByInvitee_IdAndStatusOrderByCreatedAtDesc(2L, InvitationStatus.PENDING))
-                .thenReturn(java.util.List.of(invitation));
+        when(tripDestinationRepository.findAllByTrip_IdOrderByOrderIndexAsc(10L)).thenReturn(List.of(destination));
+        when(invitationRepository.findAllByInvitee_IdAndStatusOrderByCreatedAtDesc(2L, InvitationStatus.PENDING))
+                .thenReturn(List.of(invitation));
 
-        var preview = service.incoming(2L).getFirst();
+        var preview = invitationService.getIncomingInvitations(2L).getFirst();
 
         assertEquals("Paris", preview.tripTitle());
         assertEquals(trip.getStartDate(), preview.startDate());
@@ -57,78 +95,118 @@ class InvitationServiceTest {
         assertEquals("Paris", preview.destinations().getFirst().city());
         assertEquals("France", preview.destinations().getFirst().country());
         assertEquals(InvitationStatus.PENDING, preview.status());
-        verify(members, never()).save(any());
-        status(HttpStatus.FORBIDDEN, () -> access.requireTripOwnerOrMember(10L, 2L));
+        verify(tripMemberRepository, never()).save(any());
+        assertStatus(HttpStatus.FORBIDDEN,
+                () -> tripAccessService.requireTripOwnerOrMember(10L, 2L));
     }
 
-    @Test void ownerInvitesRegisteredUserWithoutGrantingAccess() {
-        var result = service.invite(new InvitationRequestDto(10L, " guest@example.com "), 1L);
+    @Test
+    void ownerInvitesRegisteredUserWithoutGrantingAccess() {
+        var result = invitationService.sendInvitation(new InvitationRequestDto(10L, " guest@example.com "), 1L);
+
         assertEquals(InvitationStatus.PENDING, result.status());
         assertEquals("Paris", result.tripTitle());
-        verify(members, never()).save(any());
+        verify(tripMemberRepository, never()).save(any());
     }
 
-    @Test void memberCannotInvite() {
-        status(HttpStatus.FORBIDDEN, () -> service.invite(new InvitationRequestDto(10L, "guest@example.com"), 2L));
-        verifyNoInteractions(invitations, users);
+    @Test
+    void memberCannotInvite() {
+        assertStatus(HttpStatus.FORBIDDEN,
+                () -> invitationService.sendInvitation(new InvitationRequestDto(10L, "guest@example.com"), 2L));
+        verifyNoInteractions(invitationRepository, userRepository);
     }
 
-    @Test void cannotInviteSelfOrExistingMember() {
-        when(users.findByEmail("owner@example.com")).thenReturn(Optional.of(owner));
-        status(HttpStatus.BAD_REQUEST, () -> service.invite(new InvitationRequestDto(10L, "owner@example.com"), 1L));
-        when(members.existsById(new TripMemberId(10L, 2L))).thenReturn(true);
-        status(HttpStatus.CONFLICT, () -> service.invite(new InvitationRequestDto(10L, "guest@example.com"), 1L));
-        verify(invitations, never()).save(any());
+    @Test
+    void cannotInviteSelfOrExistingMember() {
+        when(userRepository.findByEmail("owner@example.com")).thenReturn(Optional.of(owner));
+        assertStatus(HttpStatus.BAD_REQUEST,
+                () -> invitationService.sendInvitation(new InvitationRequestDto(10L, "owner@example.com"), 1L));
+        when(tripMemberRepository.existsById(new TripMemberId(10L, 2L))).thenReturn(true);
+        assertStatus(HttpStatus.CONFLICT,
+                () -> invitationService.sendInvitation(new InvitationRequestDto(10L, "guest@example.com"), 1L));
+        verify(invitationRepository, never()).save(any());
     }
 
-    @Test void unknownEmailReturnsNotFound() {
-        status(HttpStatus.NOT_FOUND, () -> service.invite(new InvitationRequestDto(10L, "unknown@example.com"), 1L));
+    @Test
+    void unknownEmailReturnsNotFound() {
+        assertStatus(HttpStatus.NOT_FOUND,
+                () -> invitationService.sendInvitation(new InvitationRequestDto(10L, "unknown@example.com"), 1L));
     }
 
-    @Test void pendingInvitationCannotBeDuplicated() {
-        when(invitations.findByTrip_IdAndInvitee_Id(10L, 2L)).thenReturn(Optional.of(invitation));
-        status(HttpStatus.CONFLICT, () -> service.invite(new InvitationRequestDto(10L, "guest@example.com"), 1L));
+    @Test
+    void pendingInvitationCannotBeDuplicated() {
+        when(invitationRepository.findByTrip_IdAndInvitee_Id(10L, 2L)).thenReturn(Optional.of(invitation));
+        assertStatus(HttpStatus.CONFLICT,
+                () -> invitationService.sendInvitation(new InvitationRequestDto(10L, "guest@example.com"), 1L));
     }
 
-    @Test void declinedInvitationCanBeSentAgain() {
+    @Test
+    void declinedInvitationCanBeSentAgain() {
         invitation.setStatus(InvitationStatus.DECLINED);
-        invitation.setRespondedAt(java.time.LocalDateTime.now());
-        when(invitations.findByTrip_IdAndInvitee_Id(10L, 2L)).thenReturn(Optional.of(invitation));
-        var result = service.invite(new InvitationRequestDto(10L, "guest@example.com"), 1L);
+        invitation.setRespondedAt(LocalDateTime.now());
+        when(invitationRepository.findByTrip_IdAndInvitee_Id(10L, 2L)).thenReturn(Optional.of(invitation));
+        var result = invitationService.sendInvitation(new InvitationRequestDto(10L, "guest@example.com"), 1L);
+
         assertEquals(InvitationStatus.PENDING, result.status());
         assertNull(result.respondedAt());
     }
 
-    @Test void acceptingGrantsTripAccessAndCannotBeRepeated() {
-        service.respond(20L, 2L, true);
-        verify(members).save(argThat(member -> member.getId().equals(new TripMemberId(10L, 2L))));
+    @Test
+    void removedMemberCanBeInvitedAgainButMustAcceptAgain() {
+        invitation.setStatus(InvitationStatus.ACCEPTED);
+        invitation.setRespondedAt(LocalDateTime.now());
+        when(invitationRepository.findByTrip_IdAndInvitee_Id(10L, 2L)).thenReturn(Optional.of(invitation));
+
+        var result = invitationService.sendInvitation(new InvitationRequestDto(10L, "guest@example.com"), 1L);
+
+        assertEquals(InvitationStatus.PENDING, result.status());
+        assertNull(result.respondedAt());
+        verify(tripMemberRepository, never()).save(any());
+        assertStatus(HttpStatus.FORBIDDEN,
+                () -> tripAccessService.requireTripOwnerOrMember(10L, 2L));
+    }
+
+    @Test
+    void acceptingGrantsTripAccessAndCannotBeRepeated() {
+        invitationService.respondToInvitation(20L, 2L, true);
+        verify(tripMemberRepository).save(argThat(member ->
+                member.getId().equals(new TripMemberId(10L, 2L))));
         assertEquals(InvitationStatus.ACCEPTED, invitation.getStatus());
         assertNotNull(invitation.getRespondedAt());
-        when(members.existsById(new TripMemberId(10L, 2L))).thenReturn(true);
-        assertDoesNotThrow(() -> access.requireTripOwnerOrMember(10L, 2L));
-        status(HttpStatus.CONFLICT, () -> service.respond(20L, 2L, true));
-        verify(members, times(1)).save(any());
+        when(tripMemberRepository.existsById(new TripMemberId(10L, 2L))).thenReturn(true);
+        assertDoesNotThrow(() -> tripAccessService.requireTripOwnerOrMember(10L, 2L));
+        assertStatus(HttpStatus.CONFLICT,
+                () -> invitationService.respondToInvitation(20L, 2L, true));
+        verify(tripMemberRepository, times(1)).save(any());
     }
 
-    @Test void decliningDoesNotGrantAccess() {
-        service.respond(20L, 2L, false);
+    @Test
+    void decliningDoesNotGrantAccess() {
+        invitationService.respondToInvitation(20L, 2L, false);
         assertEquals(InvitationStatus.DECLINED, invitation.getStatus());
-        verify(members, never()).save(any());
-        status(HttpStatus.FORBIDDEN, () -> access.requireTripOwnerOrMember(10L, 2L));
+        verify(tripMemberRepository, never()).save(any());
+        assertStatus(HttpStatus.FORBIDDEN,
+                () -> tripAccessService.requireTripOwnerOrMember(10L, 2L));
     }
 
-    @Test void otherUsersCannotAnswerEvenIfTheyOwnTheTrip() {
-        status(HttpStatus.FORBIDDEN, () -> service.respond(20L, 1L, true));
-        status(HttpStatus.FORBIDDEN, () -> service.respond(20L, 3L, false));
+    @Test
+    void otherUsersCannotAnswerEvenIfTheyOwnTheTrip() {
+        assertStatus(HttpStatus.FORBIDDEN,
+                () -> invitationService.respondToInvitation(20L, 1L, true));
+        assertStatus(HttpStatus.FORBIDDEN,
+                () -> invitationService.respondToInvitation(20L, 3L, false));
         assertEquals(InvitationStatus.PENDING, invitation.getStatus());
-        verifyNoInteractions(members);
+        verifyNoInteractions(tripMemberRepository);
     }
 
-    @Test void missingInvitationReturnsNotFound() {
-        status(HttpStatus.NOT_FOUND, () -> service.respond(99L, 2L, true));
+    @Test
+    void missingInvitationReturnsNotFound() {
+        assertStatus(HttpStatus.NOT_FOUND,
+                () -> invitationService.respondToInvitation(99L, 2L, true));
     }
 
-    private void status(HttpStatus expected, Runnable action) {
-        assertEquals(expected, assertThrows(ResponseStatusException.class, action::run).getStatusCode());
+    private void assertStatus(HttpStatus expected, Runnable action) {
+        ResponseStatusException error = assertThrows(ResponseStatusException.class, action::run);
+        assertEquals(expected, error.getStatusCode());
     }
 }

@@ -175,21 +175,21 @@ class AuthIntegrationTest {
                 .user(new com.soda2026.journi.security.UserPrincipal(model));
         mvc.perform(get("/invitations/mine")).andExpect(status().isUnauthorized());
         mvc.perform(get("/invitations/mine").with(user)).andExpect(status().isOk());
-        verify(invitations).incoming(42L);
+        verify(invitations).getIncomingInvitations(42L);
         mvc.perform(post("/invitations").with(user).contentType("application/json")
                 .content("{\"tripId\":10,\"email\":\"guest@example.com\"}"))
                 .andExpect(status().isForbidden());
         mvc.perform(post("/invitations").with(user).with(csrf()).contentType("application/json")
                 .content("{\"tripId\":10,\"email\":\"guest@example.com\",\"inviterId\":7}"))
                 .andExpect(status().isCreated());
-        verify(invitations).invite(any(), eq(42L));
+        verify(invitations).sendInvitation(any(), eq(42L));
         mvc.perform(post("/invitations").with(user).with(csrf()).contentType("application/json")
                 .content("{\"tripId\":10,\"email\":\"invalid\"}"))
                 .andExpect(status().isBadRequest());
         mvc.perform(post("/invitations/20/accept").with(user).with(csrf())).andExpect(status().isOk());
-        verify(invitations).respond(20L, 42L, true);
+        verify(invitations).respondToInvitation(20L, 42L, true);
         mvc.perform(post("/invitations/21/decline").with(user).with(csrf())).andExpect(status().isOk());
-        verify(invitations).respond(21L, 42L, false);
+        verify(invitations).respondToInvitation(21L, 42L, false);
     }
 
     @Test void issuesCsrfTokenAndRejectsAnonymousRequests() throws Exception {
