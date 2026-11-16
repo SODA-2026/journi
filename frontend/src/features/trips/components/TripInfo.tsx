@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import type { TripInfoType } from "../trips";
 import { getTripInfo } from "../TripFetch";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
-import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
+import { useAuth } from "../../../context/AuthContext";
+import { InviteUserForm } from "../../invitations/InviteUserForm";
 
 export function TripInfo() {
+    const { user } = useAuth();
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
 
-    let params = useParams();
+    const params = useParams();
     const tripId = Number(params.id);
 
     useEffect(() => {
@@ -41,6 +43,15 @@ export function TripInfo() {
         <div>
             <Link to={"/trips"}>Tillbaka</Link>
             <h2>{trip.title}</h2>
+            <p className="mt-1 font-medium text-[#235e4f]">
+                {user?.id === trip.ownerId
+                    ? "Du är skapare"
+                    : "Du är inbjuden deltagare"}
+            </p>
+            <p>Skapare: {trip.ownerName}</p>
+            {user?.id === trip.ownerId && (
+                <InviteUserForm key={trip.id} tripId={trip.id} />
+            )}
             <section>
                 <p>Destinationer</p>
                 <ul>

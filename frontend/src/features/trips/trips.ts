@@ -30,6 +30,8 @@ export interface TripFormErrors {
 }
 
 export interface TripSummary {
+    ownerId: number;
+    ownerName: string;
     tripId: number;
     title: string;
     createdAt: string;
@@ -43,6 +45,8 @@ export interface TripDestination {
 }
 
 export interface TripInfoType {
+    ownerId: number;
+    ownerName: string;
     id: number;
     title: string;
     startDate: string;

@@ -28,7 +28,7 @@
 
      @GetMapping
      public ResponseEntity<List<TripSummaryDTO>> getAll(@AuthenticationPrincipal UserPrincipal user) {
-         return ResponseEntity.ok(tripService.findTripsByOwnerId(user.getId()));
+         return ResponseEntity.ok(tripService.findMyTrips(user.getId()));
      }
 
      @PostMapping("/create")
@@ -38,7 +38,7 @@
 
      @GetMapping("/mine")
      public ResponseEntity<List<TripSummaryDTO>> myTrips(@AuthenticationPrincipal UserPrincipal user) {
-         return ResponseEntity.ok(tripService.findTripsByOwnerId(user.getId()));
+         return ResponseEntity.ok(tripService.findMyTrips(user.getId()));
      }
 
      @DeleteMapping("/{id}")

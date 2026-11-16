@@ -4,10 +4,10 @@ import { getMyTrips } from "../TripFetch";
 import { Link } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { DeleteTripButton } from "./DeleteTripButton";
-
-
+import { useAuth } from "../../../context/AuthContext";
 
 export function TripList() {
+    const { user } = useAuth();
     const [trips, setTrips] = useState<TripSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -59,30 +59,40 @@ export function TripList() {
         <div className="flex flex-col gap-4">
             <h2 className="text-2xl font-bold text-[#1d4237]">Mina resor</h2>
             <ul className="flex flex-col gap-3">
-                {trips.map((t) => (
+                {trips.map((trip) => (
                     <li
-                        key={t.tripId}
+                        key={trip.tripId}
                         className="relative flex items-center justify-between gap-4 rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f]"
-                     >
-                            <div>
-                              <Link
-                                to={`/trips/${t.tripId}`}
+                    >
+                        <div>
+                            <Link
+                                to={`/trips/${trip.tripId}`}
                                 className="text-lg font-semibold text-[#1d4237] after:absolute after:inset-0"
-                              >        
-                                {t.title}
-                              </Link>
-                              <p className="text-sm text-[#1d4237]/70">
-                                Avresa {formatDate(t.startDate)} · Skapad {formatDate(t.createdAt)}
-                              </p>
-                            </div>
+                            >
+                                {trip.title}
+                            </Link>
+                            <p className="mt-1 text-sm font-medium text-[#235e4f]">
+                                {user?.id === trip.ownerId
+                                    ? "Du är skapare"
+                                    : "Du är inbjuden deltagare"}
+                            </p>
+                            <p className="text-sm text-[#1d4237]/70">
+                                Skapare: {trip.ownerName}
+                            </p>
+                            <p className="text-sm text-[#1d4237]/70">
+                                Avresa {formatDate(trip.startDate)} · Skapad {formatDate(trip.createdAt)}
+                            </p>
+                        </div>
 
+                        {user?.id === trip.ownerId && (
                             <div className="relative z-10">
-                              <DeleteTripButton
-                                tripId={t.tripId}
-                                title={t.title}
-                                onDeleted={handleTripDeleted}
-                              />
-                            </div>      
+                                <DeleteTripButton
+                                    tripId={trip.tripId}
+                                    title={trip.title}
+                                    onDeleted={handleTripDeleted}
+                                />
+                            </div>
+                        )}
                     </li>
                 ))}
             </ul>

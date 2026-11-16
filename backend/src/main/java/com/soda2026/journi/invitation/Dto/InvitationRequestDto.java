@@ -1,36 +1,11 @@
- package com.soda2026.journi.invitation.Dto;
+package com.soda2026.journi.invitation.Dto;
 
- import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
- public class InvitationRequestDto {
-     @NotNull private Long tripId;
-     @NotNull private Long inviterId;
-     @NotNull private Long inviteeId;
-
-     public InvitationRequestDto() {
-     }
-
-     public Long getTripId() {
-         return tripId;
-     }
-
-     public void setTripId(Long tripId) {
-         this.tripId = tripId;
-     }
-
-     public Long getInviterId() {
-         return inviterId;
-     }
-
-     public void setInviterId(Long inviterId) {
-         this.inviterId = inviterId;
-     }
-
-     public Long getInviteeId() {
-         return inviteeId;
-     }
-
-     public void setInviteeId(Long inviteeId) {
-         this.inviteeId = inviteeId;
-     }
- }
+public record InvitationRequestDto(
+        @NotNull @Positive Long tripId,
+        @NotBlank @Email String email
+) {}

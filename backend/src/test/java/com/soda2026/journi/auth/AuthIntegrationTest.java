@@ -31,22 +31,25 @@ class AuthIntegrationTest {
     @EnableWebMvc
     @Import({SecurityConfig.class, AuthController.class, AuthService.class, UserService.class, UserMapper.class,
             com.soda2026.journi.trip.TripController.class,
+            com.soda2026.journi.invitation.InvitationController.class,
             com.soda2026.journi.tripDestination.TripDestinationController.class})
     static class Config {
         @Bean com.soda2026.journi.trip.TripService trips() { return mock(com.soda2026.journi.trip.TripService.class); }
         @Bean com.soda2026.journi.tripDestination.TripDestinationService destinations() {
             return mock(com.soda2026.journi.tripDestination.TripDestinationService.class);
         }
+        @Bean com.soda2026.journi.invitation.InvitationService invitations() { return mock(com.soda2026.journi.invitation.InvitationService.class); }
         @Bean UserRepository users() { return mock(UserRepository.class); }
     }
     @Autowired WebApplicationContext context;
     @Autowired UserRepository users;
+    @Autowired com.soda2026.journi.invitation.InvitationService invitations;
     @Autowired PasswordEncoder encoder;
     @Autowired com.soda2026.journi.trip.TripService trips;
     @Autowired com.soda2026.journi.tripDestination.TripDestinationService destinations;
     MockMvc mvc;
     @BeforeEach void setup() {
-        reset(users, trips, destinations);
+        reset(users, trips, destinations, invitations);
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         UserModel user = new UserModel("olena@example.com", "Olena", encoder.encode("password123"), null);
         user.setId(42L);
@@ -157,7 +160,7 @@ class AuthIntegrationTest {
         var user = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
                 .user(new com.soda2026.journi.security.UserPrincipal(model));
         mvc.perform(get("/trips/mine").with(user)).andExpect(status().isOk());
-        verify(trips).findTripsByOwnerId(42L);
+        verify(trips).findMyTrips(42L);
         mvc.perform(get("/trips/7").with(user)).andExpect(status().isForbidden());
         verify(trips, never()).findTripsByOwnerId(7L);
         mvc.perform(post("/api/trips/10/destinations").with(user).with(csrf())
@@ -165,6 +168,30 @@ class AuthIntegrationTest {
                 .andExpect(status().isCreated());
         verify(destinations).createDestination(eq(10L), any(), eq(42L));
     }
+    @Test void invitationEndpointsUseSessionIdentityAndRequireCsrf() throws Exception {
+        var model = new UserModel("olena@example.com", "Olena", "hash", null);
+        model.setId(42L);
+        var user = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                .user(new com.soda2026.journi.security.UserPrincipal(model));
+        mvc.perform(get("/invitations/mine")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/invitations/mine").with(user)).andExpect(status().isOk());
+        verify(invitations).incoming(42L);
+        mvc.perform(post("/invitations").with(user).contentType("application/json")
+                .content("{\"tripId\":10,\"email\":\"guest@example.com\"}"))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/invitations").with(user).with(csrf()).contentType("application/json")
+                .content("{\"tripId\":10,\"email\":\"guest@example.com\",\"inviterId\":7}"))
+                .andExpect(status().isCreated());
+        verify(invitations).invite(any(), eq(42L));
+        mvc.perform(post("/invitations").with(user).with(csrf()).contentType("application/json")
+                .content("{\"tripId\":10,\"email\":\"invalid\"}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(post("/invitations/20/accept").with(user).with(csrf())).andExpect(status().isOk());
+        verify(invitations).respond(20L, 42L, true);
+        mvc.perform(post("/invitations/21/decline").with(user).with(csrf())).andExpect(status().isOk());
+        verify(invitations).respond(21L, 42L, false);
+    }
+
     @Test void issuesCsrfTokenAndRejectsAnonymousRequests() throws Exception {
         mvc.perform(get("/api/auth/csrf")).andExpect(status().isOk()).andExpect(jsonPath("$.token").isNotEmpty());
         mvc.perform(get("/api/auth/me")).andExpect(status().isUnauthorized());

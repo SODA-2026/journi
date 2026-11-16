@@ -71,6 +71,12 @@ package com.soda2026.journi.trip;
     }
 
      @Transactional(readOnly = true)
+     public List<TripSummaryDTO> findMyTrips(Long userId) {
+         return tripRepository.findAllAccessibleTo(userId).stream()
+                 .map(tripMapper::toTripSummaryDTO).toList();
+     }
+
+     @Transactional(readOnly = true)
      public List<TripSummaryDTO> findTripsByOwnerId(Long ownerId){
          return tripRepository.findAllByOwnerIdOrderByStartDateDesc(ownerId).stream()
                  .map(tripMapper::toTripSummaryDTO)
