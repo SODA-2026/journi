@@ -1,11 +1,22 @@
+import { api } from "../../api/ApiClient";
 import type {
     CreateTripRequest,
+    TripInfoType,
     TripResponse,
     TripSummary,
 } from "./trips";
+
+
+export function getTripInfo(tripId: number): Promise<TripInfoType> {
+    return api(`/trips/mine/${tripId}`);
+}
+  
 const apiUrl = "http://localhost:8080/trips";
 
-export async function createTrip(
+export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
+    return api("/trips/create", { method: "POST", body: JSON.stringify(data) });
+}
+/* export async function createTrip(
     data: CreateTripRequest
 ): Promise<TripResponse> {
     const response = await fetch("http://localhost:8080/trips/create", {
@@ -21,8 +32,7 @@ export async function createTrip(
     }
 
     return response.json();
-}
-
+} */
 export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
     const response = await fetch(`${apiUrl}/${ownerId}`, {
         method: "GET",
@@ -31,4 +41,24 @@ export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
         throw new Error(`Server error: ${response.status}`);
     }
     return response.json();
+
+
 }
+export async function deleteTrip(id: number): Promise<void> {
+    return api(`/trips/${id}`, { method: "DELETE" });
+
+
+    /* const response = await fetch(`http://localhost:8080/trips/${id}`, {
+         method: "DELETE",
+     });
+
+     if (!response.ok) {
+         throw new Error(`Server error: ${response.status}`);
+     }
+
+     */
+
+}
+export function getMyTrips(): Promise<TripSummary[]> {
+     return api("/trips/mine");
+    }

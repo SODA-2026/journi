@@ -1,188 +1,105 @@
 package com.soda2026.journi.tripDestination;
 
-import com.soda2026.journi.tripDestination.dto.CreateTripDestinationRequest;
-import com.soda2026.journi.suggestion.DestinationKind;
-import com.soda2026.journi.suggestion.SuggestionModel;
-import com.soda2026.journi.suggestion.SuggestionType;
+import com.soda2026.journi.city.CityModel;
+import com.soda2026.journi.country.CountryModel;
 import com.soda2026.journi.trip.TripModel;
+import com.soda2026.journi.tripDestination.dto.CreateTripDestinationRequest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TripDestinationServiceTest {
-    @Test
-    void rejectsCityFromAnotherCountry() {
-        TripDestinationRepository repository =
-                mock(TripDestinationRepository.class);
-        EntityManager entityManager = mock(EntityManager.class);
+    private final TripDestinationRepository repository = mock(TripDestinationRepository.class);
+    private final EntityManager entityManager = mock(EntityManager.class);
+    private final TripDestinationService service = new TripDestinationService(repository, entityManager, new TripDestinationMapper());
 
-        TripDestinationService service =
-                new TripDestinationService(repository, entityManager, new TripDestinationMapper());
-
-        TripModel trip = mock(TripModel.class);
-        when(trip.getId()).thenReturn(10L);
-
-        SuggestionModel selectedCountry = new SuggestionModel();
-        selectedCountry.setId(1L);
-        selectedCountry.setType(SuggestionType.DESTINATION);
-        selectedCountry.setDestinationKind(DestinationKind.COUNTRY);
-
-        SuggestionModel anotherCountry = new SuggestionModel();
-        anotherCountry.setId(2L);
-
-        SuggestionModel city = new SuggestionModel();
-        city.setId(5L);
-        city.setType(SuggestionType.DESTINATION);
-        city.setDestinationKind(DestinationKind.CITY);
-        city.setParentSuggestion(anotherCountry);
-
-        when(entityManager.find(SuggestionModel.class, 1L))
-                .thenReturn(selectedCountry);
-        when(entityManager.find(SuggestionModel.class, 5L))
-                .thenReturn(city);
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> service.createFirstDestination(trip, 1L, 5L)
-        );
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals(
-                "Selected city does not belong to selected country",
-                exception.getReason()
-        );
-        verify(repository, never()).save(any(TripDestinationModel.class));
+    @Test void rejectsCityFromAnotherCountry() {
+        TripModel trip = trip();
+        CountryModel selected = country(1L);
+        CityModel city = city(5L, country(2L));
+        when(entityManager.find(CountryModel.class, 1L)).thenReturn(selected);
+        when(entityManager.find(CityModel.class, 5L)).thenReturn(city);
+        assertError(HttpStatus.BAD_REQUEST, "Selected city does not belong to selected country",
+                () -> service.createFirstDestination(trip, 1L, 5L));
+        verifyNoInteractions(repository);
     }
 
-    @Test
-    void rejectsMissingCity() {
-        TripDestinationRepository repository =
-                mock(TripDestinationRepository.class);
-        EntityManager entityManager = mock(EntityManager.class);
-
-        TripDestinationService service =
-                new TripDestinationService(repository, entityManager, new TripDestinationMapper());
-
-        TripModel trip = mock(TripModel.class);
-        when(trip.getId()).thenReturn(10L);
-
-        SuggestionModel country = new SuggestionModel();
-        country.setId(1L);
-        country.setType(SuggestionType.DESTINATION);
-        country.setDestinationKind(DestinationKind.COUNTRY);
-
-        when(entityManager.find(SuggestionModel.class, 1L))
-                .thenReturn(country);
-        when(entityManager.find(SuggestionModel.class, 999L))
-                .thenReturn(null);
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> service.createFirstDestination(trip, 1L, 999L)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("City not found", exception.getReason());
-
-        verify(repository, never()).save(any(TripDestinationModel.class));
+    @Test void rejectsMissingCity() {
+        when(entityManager.find(CountryModel.class, 1L)).thenReturn(country(1L));
+        assertError(HttpStatus.NOT_FOUND, "City not found",
+                () -> service.createFirstDestination(trip(), 1L, 999L));
+        verifyNoInteractions(repository);
     }
 
-    @Test
-    void createsFirstDestination() {
-        TripDestinationRepository repository =
-                mock(TripDestinationRepository.class);
-        EntityManager entityManager = mock(EntityManager.class);
+    @Test void rejectsMissingCountry() {
+        assertError(HttpStatus.NOT_FOUND, "Country not found",
+                () -> service.createFirstDestination(trip(), 999L, 4L));
+        verifyNoInteractions(repository);
+        verify(entityManager, never()).find(eq(CityModel.class), any());
+    }
 
-        TripDestinationService service =
-                new TripDestinationService(repository, entityManager, new TripDestinationMapper());
+    @Test void rejectsUnsavedTrip() {
+        assertError(HttpStatus.BAD_REQUEST, "Trip must be saved before adding a destination",
+                () -> service.createFirstDestination(new TripModel(), 1L, 4L));
+        verifyNoInteractions(entityManager, repository);
+    }
 
-        TripModel trip = mock(TripModel.class);
-        when(trip.getId()).thenReturn(10L);
-        when(entityManager.find(TripModel.class, 10L))
-                .thenReturn(trip);
-
-        SuggestionModel country = new SuggestionModel();
-        country.setId(1L);
-        country.setType(SuggestionType.DESTINATION);
-        country.setDestinationKind(DestinationKind.COUNTRY);
-        country.setCountry("Sverige");
-
-        SuggestionModel city = new SuggestionModel();
-        city.setId(4L);
-        city.setType(SuggestionType.DESTINATION);
-        city.setDestinationKind(DestinationKind.CITY);
-        city.setParentSuggestion(country);
-        city.setCountry("Sverige");
-        city.setName("Malmö");
-
-        when(entityManager.find(SuggestionModel.class, 1L))
-                .thenReturn(country);
-        when(entityManager.find(SuggestionModel.class, 4L))
-                .thenReturn(city);
-
-        when(repository.existsByTrip_IdAndOrderIndex(10L, 0))
-                .thenReturn(false);
-        when(repository.save(any(TripDestinationModel.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+    @Test void createsFirstDestinationWithCityAndOrderZero() {
+        TripModel trip = trip();
+        CountryModel country = country(1L);
+        CityModel city = city(4L, country);
+        when(entityManager.find(CountryModel.class, 1L)).thenReturn(country);
+        when(entityManager.find(CityModel.class, 4L)).thenReturn(city);
+        when(repository.save(any())).thenAnswer(call -> call.getArgument(0));
 
         var response = service.createFirstDestination(trip, 1L, 4L);
-
-        ArgumentCaptor<TripDestinationModel> captor =
-                ArgumentCaptor.forClass(TripDestinationModel.class);
+        var captor = ArgumentCaptor.forClass(TripDestinationModel.class);
         verify(repository).save(captor.capture());
-
-        TripDestinationModel savedDestination = captor.getValue();
-
-        assertEquals(trip, savedDestination.getTrip());
-        assertEquals(city, savedDestination.getSourceSuggestion());
-        assertEquals("Sverige", savedDestination.getCountry());
-        assertEquals("Malmö", savedDestination.getPlaceName());
-        assertEquals(Integer.valueOf(0), savedDestination.getOrderIndex());
-
-        assertEquals(Long.valueOf(10L), response.tripId());
-        assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
-        assertEquals("Sverige", response.country());
-        assertEquals("Malmö", response.placeName());
-        assertEquals(Integer.valueOf(0), response.orderIndex());
-
+        assertSame(trip, captor.getValue().getTrip());
+        assertSame(city, captor.getValue().getCity());
+        assertEquals(0, captor.getValue().getOrderIndex());
+        assertEquals(10L, response.tripId());
+        assertEquals(4L, response.cityId());
+        assertEquals(0, response.orderIndex());
     }
 
-    @Test
-    void rejectsOccupiedOrderIndex() {
-        TripDestinationRepository repository =
-                mock(TripDestinationRepository.class);
-        EntityManager entityManager = mock(EntityManager.class);
+    @Test void rejectsOccupiedOrderIndex() {
+        when(entityManager.find(TripModel.class, 10L)).thenReturn(trip());
+        when(repository.existsByTrip_IdAndOrderIndex(10L, 2)).thenReturn(true);
+        assertError(HttpStatus.CONFLICT, "Destination order index is already occupied",
+                () -> service.createDestination(10L, new CreateTripDestinationRequest(4L, 2)));
+        verify(repository, never()).save(any());
+    }
 
-        TripDestinationService service =
-                new TripDestinationService(repository, entityManager, new TripDestinationMapper());
+    @Test void rejectsMissingTripWhenAddingDestination() {
+        assertError(HttpStatus.NOT_FOUND, "Trip not found",
+                () -> service.createDestination(10L, new CreateTripDestinationRequest(4L, 2)));
+        verifyNoInteractions(repository);
+    }
 
-        TripModel trip = mock(TripModel.class);
-        when(entityManager.find(TripModel.class, 10L))
-                .thenReturn(trip);
+    @Test void rejectsMissingCityWhenAddingDestination() {
+        when(entityManager.find(TripModel.class, 10L)).thenReturn(trip());
+        assertError(HttpStatus.NOT_FOUND, "City not found",
+                () -> service.createDestination(10L, new CreateTripDestinationRequest(999L, 2)));
+        verify(repository, never()).save(any());
+    }
 
-        when(repository.existsByTrip_IdAndOrderIndex(10L, 0))
-                .thenReturn(true);
-
-        CreateTripDestinationRequest request =
-                new CreateTripDestinationRequest(4L, 0);
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> service.createDestination(10L, request)
-        );
-
-        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
-        assertEquals(
-                "Destination order index is already occupied",
-                exception.getReason()
-        );
-
-        verify(repository, never()).save(any(TripDestinationModel.class));
+    private void assertError(HttpStatus status, String reason, org.junit.jupiter.api.function.Executable action) {
+        var error = assertThrows(ResponseStatusException.class, action);
+        assertEquals(status, error.getStatusCode());
+        assertEquals(reason, error.getReason());
+    }
+    private TripModel trip() {
+        var trip = new TripModel(); trip.setId(10L); return trip;
+    }
+    private CountryModel country(Long id) {
+        var country = new CountryModel(); country.setId(id); country.setName("Sverige"); return country;
+    }
+    private CityModel city(Long id, CountryModel country) {
+        var city = new CityModel(); city.setId(id); city.setName("Malmö"); city.setCountry(country); return city;
     }
 }

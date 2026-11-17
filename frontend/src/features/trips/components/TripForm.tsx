@@ -85,6 +85,7 @@ export function TripForm() {
         };
 
         const newErrors = validate(dataToSubmit);
+        setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {
             return;

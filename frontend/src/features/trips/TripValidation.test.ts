@@ -4,6 +4,8 @@ import { validate } from "./TripValidation";
 describe("validate", () => {
     const valid = {
         title: "Paris",
+        countryId: 1,
+        cityId: 1,
         startDate: "2026-11-05",
         endDate: "2026-11-08",
     };
