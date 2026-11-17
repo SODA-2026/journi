@@ -17,7 +17,7 @@
  import org.springframework.validation.annotation.Validated;
 
  import java.util.List;
- import java.util.Objects;
+ import com.soda2026.journi.trip.TripAccessService;
 
  @Service
  @Validated
@@ -25,19 +25,23 @@
      private final TripDestinationRepository repository;
      private final EntityManager entityManager;
      private final TripDestinationMapper mapper;
+     private final TripAccessService tripAccessService;
 
      public TripDestinationService(
              TripDestinationRepository repository,
              EntityManager entityManager,
-             TripDestinationMapper mapper
+             TripDestinationMapper mapper,
+             TripAccessService tripAccessService
      ) {
          this.repository = repository;
          this.entityManager = entityManager;
          this.mapper = mapper;
+         this.tripAccessService = tripAccessService;
      }
 
      @Transactional(readOnly = true)
-     public List<TripDestinationResponse> getDestinations(Long tripId) {
+     public List<TripDestinationResponse> getDestinations(Long tripId, Long userId) {
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
          return repository.findAllByTrip_IdOrderByOrderIndexAsc(tripId)
                  .stream()
                  .map(mapper::toDto)
@@ -57,12 +61,7 @@
              );
          }
 
-         TripModel trip = entityManager.find(TripModel.class, tripId);
-         if (trip == null) {
-             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip not found");
-         }
-
-         requireCanEdit(trip, user);
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
          return createDestination(tripId, request);
      }
 
@@ -142,12 +141,4 @@
          return mapper.toDto(saved);
      }
 
-     private void requireCanEdit(TripModel trip, UserModel user) {
-         if (!Objects.equals(trip.getOwnerId(), user.getId())) {
-             throw new ResponseStatusException(
-                     HttpStatus.FORBIDDEN,
-                     "Only the trip owner may add destinations"
-             );
-         }
-     }
  }
