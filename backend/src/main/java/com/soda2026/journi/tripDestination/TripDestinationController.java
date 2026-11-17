@@ -29,9 +29,10 @@
 
      @GetMapping
      public List<TripDestinationResponse> getDestinations(
-             @PathVariable("tripId") @Positive Long tripId
+             @PathVariable("tripId") @Positive Long tripId,
+             @AuthenticationPrincipal UserPrincipal user
      ) {
-         return service.getDestinations(tripId);
+         return service.getDestinations(tripId, user.getId());
      }
 
      @PostMapping

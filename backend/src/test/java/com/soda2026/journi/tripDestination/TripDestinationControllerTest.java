@@ -9,6 +9,10 @@ import com.soda2026.journi.user.UserModel;
 import com.soda2026.journi.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
+import com.soda2026.journi.trip.TripAccessService;
+import com.soda2026.journi.trip.TripRepository;
+import com.soda2026.journi.tripMember.TripMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +36,10 @@ class TripDestinationControllerTest {
     @Configuration
     @EnableWebSecurity
     @EnableWebMvc
-    @Import({SecurityConfig.class, TripDestinationController.class, TripDestinationService.class, TripDestinationMapper.class})
+    @Import({TripAccessService.class, SecurityConfig.class, TripDestinationController.class, TripDestinationService.class, TripDestinationMapper.class})
     static class Config {
+        @Bean TripRepository trips() { return mock(TripRepository.class); }
+        @Bean TripMemberRepository members() { return mock(TripMemberRepository.class); }
         @Bean UserRepository users() { return mock(UserRepository.class); }
         @Bean TripDestinationRepository repository() { return mock(TripDestinationRepository.class); }
         @Bean EntityManager entityManager() { return mock(EntityManager.class); }
@@ -42,11 +48,13 @@ class TripDestinationControllerTest {
     @Autowired WebApplicationContext context;
     @Autowired TripDestinationRepository repository;
     @Autowired EntityManager entityManager;
+    @Autowired TripRepository trips;
+    @Autowired TripMemberRepository members;
     private MockMvc mvc;
     private UserPrincipal principal;
 
     @BeforeEach void setup() {
-        reset(repository, entityManager);
+        reset(repository, entityManager, trips, members);
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         var user = new UserModel("owner@example.com", "Owner", "hash", null);
         user.setId(42L);
@@ -68,6 +76,7 @@ class TripDestinationControllerTest {
 
     @Test void createsDestinationForAuthenticatedOwner() throws Exception {
         var trip = trip(42L);
+        when(trips.findById(10L)).thenReturn(Optional.of(trip));
         var city = city(4L, "Malmö");
         when(entityManager.find(TripModel.class, 10L)).thenReturn(trip);
         when(entityManager.find(CityModel.class, 4L)).thenReturn(city);
@@ -86,6 +95,7 @@ class TripDestinationControllerTest {
 
     @Test void returnsDestinationsInCurrentResponseFormat() throws Exception {
         var trip = trip(42L);
+        when(trips.findById(10L)).thenReturn(Optional.of(trip));
         when(repository.findAllByTrip_IdOrderByOrderIndexAsc(10L)).thenReturn(List.of(
                 new TripDestinationModel(trip, city(4L, "Malmö"), 0),
                 new TripDestinationModel(trip, city(5L, "Stockholm"), 1)));
@@ -102,7 +112,7 @@ class TripDestinationControllerTest {
     }
 
     @Test void rejectsPostByNonOwner() throws Exception {
-        when(entityManager.find(TripModel.class, 10L)).thenReturn(trip(7L));
+        when(trips.findById(10L)).thenReturn(Optional.of(trip(7L)));
         mvc.perform(post("/api/trips/10/destinations").with(user(principal)).with(csrf())
                 .contentType("application/json").content("{\"cityId\":4,\"orderIndex\":0}"))
                 .andExpect(status().isForbidden());
