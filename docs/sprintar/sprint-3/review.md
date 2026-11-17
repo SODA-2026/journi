@@ -44,18 +44,18 @@ Som användare ska jag kunna logga in, skapa och redigera aktiviter/resor sedan 
 
 | Issue | Story | Varför inte klar | Vad händer med den? |
 |---|---|---|---|
-|KAN-27 | | | |
-|KAN-30 | | | |
-|KAN-31 | | | |
-|KAN-29 | | | |
-|KAN-88 | | | |
-|KAN-40 | | | |
-|KAN-51 | | | |
-|KAN-52 | | | |
-|KAN-43 | | | |
-|KAN-23 | | | |
-|KAN-49 | | | |
-|KAN-50 | | | |
+|KAN-27 |Som användare vill jag kunna ändra information om en befintlig resa så att jag kan uppdatera mina planer |Andra kort |Pågående arbete |
+|KAN-30 |Som användare vill jag kunna lägga till aktiviteter med datum, tid och beskrivning så att jag kan planera vad jag ska göra under resan |Dhannea var sjuk |Pågående arbete |
+|KAN-31 |Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe |Andra kort |Pågående arbete |
+|KAN-29 |Som användare vill jag kunna lägga till flera destinationer på en resa så att jag kan planera en rundresa. |Anders var sjuk |Pågående arbete |
+|KAN-88 |Fyll databas med mockup data |Andra ansvar |Ej påbörjat |
+|KAN-40 |Som resemål skapare vill jag kunna bjuda till andra användare för att delta på en resemål |Andra arbete |Påbörjat arbete |
+|KAN-51 |Som användare vill jag se aktiviteter som passar ett valt resmål så att jag vet vad jag kan göra där |Andra arbete |Ej påbörjat |
+|KAN-52 |Som användare vill jag lägga till ett resmål eller en aktivitet i en reseplan så att förslagen blir en del av min planering |Andra arbete |Ej påbörjat |
+|KAN-43 |Som inloggad användare vill jag spara en reseplan till mitt konto så att den finns kvar nästa gång jag kommer tillbaka. |Andra arbete |Ej påbörjat |
+|KAN-23 |Som användare vill jag se förslag på resemål och aktiviteter för att enklare planera. |Andra arbete |Ej påbörjat |
+|KAN-49 |Som användare vill jag se en lista med förslag på resmål så att jag får inspiration till var jag kan resa |Andra arbete |Ej påbörjat |
+|KAN-50 |Som användare vill jag öppna ett resmål och läsa mer så att jag kan avgöra om det passar mig |Andra arbete |Ej påbörjat |
 | | | | |
 | | | | |
 
