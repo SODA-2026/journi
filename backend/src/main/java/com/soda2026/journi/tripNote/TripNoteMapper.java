@@ -27,6 +27,7 @@
 
      public TripNoteSummeryDto toTripNoteSummaryDto(TripNoteModel note) {
          return new TripNoteSummeryDto(
+                 note.getId(),
                  note.getContent(),
                  note.getCreatedAt()
          );

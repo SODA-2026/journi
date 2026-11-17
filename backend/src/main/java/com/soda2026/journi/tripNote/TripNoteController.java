@@ -33,4 +33,10 @@
          return ResponseEntity.ok(tripNoteService.getAllTripNotesByTripId(tripId, user.getId()));
 
      }
+
+     @DeleteMapping("/{noteId}")
+     public ResponseEntity<Void> deleteTripNote(@PathVariable Long noteId, @AuthenticationPrincipal UserPrincipal user) {
+         tripNoteService.delete(noteId, user.getId());
+         return ResponseEntity.noContent().build();
+     }
  }
