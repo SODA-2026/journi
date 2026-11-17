@@ -3,6 +3,7 @@
  import com.soda2026.journi.tripNote.Dto.TripNoteRequestDto;
  import com.soda2026.journi.tripNote.Dto.TripNoteResponseDto;
  import com.soda2026.journi.trip.TripModel;
+ import com.soda2026.journi.tripNote.Dto.TripNoteSummeryDto;
  import com.soda2026.journi.user.UserModel;
  import org.springframework.stereotype.Component;
 
@@ -22,5 +23,12 @@
 
      public TripNoteModel toEntity(TripNoteRequestDto dto, TripModel trip, UserModel author){
          return new TripNoteModel(trip, author, dto.getContent());
+     }
+
+     public TripNoteSummeryDto toTripNoteSummaryDto(TripNoteModel note) {
+         return new TripNoteSummeryDto(
+                 note.getContent(),
+                 note.getCreatedAt()
+         );
      }
  }
