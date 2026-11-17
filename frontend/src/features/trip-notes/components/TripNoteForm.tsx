@@ -21,8 +21,7 @@ export function TripNoteForm({ tripId, onCreated }: TripNoteFormProps) {
         setError("");
 
         try {
-            const note = await createTripNote({
-                tripId,
+            const note = await createTripNote(tripId, {
                 content: content.trim(),
             });
             setContent("");

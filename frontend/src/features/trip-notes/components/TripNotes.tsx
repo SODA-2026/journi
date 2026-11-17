@@ -38,7 +38,7 @@ export function TripNotes({ tripId }: { tripId: number }) {
         setDeleteError("");
 
         try {
-            await deleteTripNote(noteId);
+            await deleteTripNote(tripId, noteId);
             setNotes((current) => current.filter((note) => note.id !== noteId));
         } catch (error) {
             console.error("Failed to delete trip note:", error);

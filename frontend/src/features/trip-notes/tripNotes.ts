@@ -5,6 +5,5 @@ export interface TripNote {
 }
 
 export interface CreateTripNoteRequest {
-    tripId: number;
     content: string;
 }

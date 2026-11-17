@@ -37,8 +37,8 @@ public class TripNoteService {
     }
 
     @Transactional
-    public TripNoteResponseDto createTripNote(TripNoteRequestDto dto, Long userId) {
-        TripModel trip = getTripAndVerifyAccess(dto.getTripId(), userId);
+    public TripNoteResponseDto createTripNote(Long tripId, TripNoteRequestDto dto, Long userId) {
+        TripModel trip = getTripAndVerifyAccess(tripId, userId);
 
         UserModel author = userRepository.getReferenceById(userId);
 
@@ -74,10 +74,14 @@ public class TripNoteService {
     }
 
     @Transactional
-    public void delete(Long noteId, Long currentUserId) {
+    public void delete(Long tripId, Long noteId, Long currentUserId) {
         // 1. Find the note (404 if it doesn't exist)
         TripNoteModel note = tripNoteRepository.findById(noteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip note not found"));
+
+        if (!note.getTrip().getId().equals(tripId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip note not found");
+        }
 
         // 2. Check permission: allow the note's author OR the trip owner
         boolean isAuthor = note.getAuthor().getId().equals(currentUserId);

@@ -8,11 +8,12 @@
  import org.springframework.http.ResponseEntity;
  import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.web.bind.annotation.*;
+ import jakarta.validation.Valid;
 
  import java.util.List;
 
  @RestController
- @RequestMapping("/trip-notes")
+  @RequestMapping("/trips/{tripId}/notes")
  public class TripNoteController {
 
      private final TripNoteService tripNoteService;
@@ -22,21 +23,30 @@
      }
 
      @PostMapping
-     public ResponseEntity<TripNoteResponseDto> createTripNote(@RequestBody TripNoteRequestDto tripNoteRequestDto, @AuthenticationPrincipal UserPrincipal user) {
-         return ResponseEntity.status(HttpStatus.CREATED).body(tripNoteService.createTripNote(tripNoteRequestDto, user.getId()));
+     public ResponseEntity<TripNoteResponseDto> createTripNote(
+             @PathVariable Long tripId,
+             @Valid @RequestBody TripNoteRequestDto tripNoteRequestDto,
+             @AuthenticationPrincipal UserPrincipal user) {
+         return ResponseEntity.status(HttpStatus.CREATED)
+                 .body(tripNoteService.createTripNote(tripId, tripNoteRequestDto, user.getId()));
 
      }
 
-     @GetMapping("/{tripId}")
-     public ResponseEntity<List<TripNoteSummeryDto>> getTripNotesPerTrip(@PathVariable Long tripId, @AuthenticationPrincipal UserPrincipal user) {
+     @GetMapping
+     public ResponseEntity<List<TripNoteSummeryDto>> getTripNotesPerTrip(
+             @PathVariable Long tripId,
+             @AuthenticationPrincipal UserPrincipal user) {
 
          return ResponseEntity.ok(tripNoteService.getAllTripNotesByTripId(tripId, user.getId()));
 
      }
 
      @DeleteMapping("/{noteId}")
-     public ResponseEntity<Void> deleteTripNote(@PathVariable Long noteId, @AuthenticationPrincipal UserPrincipal user) {
-         tripNoteService.delete(noteId, user.getId());
+     public ResponseEntity<Void> deleteTripNote(
+             @PathVariable Long tripId,
+             @PathVariable Long noteId,
+             @AuthenticationPrincipal UserPrincipal user) {
+         tripNoteService.delete(tripId, noteId, user.getId());
          return ResponseEntity.noContent().build();
      }
  }
