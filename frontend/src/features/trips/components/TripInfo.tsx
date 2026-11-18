@@ -61,7 +61,7 @@ export function TripInfo() {
                 <p>Aktiviteter</p>
             </section>
             <section>
-                <TripNotes tripId={tripId} />
+                <TripNotes tripId={tripId} tripOwnerId={trip.ownerId} />
             </section>
             <p>Skapad: {formatDate(trip.createdAt)}</p>
             <div>{/* Redigera och ta bort Link/knapp */}</div>

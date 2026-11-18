@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 public record TripNoteSummeryDto(
         Long id,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long authorId
 ) {
 
 }

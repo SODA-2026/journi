@@ -3,8 +3,15 @@ import { deleteTripNote, getTripNotes } from "../TripNoteApi";
 import type { TripNote } from "../tripNotes";
 import { TripNoteForm } from "./TripNoteForm";
 import { TripNotesList } from "./TripNotesList";
+import { useAuth } from "../../../context/AuthContext";
 
-export function TripNotes({ tripId }: { tripId: number }) {
+type TripNotesProps = {
+    tripId: number;
+    tripOwnerId: number;
+};
+
+export function TripNotes({ tripId, tripOwnerId }: TripNotesProps) {
+    const { user } = useAuth();
     const [notes, setNotes] = useState<TripNote[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -82,6 +89,8 @@ export function TripNotes({ tripId }: { tripId: number }) {
                 notes={notes}
                 deletingNoteId={deletingNoteId}
                 onDelete={handleDelete}
+                currentUserId={user?.id ?? null}
+                tripOwnerId={tripOwnerId}
             />
             {deleteError && <p role="alert">{deleteError}</p>}
         </section>

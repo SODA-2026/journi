@@ -29,7 +29,8 @@
          return new TripNoteSummeryDto(
                  note.getId(),
                  note.getContent(),
-                 note.getCreatedAt()
+                 note.getCreatedAt(),
+                 note.getAuthor().getId()
          );
      }
  }

@@ -75,7 +75,6 @@ public class TripNoteService {
 
     @Transactional
     public void delete(Long tripId, Long noteId, Long currentUserId) {
-        // 1. Find the note (404 if it doesn't exist)
         TripNoteModel note = tripNoteRepository.findById(noteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip note not found"));
 
@@ -83,15 +82,19 @@ public class TripNoteService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip note not found");
         }
 
-        // 2. Check permission: allow the note's author OR the trip owner
         boolean isAuthor = note.getAuthor().getId().equals(currentUserId);
         boolean isTripOwner = note.getTrip().getOwnerId().equals(currentUserId);
+        boolean hasCurrentAccess = isTripOwner
+                || tripMemberRepository.existsById_TripIdAndId_UserId(tripId, currentUserId);
+
+        if (!hasCurrentAccess) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not a member of this trip");
+        }
 
         if (!isAuthor && !isTripOwner) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed to delete this note");
         }
 
-        // 3. Delete the note
         tripNoteRepository.delete(note); // or tripNoteRepository.deleteById(noteId);
     }
 }
