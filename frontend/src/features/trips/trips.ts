@@ -5,6 +5,11 @@ export interface CreateTripRequest {
     endDate: string;
     countryId: number;
     cityId: number;
+    destinations?: TripDestinationInput[];
+}
+
+export interface TripDestinationInput {
+    cityId: number;
 }
 
 export interface TripResponse {
