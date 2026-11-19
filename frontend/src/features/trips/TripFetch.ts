@@ -72,3 +72,17 @@ export function reorderTripDestinations(
         body: JSON.stringify(destinationIds),
     });
 }
+
+export function addTripDestination(
+    tripId: number,
+    cityId: number,
+    orderIndex: number,
+): Promise<unknown> {
+    return api(`/api/trips/${tripId}/destinations`, {
+        method: "POST",
+        body: JSON.stringify({
+            cityId,
+            orderIndex,
+        }),
+    });
+}

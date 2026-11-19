@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
-import { getTripInfo, reorderTripDestinations } from "../TripFetch";
+import { getTripInfo, reorderTripDestinations, addTripDestination } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
@@ -48,9 +48,6 @@ export function TripInfo() {
         );
     }
 
-
-    
-
     if (error)
         return (
             <div className="mx-auto max-w-3xl">
@@ -79,6 +76,23 @@ export function TripInfo() {
             console.error(err);
             setTrip({ ...trip, destinations: trip.destinations });
             setReorderError("Kunde inte ändra destinationernas ordning");
+        }
+    };
+
+    const handleAddDestination = async (cityId: number,) => {
+        if (!trip) return;
+
+        try {
+            await addTripDestination(
+                trip.id,
+                cityId,
+                trip.destinations.length,
+            );
+
+            const updatedTrip = await getTripInfo(trip.id);
+            setTrip(updatedTrip);
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -143,6 +157,31 @@ export function TripInfo() {
                                 ))}
                             </ol>
                         )}
+                        <div className="mt-6 rounded-lg border p-4">
+                            <h3 className="mb-3 font-bold">Teststäder</h3>
+                            <div className="flex flex-col gap-4">
+                                <button
+                                    onClick={() => handleAddDestination(1)}
+                                    className="text-lg px-2 py-2 rounded-lg bg-[#235e4f] text-base text-white hover:bg-[#1d4237]"
+                                    >
+                                    Lägg till Stockholm
+                                </button>
+
+                                <button
+                                    onClick={() => handleAddDestination(2)}
+                                    className="text-lg px-2 py-2 rounded-lg bg-[#235e4f] text-base text-white hover:bg-[#1d4237]"
+                                >
+                                    Lägg till Göteborg
+                                </button>
+
+                                <button
+                                    onClick={() => handleAddDestination(3)}
+                                    className="text-lg px-2 py-2 rounded-lg bg-[#235e4f] text-base text-white hover:bg-[#1d4237]"
+                                >
+                                    Lägg till Malmö
+                                </button>
+                            </div>
+                        </div>
                     </section>
 
                     <div className="flex flex-col gap-5">
