@@ -30,6 +30,15 @@ export function TripInfo() {
             })
             .finally(() => setIsLoading(false));
     }, [tripId]);
+
+
+    // useMemo keeps the array stable between renders
+    // without it TripActivities gets a new array every time - endless loop of requests
+    const destinationOptions = useMemo(
+        () =>
+            trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
+        [trip],
+    );
   
     if (isLoading) {
         return (
@@ -39,13 +48,8 @@ export function TripInfo() {
         );
     }
 
-    // useMemo keeps the array stable between renders
-    // without it TripActivities gets a new array every time - endless loop of requests
-    const destinationOptions = useMemo(
-        () =>
-            trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
-        [trip],
-    );
+
+    
 
     if (error)
         return (
