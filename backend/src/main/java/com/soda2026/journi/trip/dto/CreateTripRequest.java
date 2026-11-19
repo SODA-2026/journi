@@ -2,9 +2,12 @@
 
  import com.fasterxml.jackson.annotation.JsonFormat;
  import jakarta.validation.constraints.*;
+ import jakarta.validation.Valid;
  import org.springframework.format.annotation.DateTimeFormat;
 
  import java.time.LocalDate;
+ import java.util.ArrayList;
+ import java.util.List;
 
  public class CreateTripRequest {
 
@@ -26,6 +29,9 @@
      @NotNull
      @Positive
      private Long cityId;
+
+     @Valid
+     private List<TripDestinationInput> destinations = new ArrayList<>();
 
      public CreateTripRequest(String title, LocalDate startDate, LocalDate endDate) {
          this.title = title;
@@ -74,5 +80,18 @@
 
      public void setCityId(Long cityId) {
          this.cityId = cityId;
+     }
+
+     public List<TripDestinationInput> getDestinations() {
+         return destinations;
+     }
+
+     public void setDestinations(List<TripDestinationInput> destinations) {
+         this.destinations = destinations == null ? new ArrayList<>() : destinations;
+     }
+
+     public record TripDestinationInput(
+             @NotNull @Positive Long cityId
+     ) {
      }
  }

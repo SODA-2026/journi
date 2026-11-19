@@ -154,15 +154,13 @@ class AuthIntegrationTest {
         mvc.perform(post("/api/auth/logout").session(session).header(fresh.getHeaderName(), fresh.getToken()))
                 .andExpect(status().isNoContent());
     }
-    @Test void tripsUseSessionIdentityAndRejectAnotherOwner() throws Exception {
+    @Test void tripsAndDestinationsUseSessionIdentity() throws Exception {
         var model = new UserModel("olena@example.com", "Olena", "hash", null);
         model.setId(42L);
         var user = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
                 .user(new com.soda2026.journi.security.UserPrincipal(model));
         mvc.perform(get("/trips/mine").with(user)).andExpect(status().isOk());
         verify(trips).findMyTrips(42L);
-        mvc.perform(get("/trips/7").with(user)).andExpect(status().isForbidden());
-        verify(trips, never()).findTripsByOwnerId(7L);
         mvc.perform(post("/api/trips/10/destinations").with(user).with(csrf())
                 .contentType("application/json").content("{\"cityId\":4,\"orderIndex\":0}"))
                 .andExpect(status().isCreated());

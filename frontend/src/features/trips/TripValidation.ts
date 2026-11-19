@@ -26,11 +26,13 @@ export function validate(values: TripFormData): TripFormErrors {
         errors.endDate = "The end date cannot be before start date!";
     }
 
-    // TODO: Validation for country & city requirement
-    if (values.countryId === null) {
+    const hasAddedDestinations =
+        Array.isArray(values.destinations) && values.destinations.length > 0;
+
+    if (!hasAddedDestinations && (!values.countryId || values.countryId === 0)) {
         errors.countryId = "Country is required";
     }
-    if (values.cityId === null) {
+    if (!hasAddedDestinations && (!values.cityId || values.cityId === 0)) {
         errors.cityId = "City is required";
     }
 

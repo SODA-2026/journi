@@ -16,4 +16,5 @@ public record TripInfoDTO(
         LocalDate endDate,
         Instant createdAt,
         List<TripDestinationSummaryDTO> destinations
+
         ) {}

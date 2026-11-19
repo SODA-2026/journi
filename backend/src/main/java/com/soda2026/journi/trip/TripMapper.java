@@ -66,6 +66,8 @@
                  destinations.stream()
                          .map(tripDestinationMapper::toTripDestinationSummaryDTO)
                          .toList()
+
+
          );
      }
 

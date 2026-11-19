@@ -49,3 +49,13 @@ export async function deleteTrip(id: number): Promise<void> {
 export function getMyTrips(): Promise<TripSummary[]> {
      return api("/trips/mine");
     }
+
+export function reorderTripDestinations(
+    tripId: number,
+    destinationIds: number[],
+): Promise<unknown> {
+    return api(`/api/trips/${tripId}/destinations/reorder`, {
+        method: "PUT",
+        body: JSON.stringify(destinationIds),
+    });
+}

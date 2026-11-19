@@ -2,6 +2,7 @@
 
  import org.springframework.data.jpa.repository.JpaRepository;
  import java.util.List;
+ import java.util.Optional;
 
  public interface TripDestinationRepository
         extends JpaRepository<TripDestinationModel, Long> {
@@ -14,6 +15,11 @@
              Long tripId,
              Integer orderIndex
      );
+
+     // Dhannea's ändringar
+     Optional<TripDestinationModel> findByIdAndTrip_Id(Long id, Long tripId);
+
+     boolean existsByIdAndTrip_Id(Long id, Long tripId);
 
  }
 
