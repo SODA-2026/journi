@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
 import { getTripInfo } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
+import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
 
 export function TripInfo() {
@@ -28,6 +29,15 @@ export function TripInfo() {
             })
             .finally(() => setIsLoading(false));
     }, [tripId]);
+
+    // useMemo keeps the array stable between renders
+    // without it TripActivities gets a new array every time - endless loop of requests
+    const destinationOptions = useMemo(
+        () =>
+            trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
+        [trip],
+    );
+
     if (isLoading) return <p>Laddar resa...</p>;
     if (error)
         return (
@@ -59,6 +69,10 @@ export function TripInfo() {
             </p>
             <section>
                 <p>Aktiviteter</p>
+                <TripActivities
+                    tripId={tripId}
+                    destinations={destinationOptions}
+                />
             </section>
             <section>
                 <TripNotes tripId={tripId} tripOwnerId={trip.ownerId} />
