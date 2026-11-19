@@ -50,6 +50,7 @@ export interface TripDestination {
 export interface TripInfoType {
     id: number;
     title: string;
+    ownerId: number;
     startDate: string;
     endDate: string;
     createdAt: string;

@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
 import { getTripInfo, reorderTripDestinations } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
+import { TripActivities } from "../../activities/components/TripActivities";
+import { TripNotes } from "../../trip-notes/components/TripNotes";
 
 export function TripInfo() {
     const [error, setError] = useState("");
@@ -28,6 +30,7 @@ export function TripInfo() {
             })
             .finally(() => setIsLoading(false));
     }, [tripId]);
+  
     if (isLoading) {
         return (
             <div className="rounded-xl border border-[#d6e1d9] bg-white px-6 py-8 text-[#526c62]">
@@ -35,6 +38,15 @@ export function TripInfo() {
             </div>
         );
     }
+
+    // useMemo keeps the array stable between renders
+    // without it TripActivities gets a new array every time - endless loop of requests
+    const destinationOptions = useMemo(
+        () =>
+            trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
+        [trip],
+    );
+
     if (error)
         return (
             <div className="mx-auto max-w-3xl">
@@ -132,11 +144,14 @@ export function TripInfo() {
                     <div className="flex flex-col gap-5">
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
                             <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Aktiviteter</h2>
-                            <p className="text-[#526c62]">Inga aktiviteter har lagts till.</p>
-                        </section>
+                             <TripActivities
+                               tripId={tripId}
+                               destinations={destinationOptions}
+                             />                        
+                         </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
                             <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Anteckningar</h2>
-                            <p className="text-[#526c62]">Inga anteckningar har lagts till.</p>
+                <TripNotes tripId={tripId} tripOwnerId={trip.ownerId} />
                         </section>
                     </div>
                 </div>

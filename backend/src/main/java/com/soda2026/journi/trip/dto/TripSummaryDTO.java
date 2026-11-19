@@ -3,5 +3,9 @@
  import java.time.Instant;
  import java.time.LocalDate;
 
- public record TripSummaryDTO(Long tripId, String title, Instant createdAt, LocalDate startDate) {
+ public record TripSummaryDTO(
+         Long tripId,
+         String title,
+         Instant createdAt,
+         LocalDate startDate) {
  }
