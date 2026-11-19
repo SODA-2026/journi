@@ -10,8 +10,10 @@ import java.util.List;
 public record TripInfoDTO(
         Long id,
         String title,
+        Long ownerId,
         LocalDate startDate,
         LocalDate endDate,
         Instant createdAt,
         List<TripDestinationSummaryDTO> destinations
+
         ) {}

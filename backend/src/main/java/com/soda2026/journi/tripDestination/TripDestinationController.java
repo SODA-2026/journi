@@ -12,6 +12,7 @@
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseStatus;
  import org.springframework.web.bind.annotation.RestController;
+ import org.springframework.web.bind.annotation.PutMapping;
 
  import java.util.List;
  import com.soda2026.journi.security.UserPrincipal;
@@ -44,6 +45,15 @@
      ) {
          return service.createDestination(tripId, request, user.getId());
      }
+
+      @PutMapping("/reorder")
+      public List<TripDestinationResponse> reorderDestinations(
+              @PathVariable("tripId") @Positive Long tripId,
+              @Valid @RequestBody List<@Positive Long> destinationIds,
+              @AuthenticationPrincipal UserPrincipal user
+      ) {
+          return service.reorderDestinations(tripId, destinationIds, user.getId());
+      }
  }
 
  /*

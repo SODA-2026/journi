@@ -1,8 +1,12 @@
  package com.soda2026.journi.tripActivity;
 
+ import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
+ import jakarta.validation.Valid;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
  import org.springframework.web.bind.annotation.*;
- import com.soda2026.journi.activity.TripActivityService;
+ import com.soda2026.journi.tripActivity.TripActivityService;
 
  import java.util.List;
 
@@ -28,8 +32,22 @@
      }
 
      @DeleteMapping("/{id}")
+     @ResponseStatus(HttpStatus.NO_CONTENT)
      public void delete(@PathVariable Long id) {
          tripActivityService.delete(id);
+     }
+
+     @GetMapping("/trips/{tripId}")
+     public List<TripActivityResponseDTO> getActivities(@PathVariable Long tripId,
+                                                        @RequestParam Long tripDestinationId){
+         return tripActivityService.getActivityForDestination(tripId, tripDestinationId);
+     }
+
+     @PostMapping("/trips/{tripId}")
+     public ResponseEntity<TripActivityResponseDTO> create(@PathVariable Long tripId,
+                                                           @Valid @RequestBody TripActivityRequestDTO request){
+         return ResponseEntity.status(HttpStatus.CREATED)
+                 .body(tripActivityService.createActivity(tripId, request));
      }
 
  }

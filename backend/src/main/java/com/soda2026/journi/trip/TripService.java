@@ -52,11 +52,23 @@ package com.soda2026.journi.trip;
 
         TripModel savedTrip = tripRepository.save(trip);
 
-        tripDestinationService.createFirstDestination(
-                savedTrip,
-                createTripRequest.getCountryId(),
-                createTripRequest.getCityId()
-        );
+        if (createTripRequest.getDestinations() != null
+                && !createTripRequest.getDestinations().isEmpty()) {
+            for (int i = 0; i < createTripRequest.getDestinations().size(); i++) {
+                var destination = createTripRequest.getDestinations().get(i);
+                tripDestinationService.createDestination(
+                        savedTrip,
+                        destination.cityId(),
+                        i
+                );
+            }
+        } else {
+            tripDestinationService.createFirstDestination(
+                    savedTrip,
+                    createTripRequest.getCountryId(),
+                    createTripRequest.getCityId()
+            );
+        }
 
         return tripMapper.toDto(savedTrip);
 

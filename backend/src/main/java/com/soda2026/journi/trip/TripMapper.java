@@ -53,12 +53,15 @@
          return new TripInfoDTO(
                  tripModel.getId(),
                  tripModel.getTitle(),
+                 tripModel.getOwnerId(),
                  tripModel.getStartDate(),
                  tripModel.getEndDate(),
                  tripModel.getCreatedAt(),
                  destinations.stream()
                          .map(tripDestinationMapper::toTripDestinationSummaryDTO)
                          .toList()
+
+
          );
      }
 
