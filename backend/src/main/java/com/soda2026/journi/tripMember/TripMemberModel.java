@@ -24,21 +24,16 @@ public class TripMemberModel {
     @JoinColumn(name = "user_id", nullable = false)
     private UserModel user;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private TripMemberRole role = TripMemberRole.EDITOR;
-
     @Column(name = "joined_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime joinedAt;
 
     protected TripMemberModel() {
     }
 
-    public TripMemberModel(TripModel trip, UserModel user, TripMemberRole role) {
+    public TripMemberModel(TripModel trip, UserModel user) {
         this.trip = Objects.requireNonNull(trip, "Trip is required");
         this.user = Objects.requireNonNull(user, "User is required");
         this.id = new TripMemberId(trip.getId(), user.getId());
-        this.role = Objects.requireNonNull(role, "Role is required");
     }
 
     public TripMemberId getId() {
@@ -53,35 +48,15 @@ public class TripMemberModel {
         return user;
     }
 
-    public TripMemberRole getRole() {
-        return role;
-    }
-
     public LocalDateTime getJoinedAt() {
         return joinedAt;
     }
 
-    public void setRole(TripMemberRole role) {
-        this.role = Objects.requireNonNull(role, "Role is required");
-    }
+
 }
 
 /*
- * Medlemskap i en resa
- * Kopplar en befintlig resa till en befintlig användare genom en sammansatt nyckel.
- * @MapsId kopplar relationerna till motsvarande fält i TripMemberId.
- * EDITOR och VIEWER lagras som text. Databasen hanterar joined_at och updated_at;
- * aktuella tidsvärden kan behöva läsas om efter sparande.
- * Medlemskap ska skapas när en inbjudan accepteras, i samma transaktion.
- * Modellen kontrollerar inte inbjudningar eller behörighet; det är tjänsternas ansvar.
- * Förutsätter färdiga JPA-entiteter TripModel och UserModel med getId().
- *
- * Участие в поездке
- * Связывает существующую поездку с существующим пользователем составным ключом.
- * @MapsId связывает отношения с соответствующими полями TripMemberId.
- * EDITOR и VIEWER хранятся как текст. Датами joined_at и updated_at управляет база;
- * после сохранения для получения актуальных дат может потребоваться повторное чтение.
- * Участник должен создаваться при принятии приглашения в той же транзакции.
- * Модель не проверяет приглашения или права; это ответственность сервисов.
- * Ожидает готовые JPA-сущности TripModel и UserModel с getId().
+ * Each row grants the user membership in one trip, with the same rights as other members.
+ * The owner is stored separately in trips.owner_id and has access without a membership row.
+ * New memberships are created when invitations are accepted.
  */
