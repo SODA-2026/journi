@@ -6,6 +6,7 @@ import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
 import { TripActivities } from "../../activities/components/TripActivities";
+import { TripNotes } from "../../trip-notes/components/TripNotes";
 
 export function TripInfo() {
     const [error, setError] = useState("");
@@ -74,7 +75,7 @@ export function TripInfo() {
                 />
             </section>
             <section>
-                <p>Anteckningar</p>
+                <TripNotes tripId={tripId} tripOwnerId={trip.ownerId} />
             </section>
             <p>Skapad: {formatDate(trip.createdAt)}</p>
             <div>{/* Redigera och ta bort Link/knapp */}</div>
