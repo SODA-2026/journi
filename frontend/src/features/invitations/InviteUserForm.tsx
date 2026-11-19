@@ -50,9 +50,9 @@ export function InviteUserForm({ tripId, onSent }: InviteUserFormProps) {
 
     return (
         <section className="my-6 rounded-xl border border-[#9fb0aa] bg-white p-5">
-            <h3 className="mb-3 text-xl font-semibold">Bjud in till resan</h3>
+            <h3 className="mb-3 text-lg font-bold text-[#1d4237]">Bjud in till resan</h3>
             <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
-                <label className="flex flex-col gap-1">
+                <label className="flex flex-col gap-1.5 text-base text-[#1d4237]">
                     E-postadress till en registrerad användare
                     <input
                         type="email"
@@ -60,22 +60,22 @@ export function InviteUserForm({ tripId, onSent }: InviteUserFormProps) {
                         value={email}
                         disabled={submitting}
                         onChange={handleEmailChange}
-                        className="rounded-lg border border-[#9fb0aa] px-3 py-2"
+                        className="w-full rounded-lg border border-[#9fb0aa] bg-white px-3 py-2 text-base text-[#1d4237] focus:border-[#235e4f] focus:outline-none focus:ring-2 focus:ring-[#235e4f]/20"
                     />
                 </label>
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="rounded-lg bg-[#235e4f] px-4 py-2 text-white disabled:opacity-50"
+                    className="rounded-lg bg-[#235e4f] px-5 py-2.5 text-base text-white hover:bg-[#1d4237] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {submitting ? "Skickar…" : "Skicka inbjudan"}
                 </button>
             </form>
             {successMessage && (
-                <p role="status" className="mt-3">{successMessage}</p>
+                <p role="status" className="mt-3 text-sm text-[#1d4237]">{successMessage}</p>
             )}
             {submitError && (
-                <p role="alert" className="mt-3 text-red-700">{submitError}</p>
+                <p role="alert" className="mt-3 text-sm text-red-700">{submitError}</p>
             )}
         </section>
     );
