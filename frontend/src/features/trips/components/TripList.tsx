@@ -108,7 +108,7 @@ export function TripList() {
             {invitedTrips.length > 0 && (
                 <section aria-labelledby="invited-trips-heading">
                     <h3 id="invited-trips-heading" className="mb-3 text-xl font-bold text-[#1d4237]">
-                        Resor du är inbjuden till
+                        Resor du deltar i
                     </h3>
                     {renderTrips(invitedTrips, false)}
                 </section>
