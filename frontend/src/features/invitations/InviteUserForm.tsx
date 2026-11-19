@@ -4,9 +4,10 @@ import { inviteUser } from "./InvitationApi";
 
 type InviteUserFormProps = {
     tripId: number;
+    onSent?: () => void;
 };
 
-export function InviteUserForm({ tripId }: InviteUserFormProps) {
+export function InviteUserForm({ tripId, onSent }: InviteUserFormProps) {
     const [email, setEmail] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState("");
@@ -27,6 +28,7 @@ export function InviteUserForm({ tripId }: InviteUserFormProps) {
             await inviteUser(tripId, email.trim());
             setEmail("");
             setSuccessMessage("Inbjudan har skickats.");
+            onSent?.();
         } catch (err) {
             const status = err instanceof ApiError ? err.status : 0;
 

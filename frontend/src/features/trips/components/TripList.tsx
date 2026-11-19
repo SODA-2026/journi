@@ -55,11 +55,13 @@ export function TripList() {
         );
     }
 
-    return (
-        <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold text-[#1d4237]">Mina resor</h2>
+    const ownedTrips = trips.filter((trip) => trip.ownerId === user?.id);
+    const invitedTrips = trips.filter((trip) => trip.ownerId !== user?.id);
+
+    function renderTrips(items: TripSummary[], isOwner: boolean) {
+        return (
             <ul className="flex flex-col gap-3">
-                {trips.map((trip) => (
+                {items.map((trip) => (
                     <li
                         key={trip.tripId}
                         className="relative flex items-center justify-between gap-4 rounded-xl border border-[#9fb0aa] bg-white px-6 py-5 transition hover:border-[#235e4f]"
@@ -72,7 +74,7 @@ export function TripList() {
                                 {trip.title}
                             </Link>
                             <p className="mt-1 text-sm font-medium text-[#235e4f]">
-                                {user?.id === trip.ownerId
+                                {isOwner
                                     ? "Du är skapare"
                                     : "Du är inbjuden deltagare"}
                             </p>
@@ -84,7 +86,7 @@ export function TripList() {
                             </p>
                         </div>
 
-                        {user?.id === trip.ownerId && (
+                        {isOwner && (
                             <div className="relative z-10">
                                 <DeleteTripButton
                                     tripId={trip.tripId}
@@ -96,6 +98,21 @@ export function TripList() {
                     </li>
                 ))}
             </ul>
+        );
+    }
+
+    return (
+        <div className="flex flex-col gap-4">
+            <h2 className="text-2xl font-bold text-[#1d4237]">Mina resor</h2>
+            {ownedTrips.length > 0 && renderTrips(ownedTrips, true)}
+            {invitedTrips.length > 0 && (
+                <section aria-labelledby="invited-trips-heading">
+                    <h3 id="invited-trips-heading" className="mb-3 text-xl font-bold text-[#1d4237]">
+                        Resor du är inbjuden till
+                    </h3>
+                    {renderTrips(invitedTrips, false)}
+                </section>
+            )}
         </div>
     );
 }

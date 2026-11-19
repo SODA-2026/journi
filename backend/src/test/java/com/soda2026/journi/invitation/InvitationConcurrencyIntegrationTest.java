@@ -20,6 +20,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @EnabledIfEnvironmentVariable(named = "KAN40_MYSQL_TESTS", matches = "true")
@@ -77,6 +79,45 @@ class InvitationConcurrencyIntegrationTest {
             Long invitationCount = jdbcTemplate.queryForObject(
                     "select count(*) from invitations where trip_id = ?", Long.class, tripId);
             assertEquals(1L, invitationCount);
+        } finally {
+            if (tripId != null) {
+                jdbcTemplate.update("delete from trips where id = ?", tripId);
+            }
+            jdbcTemplate.update("delete from users where email in (?, ?)", ownerEmail, inviteeEmail);
+        }
+    }
+
+    @Test
+    void staleResponseCannotAffectResentInvitation() {
+        String suffix = UUID.randomUUID().toString();
+        String ownerEmail = "kan40-owner-" + suffix + "@example.com";
+        String inviteeEmail = "kan40-invitee-" + suffix + "@example.com";
+        Long tripId = null;
+
+        try {
+            Long ownerId = createUser(ownerEmail);
+            Long inviteeId = createUser(inviteeEmail);
+            tripId = createTrip(ownerId);
+            InvitationRequestDto request = new InvitationRequestDto(tripId, inviteeEmail);
+
+            Long previousId = invitationService.sendInvitation(request, ownerId).id();
+            invitationService.respondToInvitation(previousId, inviteeId, false);
+            Long newId = invitationService.sendInvitation(request, ownerId).id();
+            assertNotEquals(previousId, newId);
+
+            var error = assertThrows(ResponseStatusException.class,
+                    () -> invitationService.respondToInvitation(previousId, inviteeId, true));
+            assertEquals(404, error.getStatusCode().value());
+            var pending = invitationService.getIncomingInvitations(inviteeId);
+            assertEquals(1, pending.size());
+            assertEquals(newId, pending.getFirst().id());
+            assertEquals(InvitationStatus.PENDING, pending.getFirst().status());
+            assertEquals(0L, jdbcTemplate.queryForObject(
+                    "select count(*) from trip_members where trip_id = ? and user_id = ?",
+                    Long.class, tripId, inviteeId));
+
+            assertEquals(InvitationStatus.ACCEPTED,
+                    invitationService.respondToInvitation(newId, inviteeId, true).status());
         } finally {
             if (tripId != null) {
                 jdbcTemplate.update("delete from trips where id = ?", tripId);

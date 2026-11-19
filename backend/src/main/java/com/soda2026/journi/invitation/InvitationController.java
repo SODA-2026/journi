@@ -2,6 +2,7 @@ package com.soda2026.journi.invitation;
 
 import com.soda2026.journi.invitation.Dto.InvitationRequestDto;
 import com.soda2026.journi.invitation.Dto.InvitationResponseDto;
+import com.soda2026.journi.invitation.Dto.SentInvitationDto;
 import com.soda2026.journi.security.UserPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,11 @@ public class InvitationController {
     @GetMapping("/mine")
     public List<InvitationResponseDto> getIncomingInvitations(@AuthenticationPrincipal UserPrincipal user) {
         return invitationService.getIncomingInvitations(user.getId());
+    }
+
+    @GetMapping("/sent")
+    public List<SentInvitationDto> getSentInvitations(@AuthenticationPrincipal UserPrincipal user) {
+        return invitationService.getSentInvitations(user.getId());
     }
 
     @PostMapping("/{id}/accept")

@@ -1,8 +1,10 @@
  package com.soda2026.journi.tripMember;
 
+ import com.soda2026.journi.security.UserPrincipal;
  import com.soda2026.journi.tripMember.dto.TripMemberResponse;
  import jakarta.validation.constraints.Positive;
  import org.springframework.http.HttpStatus;
+ import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.web.bind.annotation.DeleteMapping;
  import org.springframework.web.bind.annotation.GetMapping;
  import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +12,6 @@
  import org.springframework.web.bind.annotation.ResponseStatus;
  import org.springframework.web.bind.annotation.RestController;
 
- import java.security.Principal;
  import java.util.List;
 
  @RestController
@@ -26,9 +27,9 @@
      @GetMapping
      public List<TripMemberResponse> getMembers(
              @PathVariable("tripId") @Positive Long tripId,
-             Principal principal
+             @AuthenticationPrincipal UserPrincipal user
      ) {
-         return service.getMembers(tripId, principal);
+         return service.getMembers(tripId, user.getId());
      }
 
      @DeleteMapping("/{userId}")
@@ -36,9 +37,9 @@
      public void removeMember(
              @PathVariable("tripId") @Positive Long tripId,
              @PathVariable("userId") @Positive Long userId,
-             Principal principal
+             @AuthenticationPrincipal UserPrincipal user
      ) {
-         service.removeMember(tripId, userId, principal);
+         service.removeMember(tripId, userId, user.getId());
      }
  }
 

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import { ApiError } from "../../api/ApiClient";
 import { formatDate } from "../../shared/formatDate";
 import {
     getIncomingInvitations,
@@ -14,33 +15,49 @@ export function IncomingInvitations() {
     const [error, setError] = useState("");
     const [acceptedInvitations, setAcceptedInvitations] = useState<Invitation[]>([]);
     const [successMessage, setSuccessMessage] = useState("");
+    const refreshVersion = useRef(0);
+    const responseInProgress = useRef(false);
 
     useEffect(() => {
         let active = true;
 
-        getIncomingInvitations()
-            .then((data) => {
-                if (active) {
+        async function refreshInvitations() {
+            if (responseInProgress.current) return;
+
+            const version = ++refreshVersion.current;
+            const isCurrent = () => active && version === refreshVersion.current;
+
+            try {
+                const data = await getIncomingInvitations();
+                if (isCurrent()) {
                     setInvitations(data);
+                    setError("");
+                    setSuccessMessage("");
+                    setAcceptedInvitations([]);
                 }
-            })
-            .catch(() => {
-                if (active) {
+            } catch {
+                if (isCurrent()) {
                     setError("Kunde inte hämta inbjudningar. Ladda om sidan för att försöka igen.");
                 }
-            })
-            .finally(() => {
-                if (active) {
+            } finally {
+                if (isCurrent()) {
                     setIsLoading(false);
                 }
-            });
+            }
+        }
 
+        void refreshInvitations();
+        window.addEventListener("focus", refreshInvitations);
         return () => {
             active = false;
+            window.removeEventListener("focus", refreshInvitations);
         };
     }, []);
 
     async function handleRespond(invitation: Invitation, accept: boolean) {
+        if (responseInProgress.current) return;
+        responseInProgress.current = true;
+        refreshVersion.current++;
         setRespondingInvitationId(invitation.id);
         setError("");
         setSuccessMessage("");
@@ -55,9 +72,22 @@ export function IncomingInvitations() {
             } else {
                 setSuccessMessage("Inbjudan avböjd.");
             }
-        } catch {
+        } catch (responseError) {
+            if (
+                responseError instanceof ApiError &&
+                (responseError.status === 404 || responseError.status === 409)
+            ) {
+                const updatedInvitations = await getIncomingInvitations().catch(() => null);
+                if (updatedInvitations !== null) {
+                    setInvitations(updatedInvitations);
+                    setAcceptedInvitations([]);
+                    setSuccessMessage("Den tidigare inbjudan gäller inte längre. Listan har uppdaterats.");
+                    return;
+                }
+            }
             setError("Kunde inte svara på inbjudan. Ladda om sidan och försök igen.");
         } finally {
+            responseInProgress.current = false;
             setRespondingInvitationId(null);
         }
     }
@@ -65,7 +95,7 @@ export function IncomingInvitations() {
     return (
         <section className="mt-6" aria-labelledby="invitations-heading">
             <h2 id="invitations-heading" className="mb-3 text-2xl font-semibold">
-                Dina inbjudningar
+                Inbjudningar till dig
             </h2>
             {isLoading && <p>Laddar inbjudningar…</p>}
             {error && <p role="alert" className="text-red-700">{error}</p>}

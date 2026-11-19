@@ -2,6 +2,7 @@ package com.soda2026.journi.invitation;
 
 import com.soda2026.journi.invitation.Dto.InvitationRequestDto;
 import com.soda2026.journi.invitation.Dto.InvitationResponseDto;
+import com.soda2026.journi.invitation.Dto.SentInvitationDto;
 import com.soda2026.journi.trip.TripAccessService;
 import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.trip.TripRepository;
@@ -69,7 +70,7 @@ public class InvitationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot invite yourself");
         }
 
-        if (tripMemberRepository.existsById(new TripMemberId(trip.getId(), invitee.getId()))) {
+        if (tripAccessService.isMember(trip.getId(), invitee.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member");
         }
 
@@ -82,18 +83,15 @@ public class InvitationService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already been invited");
             }
 
-            // No membership exists; the renewed invitation must be accepted before access is granted.
-            invitation.setStatus(InvitationStatus.PENDING);
-            invitation.setRespondedAt(null);
-        } else {
-            UserModel inviter = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
-            invitation = new InvitationModel(trip, inviter, invitee);
+            invitationRepository.delete(invitation);
+            // Free the unique trip and invitee pair before inserting a new invitation.
+            invitationRepository.flush();
         }
 
-        InvitationModel savedInvitation = invitationRepository.save(invitation);
-        return toDto(savedInvitation);
+        UserModel inviter = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+        return toDto(invitationRepository.save(new InvitationModel(trip, inviter, invitee)));
     }
 
     public List<InvitationResponseDto> getIncomingInvitations(Long userId) {
@@ -102,6 +100,10 @@ public class InvitationService {
                 .stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    public List<SentInvitationDto> getSentInvitations(Long userId) {
+        return invitationRepository.findSentByUserId(userId);
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.soda2026.journi.invitation;
 
+import com.soda2026.journi.invitation.Dto.SentInvitationDto;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -14,6 +15,17 @@ public interface InvitationRepository extends JpaRepository<InvitationModel, Lon
     Optional<InvitationModel> findByTrip_IdAndInvitee_Id(Long tripId, Long inviteeId);
 
     List<InvitationModel> findAllByInvitee_IdAndStatusOrderByCreatedAtDesc(Long inviteeId, InvitationStatus status);
+
+    @Query("""
+            select new com.soda2026.journi.invitation.Dto.SentInvitationDto(
+                i.id, t.id, t.title, recipient.email, i.status)
+            from InvitationModel i
+            join i.trip t
+            join i.invitee recipient
+            where i.inviter.id = :userId
+            order by i.createdAt desc, i.id desc
+            """)
+    List<SentInvitationDto> findSentByUserId(@Param("userId") Long userId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from InvitationModel i where i.id = :id")

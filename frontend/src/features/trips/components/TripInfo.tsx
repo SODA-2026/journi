@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import type { TripInfoType } from "../trips";
 import { getTripInfo } from "../TripFetch";
-import { Link, useParams } from "react-router";
+import { Link } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { ApiError } from "../../../api/ApiClient";
 import { useAuth } from "../../../context/AuthContext";
-import { InviteUserForm } from "../../invitations/InviteUserForm";
+import { SentInvitations } from "../../invitations/SentInvitations";
 
-export function TripInfo() {
+export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
-
-    const params = useParams();
-    const tripId = Number(params.id);
 
     useEffect(() => {
         getTripInfo(tripId)
@@ -50,7 +47,7 @@ export function TripInfo() {
             </p>
             <p>Skapare: {trip.ownerName}</p>
             {user?.id === trip.ownerId && (
-                <InviteUserForm key={trip.id} tripId={trip.id} />
+                <SentInvitations tripId={trip.id} />
             )}
             <section>
                 <p>Destinationer</p>

@@ -12,6 +12,18 @@ export interface Invitation {
     status: "PENDING" | "ACCEPTED" | "DECLINED";
 }
 
+export interface SentInvitation {
+    id: number;
+    tripId: number;
+    tripTitle: string;
+    inviteeEmail: string;
+    status: Invitation["status"];
+}
+
+export function getSentInvitations(): Promise<SentInvitation[]> {
+    return api("/invitations/sent");
+}
+
 export function inviteUser(tripId: number, email: string): Promise<Invitation> {
     return api("/invitations", {
         method: "POST",
