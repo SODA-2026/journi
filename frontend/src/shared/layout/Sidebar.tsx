@@ -13,7 +13,7 @@ const navigationLinks = [
     { to: "/dashboard", label: "Översikt", Icon: LayoutDashboard },
     { to: "/trips", label: "Mina resor", Icon: Luggage },
     { to: "/trips/new", label: "Skapa resa", Icon: Plus },
-    { to: "/places", label: "Platser", Icon: MapPin },
+    { to: "/cities", label: "Städer", Icon: MapPin },
 ];
 
 export function Sidebar({ collapsed, onNavigate }: SidebarProps) {

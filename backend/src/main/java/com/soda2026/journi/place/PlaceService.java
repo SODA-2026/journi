@@ -1,8 +1,7 @@
 package com.soda2026.journi.place;
 
+import com.soda2026.journi.tripDestination.TripDestinationService;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class PlaceService {
@@ -12,12 +11,5 @@ public class PlaceService {
     public PlaceService(PlaceRepository placeRepository, PlaceMapper placeMapper) {
         this.placeRepository = placeRepository;
         this.placeMapper = placeMapper;
-    }
-
-    public List<PlaceResponseDTO> getPlaces() {
-        return placeRepository.findAll()
-                .stream()
-                .map(placeMapper::toDto)
-                .toList();
     }
 }

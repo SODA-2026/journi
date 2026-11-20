@@ -1,11 +1,8 @@
 package com.soda2026.journi.place;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/places")
@@ -15,10 +12,5 @@ public class PlaceController {
 
     public PlaceController(PlaceService placeService) {
         this.placeService = placeService;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PlaceResponseDTO>> getPlaces() {
-        return ResponseEntity.ok(placeService.getPlaces());
     }
 }
