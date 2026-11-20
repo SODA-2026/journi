@@ -19,6 +19,10 @@ public class CityModel {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Size(max = 100)
+    @Column(name = "short_description")
+    private String shortDescription;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "country_id", nullable = false)
@@ -42,6 +46,10 @@ public class CityModel {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getShortDescription() { return shortDescription; }
+
+    public void setShortDescription(String shortDescription) { this.shortDescription = shortDescription; }
 
     public CountryModel getCountry() {
         return country;
