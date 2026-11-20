@@ -8,6 +8,7 @@ import { MyDashboard } from "../pages/MyDashboard";
 import { MyTripsPage } from "../pages/MyTripsPage";
 import { CreateTripPage } from "../pages/CreateTripPage";
 import { TripDetailsPage } from "../pages/TripDetailsPage";
+import { PlacesPage } from "../pages/PlacesPage";
 
 import { NavBar } from "../shared/NavBar";
 import { AppLayout } from "../shared/layout/AppLayout";
@@ -58,6 +59,7 @@ export function AppRoutes() {
                     <Route path="/trips" element={<MyTripsPage />} />
                     <Route path="/trips/new" element={<CreateTripPage />} />
                     <Route path="/trips/:id" element={<TripDetailsPage />} />
+                    <Route path="/places" element={<PlacesPage />} />
                 </Route>
             </Route>
         </Routes>
