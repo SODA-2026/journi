@@ -7,12 +7,14 @@ import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
+import { AddToTripModal } from "../../../shared/components/AddToTripModal";
 
 export function TripInfo() {
     const [error, setError] = useState("");
     const [reorderError, setReorderError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
+    const [showModal, setShowModal] = useState(false);
 
     let params = useParams();
     const tripId = Number(params.id);
@@ -94,6 +96,11 @@ export function TripInfo() {
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const handleAddPlace = async (placeId: number, placeName: string) => {
+        console.log("Skulle lägga till", placeId, placeName);
+        // TODO: Koppla place-API när det finns
     };
 
     return (
@@ -182,6 +189,23 @@ export function TripInfo() {
                                 </button>
                             </div>
                         </div>
+                        <div className="mt-6 rounded-lg border p-4">
+                            <h3 className="mb-3 font-bold">
+                                Testplatser
+                            </h3>
+
+                            <button
+                                onClick={() => handleAddPlace(111, "Bryggen")}
+                            >
+                                Lägg till Bryggen
+                            </button>
+
+                            <button
+                                onClick={() => console.log("Lägg till Fisktorget")}
+                            >
+                                Lägg till Fisktorget
+                            </button>
+                        </div>
                     </section>
 
                     <div className="flex flex-col gap-5">
@@ -199,9 +223,26 @@ export function TripInfo() {
                     </div>
                 </div>
 
+                <button
+                    onClick={() => setShowModal(true)}
+                    className="rounded bg-blue-600 px-4 py-2 text-white"
+                >
+                    Testa AddToTripModal
+                    
+                </button>
+
+
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}
                 </footer>
+
+                <AddToTripModal
+                    isOpen={showModal}
+                    itemId={1}
+                    itemName="Eiffeltornet"
+                    itemType="place"
+                    onClose={() => setShowModal(false)}
+                />
             </article>
         </div>
     );
