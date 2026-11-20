@@ -51,7 +51,7 @@ export function CityList({ countryId }: CityListProps) {
         return (
             <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-[#9fb0aa] px-6 py-10 text-center">
                 <p className="text-lg text-[#1d4237]">
-                    Det finns inga städer i detta land än
+                    Det finns inga tillagda städer i detta land än
                 </p>
             </div>
         );
@@ -67,6 +67,14 @@ export function CityList({ countryId }: CityListProps) {
                     <h3 className="text-lg font-semibold text-[#1d4237]">
                         {city.name}
                     </h3>
+                    <p>
+                       shortDescription
+                        {/* {city.shortDescription} */}
+                    </p>
+
+                    <img /* className="city-image" src="{city.image}" */
+                       
+                    />
                 </li>
             ))}
         </ul>
