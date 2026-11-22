@@ -15,7 +15,11 @@ export function LeaveTripButton({ tripId }: LeaveTripButtonProps) {
 
     async function handleLeave() {
         if (leaveInProgress.current) return;
-        if (!window.confirm("Vill du lämna resan? Du förlorar åtkomsten, men dina anteckningar och aktiviteter finns kvar för de andra deltagarna.")) return;
+        const confirmed = window.confirm(
+            "Vill du lämna resan? Du förlorar åtkomsten, " +
+            "men dina anteckningar och aktiviteter finns kvar för de andra deltagarna.",
+        );
+        if (!confirmed) return;
 
         leaveInProgress.current = true;
         setIsLeaving(true);
@@ -25,9 +29,11 @@ export function LeaveTripButton({ tripId }: LeaveTripButtonProps) {
             await leaveTrip(tripId);
             navigate("/trips", { replace: true });
         } catch (err) {
-            setError(err instanceof ApiError && err.status === 400
-                ? "Du kan inte lämna en resa som du själv har skapat."
-                : "Kunde inte lämna resan. Försök igen eller ladda om sidan.");
+            setError(
+                err instanceof ApiError && err.status === 400
+                    ? "Du kan inte lämna en resa som du själv har skapat."
+                    : "Kunde inte lämna resan. Försök igen eller ladda om sidan.",
+            );
         } finally {
             leaveInProgress.current = false;
             setIsLeaving(false);
@@ -44,7 +50,9 @@ export function LeaveTripButton({ tripId }: LeaveTripButtonProps) {
             >
                 {isLeaving ? "Lämnar resan..." : "Lämna resan"}
             </button>
-            {error && <p role="alert" className="mt-3 text-red-700">{error}</p>}
+            {error && (
+                <p role="alert" className="mt-3 text-red-700">{error}</p>
+            )}
         </div>
     );
 }

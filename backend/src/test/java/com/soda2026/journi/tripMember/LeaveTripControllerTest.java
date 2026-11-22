@@ -27,9 +27,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringJUnitConfig(LeaveTripControllerTest.Config.class)
 @WebAppConfiguration
@@ -88,8 +86,6 @@ class LeaveTripControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(members).delete(membership);
-        verify(entities).persist(argThat(event -> event instanceof TripDepartureModel departure
-                && departure.getTripId().equals(10L) && departure.getMemberName().equals("Member")));
         verify(members, never()).findById(new TripMemberId(10L, 3L));
         assertThrows(org.springframework.web.server.ResponseStatusException.class,
                 () -> access.requireTripOwnerOrMember(10L, 2L));
@@ -132,35 +128,4 @@ class LeaveTripControllerTest {
         verify(members, never()).delete(any());
     }
 
-    @Test
-    void onlyOwnerAndRemainingMembersCanReadDepartureHistory() throws Exception {
-        @SuppressWarnings("unchecked")
-        var query = (jakarta.persistence.TypedQuery<TripDepartureModel>) mock(jakarta.persistence.TypedQuery.class);
-        when(entities.createQuery(anyString(), eq(TripDepartureModel.class))).thenReturn(query);
-        when(query.setParameter("tripId", 10L)).thenReturn(query);
-        when(query.setMaxResults(50)).thenReturn(query);
-        when(query.getResultList()).thenReturn(java.util.List.of(new TripDepartureModel(10L, "Member")));
-
-        for (long id : new long[]{1, 3}) {
-            mvc.perform(get("/api/trips/10/members/departures").with(user(principal(id))))
-                    .andExpect(status().isOk()).andExpect(jsonPath("$[0].memberName").value("Member"));
-        }
-        when(members.existsById(new TripMemberId(10L, 2L))).thenReturn(false);
-        mvc.perform(get("/api/trips/10/members/departures").with(user(principal(2))))
-                .andExpect(status().isForbidden());
-        mvc.perform(get("/api/trips/10/members/departures").with(user(principal(4))))
-                .andExpect(status().isForbidden());
-        mvc.perform(get("/api/trips/10/members/departures"))
-                .andExpect(status().isUnauthorized());
-        verify(query, times(2)).getResultList();
-    }
-
-    @Test
-    void notificationFailurePreventsDeletingMembership() {
-        doThrow(new IllegalStateException("Event could not be stored"))
-                .when(entities).persist(any(TripDepartureModel.class));
-        var service = context.getBean(TripMemberService.class);
-        assertThrows(IllegalStateException.class, () -> service.leaveTrip(10L, 2L));
-        verify(members, never()).delete(any());
-    }
 }

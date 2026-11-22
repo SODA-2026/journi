@@ -3,7 +3,6 @@
  import com.soda2026.journi.trip.TripModel;
  import com.soda2026.journi.trip.TripAccessService;
  import com.soda2026.journi.tripMember.dto.TripMemberResponse;
- import com.soda2026.journi.tripMember.dto.TripDepartureResponse;
  import jakarta.persistence.EntityManager;
  import jakarta.validation.constraints.NotNull;
  import jakarta.validation.constraints.Positive;
@@ -60,23 +59,7 @@
          tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
          TripModel trip = getTrip(tripId);
          requireNonOwnerMember(trip, requesterId);
-         TripMemberModel member = getMember(tripId, requesterId);
-         entityManager.persist(new TripDepartureModel(tripId, member.getUser().getName()));
-         repository.delete(member);
-     }
-
-     @Transactional(readOnly = true)
-     public List<TripDepartureResponse> getDepartures(@NotNull @Positive Long tripId, Long requesterId) {
-         tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
-         return entityManager.createQuery("""
-                 select d from TripDepartureModel d where d.tripId = :tripId
-                 order by d.createdAt desc, d.id desc
-                 """, TripDepartureModel.class)
-                 .setParameter("tripId", tripId)
-                 .setMaxResults(50)
-                 .getResultList().stream()
-                 .map(TripDepartureResponse::from)
-                 .toList();
+         repository.delete(getMember(tripId, requesterId));
      }
 
      private TripModel getTrip(Long tripId) {
