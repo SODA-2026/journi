@@ -4,11 +4,9 @@ package com.soda2026.journi.trip;
  import com.soda2026.journi.trip.dto.TripInfoDTO;
  import com.soda2026.journi.trip.dto.TripResponse;
  import com.soda2026.journi.trip.dto.TripSummaryDTO;
- import com.soda2026.journi.tripDestination.TripDestinationMapper;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
  import com.soda2026.journi.tripDestination.TripDestinationRepository;
  import com.soda2026.journi.tripDestination.TripDestinationService;
- import com.soda2026.journi.tripDestination.dto.TripDestinationSummaryDTO;
  import org.springframework.http.HttpStatus;
  import org.springframework.stereotype.Service;
  import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +21,12 @@ package com.soda2026.journi.trip;
      private final TripDestinationService tripDestinationService;
      private final TripDestinationRepository tripDestinationRepository;
      private final TripMapper tripMapper;
+     private final TripAccessService tripAccessService;
 
 
-     public TripService(TripRepository tripRepository, TripMapper tripMapper, TripDestinationService tripDestinationService, TripDestinationRepository tripDestinationRepository) {
+     public TripService(TripRepository tripRepository, TripMapper tripMapper, TripDestinationService tripDestinationService, TripDestinationRepository tripDestinationRepository, TripAccessService tripAccessService) {
          this.tripRepository = tripRepository;
+         this.tripAccessService = tripAccessService;
          this.tripMapper = tripMapper;
          this.tripDestinationService = tripDestinationService;
          this.tripDestinationRepository = tripDestinationRepository;
@@ -54,25 +54,39 @@ package com.soda2026.journi.trip;
 
         TripModel savedTrip = tripRepository.save(trip);
 
-        tripDestinationService.createFirstDestination(
-                savedTrip,
-                createTripRequest.getCountryId(),
-                createTripRequest.getCityId()
-        );
+        if (createTripRequest.getDestinations() != null
+                && !createTripRequest.getDestinations().isEmpty()) {
+            for (int i = 0; i < createTripRequest.getDestinations().size(); i++) {
+                var destination = createTripRequest.getDestinations().get(i);
+                tripDestinationService.createDestination(
+                        savedTrip,
+                        destination.cityId(),
+                        i
+                );
+            }
+        } else {
+            tripDestinationService.createFirstDestination(
+                    savedTrip,
+                    createTripRequest.getCountryId(),
+                    createTripRequest.getCityId()
+            );
+        }
 
         return tripMapper.toDto(savedTrip);
 
     }
 
+    @Transactional
     public void delete(Long id, Long currentUserId) {
-        TripModel trip = tripRepository.findById(id)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!trip.getOwnerId().equals(currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        tripRepository.delete(trip);
+        tripAccessService.requireTripOwner(id, currentUserId);
+        tripRepository.deleteById(id);
     }
+
+     @Transactional(readOnly = true)
+     public List<TripSummaryDTO> findMyTrips(Long userId) {
+         return tripRepository.findAllAccessibleTo(userId).stream()
+                 .map(tripMapper::toTripSummaryDTO).toList();
+     }
 
      @Transactional(readOnly = true)
      public List<TripSummaryDTO> findTripsByOwnerId(Long ownerId){
@@ -83,17 +97,11 @@ package com.soda2026.journi.trip;
 
      @Transactional(readOnly = true)
      public TripInfoDTO getTripInfo(Long tripId, Long userId){
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
          TripModel trip = tripRepository.findById(tripId)
                  .orElseThrow(() -> new ResponseStatusException(
                          HttpStatus.NOT_FOUND,
                          "Hittade ingen resa" ));
-
-         if (!trip.getOwnerId().equals(userId)){
-             throw new ResponseStatusException(
-                     HttpStatus.FORBIDDEN,
-                     "Du har inte tillgång till denna resa"
-             );
-         }
 
          List<TripDestinationModel> destinations = tripDestinationRepository.findAllByTrip_IdOrderByOrderIndexAsc(tripId);
          return tripMapper.toTripInfoDTO(trip, destinations);

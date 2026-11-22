@@ -46,7 +46,6 @@ erDiagram
     TRIP_MEMBERS {
         bigint trip_id PK, FK
         bigint user_id PK, FK
-        enum role "EDITOR | VIEWER"
         datetime joined_at
         datetime updated_at
     }
@@ -119,7 +118,7 @@ erDiagram
 |---|---|
 | `users` | Ett användarkonto med namn, unik e-postadress, hashat lösenord, valfri profilbild och senaste inloggning. |
 | `trips` | En resa med titel och datumintervall. Varje resa har en ägare (`owner_id`). Ett villkor säkerställer att `end_date` inte ligger före `start_date`. |
-| `trip_members` | Kopplingstabell mellan användare och resor (många till många). `role` anger om medlemmen är `EDITOR` eller `VIEWER`. Ägaren och accepterade inbjudna finns här. |
+| `trip_members` | Kopplingstabell för accepterade inbjudna deltagare (många till många). Alla deltagare har samma rättigheter. Ägaren lagras enbart i `trips.owner_id`, inte som en medlemsrad. |
 | `invitations` | En inbjudan från en användare (`inviter_id`) till en annan (`invitee_id`) att gå med i en resa. En användare kan bara bjudas in en gång per resa. När inbjudan har status ACCEPTED skapas en rad i `trip_members`. |
 | `trip_destinations` | En destination (land och plats) i en resa. `order_index` bestämmer ordningen och är unik per resa. Kan valfritt komma från ett förslag. |
 | `activities` | En aktivitet på en destination, med datum, starttid, beskrivning och status. Kan valfritt komma från ett förslag och har en skapare (`created_by`). |
@@ -128,6 +127,19 @@ erDiagram
 | `password_reset_tokens` | Engångstoken för återställning av lösenord. Bara hashen sparas. Token har utgångstid och markeras som använd i `used_at`. |
 | `suggestions` | Färdiga förslag på länder, städer och aktiviteter (`type`). Fristående tabell som destinationer och aktiviteter valfritt kan kopplas till. |
  
+## Behörighet och lagring
+
+| Användarens relation till resan | Lagring |
+|---|---|
+| Ägare | `trips.owner_id` motsvarar användarens id. |
+| Inbjuden deltagare | En rad i `trip_members` med resans och användarens id. |
+| Utomstående | Varken ägare eller deltagare i resan. |
+
+Ägaren har även deltagarnas rättigheter utan en separat medlemsrad.
+`trip_members` har inget rollfält. OWNER/MEMBER kan vid behov beräknas för visning.
+V5 ersätter rollfältet i V4 med denna modell. PNG-diagrammet i `docs/bilder/`
+visar den äldre modellen med EDITOR/VIEWER och är inte aktuell för behörigheter.
+
 ## Relationer
  
 1. En användare kan skapa flera resor (`trips.owner_id`).
@@ -140,5 +152,5 @@ erDiagram
  
 - **CASCADE:** Tas en resa bort raderas dess destinationer, medlemmar, inbjudningar, anteckningar och röster. Tas en användare bort raderas dennes `password_reset_tokens`.
 - **SET NULL:** `activities.created_by` och båda `source_suggestion_id` sätts till NULL om raden de pekar på tas bort.
-- **Backendregler:** Endast medlemmar i en resa får rösta. `activity_date` måste ligga inom resans datum. Detta kan inte uttryckas som kontrollvillkor i databasen och kontrolleras därför i backend.
+- **Backendregler:** Endast ägaren och deltagare i en resa får rösta. `activity_date` måste ligga inom resans datum. Detta kan inte uttryckas som kontrollvillkor i databasen och kontrolleras därför i backend.
 - **Autentisering:** Auth antas vara stateless (JWT).

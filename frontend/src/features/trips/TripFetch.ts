@@ -11,8 +11,6 @@ export function getTripInfo(tripId: number): Promise<TripInfoType> {
     return api(`/trips/mine/${tripId}`);
 }
   
-const apiUrl = "http://localhost:8080/trips";
-
 export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     return api("/trips/create", { method: "POST", body: JSON.stringify(data) });
 }
@@ -33,17 +31,6 @@ export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
 
     return response.json();
 } */
-export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
-    const response = await fetch(`${apiUrl}/${ownerId}`, {
-        method: "GET",
-    });
-    if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-    }
-    return response.json();
-
-
-}
 export async function deleteTrip(id: number): Promise<void> {
     return api(`/trips/${id}`, { method: "DELETE" });
 
@@ -62,3 +49,13 @@ export async function deleteTrip(id: number): Promise<void> {
 export function getMyTrips(): Promise<TripSummary[]> {
      return api("/trips/mine");
     }
+
+export function reorderTripDestinations(
+    tripId: number,
+    destinationIds: number[],
+): Promise<unknown> {
+    return api(`/api/trips/${tripId}/destinations/reorder`, {
+        method: "PUT",
+        body: JSON.stringify(destinationIds),
+    });
+}

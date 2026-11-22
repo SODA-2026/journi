@@ -12,12 +12,15 @@
  import org.springframework.web.server.ResponseStatusException;
  import jakarta.validation.constraints.NotNull;
  import jakarta.validation.constraints.Positive;
+ import jakarta.validation.constraints.PositiveOrZero;
  import org.springframework.stereotype.Service;
  import org.springframework.transaction.annotation.Transactional;
  import org.springframework.validation.annotation.Validated;
 
  import java.util.List;
- import java.util.Objects;
+ import java.util.HashSet;
+ import java.util.ArrayList;
+ import com.soda2026.journi.trip.TripAccessService;
 
  @Service
  @Validated
@@ -25,19 +28,23 @@
      private final TripDestinationRepository repository;
      private final EntityManager entityManager;
      private final TripDestinationMapper mapper;
+     private final TripAccessService tripAccessService;
 
      public TripDestinationService(
              TripDestinationRepository repository,
              EntityManager entityManager,
-             TripDestinationMapper mapper
+             TripDestinationMapper mapper,
+             TripAccessService tripAccessService
      ) {
          this.repository = repository;
          this.entityManager = entityManager;
          this.mapper = mapper;
+         this.tripAccessService = tripAccessService;
      }
 
      @Transactional(readOnly = true)
-     public List<TripDestinationResponse> getDestinations(Long tripId) {
+     public List<TripDestinationResponse> getDestinations(Long tripId, Long userId) {
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
          return repository.findAllByTrip_IdOrderByOrderIndexAsc(tripId)
                  .stream()
                  .map(mapper::toDto)
@@ -57,12 +64,7 @@
              );
          }
 
-         TripModel trip = entityManager.find(TripModel.class, tripId);
-         if (trip == null) {
-             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip not found");
-         }
-
-         requireCanEdit(trip, user);
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
          return createDestination(tripId, request);
      }
 
@@ -96,6 +98,73 @@
 
          TripDestinationModel savedDestination = repository.save(destination);
          return mapper.toDto(savedDestination);
+     }
+
+     @Transactional
+     public TripDestinationResponse createDestination(
+             @NotNull TripModel trip,
+             @NotNull @Positive Long cityId,
+             @NotNull @PositiveOrZero Integer orderIndex
+     ) {
+         CityModel city = entityManager.find(CityModel.class, cityId);
+         if (city == null) {
+             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found");
+         }
+         if (repository.existsByTrip_IdAndOrderIndex(trip.getId(), orderIndex)) {
+             throw new ResponseStatusException(
+                     HttpStatus.CONFLICT,
+                     "Destination order index is already occupied"
+             );
+         }
+         TripDestinationModel destination = new TripDestinationModel(trip, city, orderIndex);
+         TripDestinationModel saved = repository.save(destination);
+         return mapper.toDto(saved);
+     }
+
+     @Transactional
+     public List<TripDestinationResponse> reorderDestinations(
+             @NotNull @Positive Long tripId,
+             @NotNull List<@Positive Long> destinationIds,
+             @NotNull @Positive Long userId
+     ) {
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
+         List<TripDestinationModel> destinations =
+                 repository.findAllByTrip_IdOrderByOrderIndexAsc(tripId);
+
+         if (destinationIds.size() != destinations.size()
+                 || new HashSet<>(destinationIds).size() != destinationIds.size()) {
+             throw new ResponseStatusException(
+                     HttpStatus.BAD_REQUEST,
+                     "Reorder must contain each destination exactly once"
+             );
+         }
+
+         java.util.Map<Long, TripDestinationModel> byId = new java.util.HashMap<>();
+         for (TripDestinationModel destination : destinations) {
+             byId.put(destination.getId(), destination);
+         }
+         if (!byId.keySet().containsAll(destinationIds)) {
+             throw new ResponseStatusException(
+                     HttpStatus.BAD_REQUEST,
+                     "Reorder contains a destination that does not belong to the trip"
+             );
+         }
+
+         for (int i = 0; i < destinations.size(); i++) {
+             byId.get(destinationIds.get(i)).setOrderIndex(Integer.MAX_VALUE - i);
+         }
+         repository.saveAll(destinations);
+         repository.flush();
+
+         List<TripDestinationModel> reordered = new ArrayList<>();
+         for (int i = 0; i < destinationIds.size(); i++) {
+             TripDestinationModel destination = byId.get(destinationIds.get(i));
+             destination.setOrderIndex(i);
+             reordered.add(destination);
+         }
+         repository.saveAll(reordered);
+
+         return reordered.stream().map(mapper::toDto).toList();
      }
 
      @Transactional
@@ -142,12 +211,4 @@
          return mapper.toDto(saved);
      }
 
-     private void requireCanEdit(TripModel trip, UserModel user) {
-         if (!Objects.equals(trip.getOwnerId(), user.getId())) {
-             throw new ResponseStatusException(
-                     HttpStatus.FORBIDDEN,
-                     "Only the trip owner may add destinations"
-             );
-         }
-     }
  }
