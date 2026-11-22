@@ -14,6 +14,20 @@ export function getTripInfo(tripId: number): Promise<TripInfoType> {
 export function leaveTrip(tripId: number): Promise<void> {
     return api(`/api/trips/${tripId}/members/me`, { method: "DELETE" });
 }
+
+export interface TripEvent {
+    id: number;
+    memberName: string;
+    createdAt: string;
+    eventType: "MEMBER_JOINED" | "MEMBER_LEFT" | "MEMBER_REMOVED";
+    actorId: number | null;
+    actorName: string | null;
+    memberId: number | null;
+}
+
+export function getTripEvents(tripId: number): Promise<TripEvent[]> {
+    return api(`/api/trips/${tripId}/members/events`);
+}
   
 export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     return api("/trips/create", { method: "POST", body: JSON.stringify(data) });
