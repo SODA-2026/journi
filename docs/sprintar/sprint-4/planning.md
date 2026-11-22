@@ -34,21 +34,10 @@ Försöka hitta kompromisser vid behov för att undvika långa diskussioner.
 
 ## Valda stories
 
-<!-- Länka issues med #nummer. Storlek: S, M eller L. -->
-
-> **Exempel:**
->
-> | Issue | Story | Storlek | Ansvarig |
-> |---|---|---|---|
-> | #3 | Skapa ett hushåll | M | Sara |
-> | #4 | Lägga till en syssla | M | Lina |
-> | #7 | Visa lista med sysslor | S | Jonas |
-> | #9 | Projektskelett och databas | M | Amir |
-
 | Issue | Story | Storlek | Ansvarig |
 |---|---|---|---|
 | KAN-91 | **Access Control – Gemensam behörighetshantering**| M |  |
-| КАТ-89| **Gemensam sidstruktur och teknisk UI-arkitektur**     | M      |          |
+| КАN-89| **Gemensam sidstruktur och teknisk UI-arkitektur**     | M      |          |
 | | || |
 | KAN-51 | Som användare vill jag se aktiviteter som passar ett valt resmål så att jag vet vad jag kan göra där | M | |
 | KAN-52 | Som användare vill jag lägga till ett resmål eller en aktivitet i en reseplan så att förslagen blir en del av min planering | M | |
@@ -62,9 +51,10 @@ Försöka hitta kompromisser vid behov för att undvika långa diskussioner.
 | KAN-27 | Som användare vill jag kunna ändra information om en befintlig resa så att jag kan uppdatera mina planer | M | Arvid |
 | KAN-40 | Som resemål skapare vill jag kunna bjuda till andra användare för att delta på en resemål| L| Olena|
 | KAN-31 | Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe | M | Sam|
+| KAN-99 | Som deltagare vill jag kunna lämna en resa så att jag inte längre deltar i planeringen | M | Olena|
 
 
-**Totalt:** 0 S, 13 M, 1 L
+**Totalt:** 0 S, 14 M, 1 L
 
 
 

@@ -21,7 +21,7 @@
 
 ### Sprintmål
 
-<!-- Kopiera från planning.md. -->
+Målet med sprinten är att användaren ska kunna planera och hantera sin resa genom att redigera reseinformation, lägga till aktiviteter och anteckningar samt bjuda in andra användare till gemensam reseplanering.
 
 
 
@@ -39,8 +39,11 @@
 
 | Issue | Story | Visas av |
 |---|---|---|
-| | | |
-| | | |
+| KAN-30 | Som användare vill jag kunna lägga till aktiviteter med datum, tid och beskrivning så att jag kan planera vad jag ska göra under resan | M | Dhannea |
+| KAN-29 | Som användare vill jag kunna lägga till flera destinationer på en resa så att jag kan planera en rundresa. | M | Anders |
+| KAN-88 | Fyll databas med mockup data | M | Anders |
+| KAN-40 | Som resemål skapare vill jag kunna bjuda till andra användare för att delta på en resemål | L | Olena |
+| KAN-31 | Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe | M | Sam |
 
 ### Blev inte klart
 
@@ -54,16 +57,15 @@
 
 ### Demoplan
 
-<!-- I vilken ordning visar ni? Vem gör vad? Berätta det som en användares väg genom appen, inte story för story. -->
+> 1.Anders skapar en resa till Italien och lägger till flera destinationer, till exempel Rom och Florens. Han visar hur resan sparas i Journi.
 
-> **Exempel:**
-> 1. Sara skapar hushållet "Korridor 4B".
-> 2. Lina lägger till tre sysslor.
-> 3. Jonas visar att sysslorna finns kvar efter omladdning.
+> 2.Dhannea öppnar resan och lägger till aktiviteter med datum, tid och beskrivning.
 
-1.
-2.
-3.
+> 3.Sam lägger till anteckningar med viktig information om resan.
+
+> 4.Olena visar hur resans ägare bjuder in en annan användare, som sedan accepterar inbjudan och får tillgång till resan.
+
+> 5.Arvid loggar in som deltagare och visar att resan finns under Mina resor och att informationen finns kvar efter omladdning.
 
 ### Frågor till läraren
 
