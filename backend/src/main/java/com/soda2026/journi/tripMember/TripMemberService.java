@@ -3,6 +3,7 @@
  import com.soda2026.journi.trip.TripModel;
  import com.soda2026.journi.trip.TripAccessService;
  import com.soda2026.journi.tripMember.dto.TripMemberResponse;
+ import com.soda2026.journi.tripMember.dto.TripDepartureResponse;
  import jakarta.persistence.EntityManager;
  import jakarta.validation.constraints.NotNull;
  import jakarta.validation.constraints.Positive;
@@ -54,6 +55,30 @@
          repository.delete(getMember(tripId, userId));
      }
 
+     @Transactional
+     public void leaveTrip(@NotNull @Positive Long tripId, Long requesterId) {
+         tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
+         TripModel trip = getTrip(tripId);
+         requireNonOwnerMember(trip, requesterId);
+         TripMemberModel member = getMember(tripId, requesterId);
+         entityManager.persist(new TripDepartureModel(tripId, member.getUser().getName()));
+         repository.delete(member);
+     }
+
+     @Transactional(readOnly = true)
+     public List<TripDepartureResponse> getDepartures(@NotNull @Positive Long tripId, Long requesterId) {
+         tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
+         return entityManager.createQuery("""
+                 select d from TripDepartureModel d where d.tripId = :tripId
+                 order by d.createdAt desc, d.id desc
+                 """, TripDepartureModel.class)
+                 .setParameter("tripId", tripId)
+                 .setMaxResults(50)
+                 .getResultList().stream()
+                 .map(TripDepartureResponse::from)
+                 .toList();
+     }
+
      private TripModel getTrip(Long tripId) {
          TripModel trip = entityManager.find(TripModel.class, tripId);
          if (trip == null) {
@@ -81,4 +106,5 @@
   * Ownership is determined by trips.owner_id. The owner cannot be removed.
   * There is no role-change endpoint: transferring ownership is not supported.
   * New memberships are created by the invitation service after acceptance.
+  * Participants may leave by deleting only their own membership; owners cannot leave.
   */

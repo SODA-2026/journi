@@ -10,6 +10,20 @@ import type {
 export function getTripInfo(tripId: number): Promise<TripInfoType> {
     return api(`/trips/mine/${tripId}`);
 }
+
+export function leaveTrip(tripId: number): Promise<void> {
+    return api(`/api/trips/${tripId}/members/me`, { method: "DELETE" });
+}
+
+export interface TripDeparture {
+    id: number;
+    memberName: string;
+    createdAt: string;
+}
+
+export function getTripDepartures(tripId: number): Promise<TripDeparture[]> {
+    return api(`/api/trips/${tripId}/members/departures`);
+}
   
 export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     return api("/trips/create", { method: "POST", body: JSON.stringify(data) });

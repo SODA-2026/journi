@@ -4,15 +4,16 @@ import { Link, MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { ApiError } from "../api/ApiClient";
 import { getSentInvitations, inviteUser } from "../features/invitations/InvitationApi";
-import { getTripInfo } from "../features/trips/TripFetch";
+import { getTripInfo, getTripDepartures } from "../features/trips/TripFetch";
 import { TripDetailsPage } from "./TripDetailsPage";
 
 vi.mock("../features/invitations/InvitationApi", () => ({
     getSentInvitations: vi.fn(),
     inviteUser: vi.fn(),
 }));
-vi.mock("../features/trips/TripFetch", () => ({ getTripInfo: vi.fn() }));
-vi.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { id: 1 } }) }));
+vi.mock("../features/trips/TripFetch", () => ({ getTripInfo: vi.fn(), getTripDepartures: vi.fn() }));
+const auth = vi.hoisted(() => ({ user: { id: 1 } }));
+vi.mock("../context/AuthContext", () => ({ useAuth: () => auth }));
 
 const trip = {
     id: 10,
@@ -26,6 +27,8 @@ const trip = {
 };
 
 beforeEach(() => {
+    vi.mocked(getTripDepartures).mockResolvedValue([]);
+    auth.user.id = 1;
     vi.mocked(getSentInvitations).mockResolvedValue([]);
 });
 
@@ -51,12 +54,34 @@ it("hides the previous trip and invitation form while the next trip loads", asyn
     renderTripRoute();
     await screen.findByRole("heading", { name: trip.title });
     expect(screen.getByRole("button", { name: "Skicka inbjudan" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Lämna resan" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("link", { name: "Next trip" }));
 
     expect(screen.getByText("Laddar resa...")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: trip.title })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Skicka inbjudan" })).not.toBeInTheDocument();
+});
+
+it("shows the leave button to an invited participant", async () => {
+    auth.user.id = 2;
+    vi.mocked(getTripInfo).mockResolvedValue(trip);
+    renderTripRoute();
+    expect(await screen.findByRole("button", { name: "Lämna resan" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Skicka inbjudan" })).not.toBeInTheDocument();
+});
+
+it("shows departures to remaining participants and refreshes on returning to the tab", async () => {
+    auth.user.id = 3;
+    vi.mocked(getTripInfo).mockResolvedValue(trip);
+    vi.mocked(getTripDepartures)
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: 1, memberName: "Olena", createdAt: "2026-11-22T20:00:00Z" }]);
+    renderTripRoute();
+    expect(await screen.findByText("Ingen har lämnat resan ännu.")).toBeInTheDocument();
+    fireEvent(window, new Event("focus"));
+    expect(await screen.findByText("Olena har lämnat resan.")).toBeInTheDocument();
+    expect(getTripDepartures).toHaveBeenLastCalledWith(10);
 });
 
 it("clears the previous trip error on navigation", async () => {
