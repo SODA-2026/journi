@@ -10,6 +10,7 @@ import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
 import { LeaveTripButton } from "./LeaveTripButton";
 import { TripDepartures } from "./TripDepartures";
+import { TripMembers } from "../../trip-members/TripMembers";
 
 export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
@@ -104,6 +105,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
                     </div>
                     {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
                     {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
+                    {user?.id === trip.ownerId && <TripMembers key={trip.id} tripId={trip.id} />}
                 </header>
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">

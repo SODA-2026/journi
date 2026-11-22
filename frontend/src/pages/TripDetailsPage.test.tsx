@@ -6,6 +6,9 @@ import { ApiError } from "../api/ApiClient";
 import { getSentInvitations, inviteUser } from "../features/invitations/InvitationApi";
 import { getTripInfo, getTripDepartures } from "../features/trips/TripFetch";
 import { TripDetailsPage } from "./TripDetailsPage";
+import { getTripMembers } from "../features/trip-members/TripMemberApi";
+
+vi.mock("../features/trip-members/TripMemberApi", () => ({ getTripMembers: vi.fn() }));
 
 vi.mock("../features/invitations/InvitationApi", () => ({
     getSentInvitations: vi.fn(),
@@ -27,6 +30,7 @@ const trip = {
 };
 
 beforeEach(() => {
+    vi.mocked(getTripMembers).mockResolvedValue([]);
     vi.mocked(getTripDepartures).mockResolvedValue([]);
     auth.user.id = 1;
     vi.mocked(getSentInvitations).mockResolvedValue([]);
