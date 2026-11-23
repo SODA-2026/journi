@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { City } from "../../destinations/destination";
 import { getAllCities } from "../ExploreApi";
+import { cityCover } from "../cityCovers";
 
 type CityListProps = {
     countryNames: Record<number, string>;
@@ -55,25 +56,36 @@ export function CityList({ countryNames }: CityListProps) {
     }
 
     return (
-        <ul className="flex flex-col gap-3">
-            {cities.map((city) => (
-                <li
-                    key={city.id}
-                    className="rounded-xl border border-[#9fb0aa] bg-white px-6 py-5"
-                >
-                    <h3 className="text-lg font-semibold text-[#1d4237]">
-                        {city.name}
-                    </h3>
-                    <p className="text-sm text-[#1d4237]/70">
-                        {countryNames[city.countryId]}
-                    </p>
-                    <p>{city.shortDescription}</p>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {cities.map((city) => {
+                const countryName = countryNames[city.countryId];
 
-                    <img /* className="city-image" src="{city.image}" */
-                        
-                    />
-                </li>
-            ))}
+                return (
+                    <li
+                        key={city.id}
+                        className="overflow-hidden rounded-xl border border-[#9fb0aa] bg-white"
+                    >
+                        <img
+                            src={cityCover(city, countryName)}
+                            alt={`${city.name}${countryName ? `, ${countryName}` : ""}`}
+                            loading="lazy"
+                            className="h-40 w-full object-cover"
+                            onError={(event) => {
+                                event.currentTarget.style.display = "none";
+                            }}
+                        />
+                        <div className="px-6 py-5">
+                            <h3 className="text-lg font-semibold text-[#1d4237]">
+                                {city.name}
+                            </h3>
+                            {countryName && (
+                                <p className="text-sm text-[#1d4237]/70">{countryName}</p>
+                            )}
+                            <p>{city.shortDescription}</p>
+                        </div>
+                    </li>
+                );
+            })}
         </ul>
     );
 }
