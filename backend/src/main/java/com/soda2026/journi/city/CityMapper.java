@@ -9,7 +9,8 @@ public class CityMapper {
         return new CityResponseDTO(
                 cityModel.getId(),
                 cityModel.getName(),
-                cityModel.getCountry().getId()
+                cityModel.getCountry().getId(),
+                cityModel.getShortDescription()
         );
 
     }

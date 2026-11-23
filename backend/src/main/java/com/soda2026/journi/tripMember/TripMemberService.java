@@ -54,6 +54,14 @@
          repository.delete(getMember(tripId, userId));
      }
 
+     @Transactional
+     public void leaveTrip(@NotNull @Positive Long tripId, Long requesterId) {
+         tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
+         TripModel trip = getTrip(tripId);
+         requireNonOwnerMember(trip, requesterId);
+         repository.delete(getMember(tripId, requesterId));
+     }
+
      private TripModel getTrip(Long tripId) {
          TripModel trip = entityManager.find(TripModel.class, tripId);
          if (trip == null) {
@@ -81,4 +89,5 @@
   * Ownership is determined by trips.owner_id. The owner cannot be removed.
   * There is no role-change endpoint: transferring ownership is not supported.
   * New memberships are created by the invitation service after acceptance.
+  * Participants may leave by deleting only their own membership; owners cannot leave.
   */

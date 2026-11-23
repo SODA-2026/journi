@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
-import { LayoutDashboard, Luggage, LogOut, Mail, UserRound, Plus } from "lucide-react";
+import { Compass, LayoutDashboard, Luggage, LogOut, Mail, UserRound, Plus } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+
 
 interface SidebarProps {
     collapsed: boolean;
@@ -13,6 +14,7 @@ const navigationLinks = [
     { to: "/trips", label: "Mina resor", Icon: Luggage },
     { to: "/invitations", label: "Inbjudningar", Icon: Mail },
     { to: "/trips/new", label: "Skapa resa", Icon: Plus },
+    { to: "/explore", label: "Utforska", Icon: Compass },
 ];
 
 export function Sidebar({ collapsed, onNavigate }: SidebarProps) {
