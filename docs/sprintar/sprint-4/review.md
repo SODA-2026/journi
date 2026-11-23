@@ -1,18 +1,5 @@
-# Sprint review: sprint N
+# Sprint review: sprint 4
 
-<!--
-  INSTRUKTION
-  Del 1 fylls i INNAN reviewn, senast söndag kväll. Det är ert manus.
-  Del 2 fylls i UNDER eller DIREKT EFTER reviewn.
-
-  Reviewn med läraren är ungefär 20 minuter:
-  - Sprintmål och vad som blev klart (2 min)
-  - Demo av fungerande mjukvara (10 min)
-  - Feedback och frågor (8 min)
-
-  Visa bara stories som uppfyller Definition of Done. Halvfärdigt redovisas under "Blev inte klart".
-  Demot ska köras på riktigt, inte med skärmdumpar. Testa det innan.
--->
 
 **Datum:**
 **Deltagare:**
@@ -39,37 +26,44 @@ Målet med sprinten är att användaren ska kunna planera och hantera sin resa g
 
 | Issue | Story | Visas av |
 |---|---|---|
-| KAN-30 | Som användare vill jag kunna lägga till aktiviteter med datum, tid och beskrivning så att jag kan planera vad jag ska göra under resan | M | Dhannea |
-| KAN-29 | Som användare vill jag kunna lägga till flera destinationer på en resa så att jag kan planera en rundresa. | M | Anders |
-| KAN-88 | Fyll databas med mockup data | M | Anders |
-| KAN-40 | Som resemål skapare vill jag kunna bjuda till andra användare för att delta på en resemål | L | Olena |
-| KAN-31 | Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe | M | Sam |
+| KAN-30 | Som användare vill jag kunna lägga till aktiviteter med datum, tid och beskrivning så att jag kan planera vad jag ska göra under resan |Dhannea |
+| KAN-29 | Som användare vill jag kunna lägga till flera destinationer på en resa så att jag kan planera en rundresa. | Anders |
+| KAN-88 | Fyll databas med mockup data | Anders |
+| KAN-40 | Som resemål skapare vill jag kunna bjuda till andra användare för att delta på en resemål | Olena |
+| KAN-31 | Som användare vill jag kunna skriva anteckningar om resan så att jag kan samla viktig information på ett ställe | Sam |
+| KAN-107 | Som ägaren vill jag ta bort en medlem| Olena|
+| KAN-104 | Skapa V7 db| Anders|
+| KAN-49 | Som användare vill jag se en lista med förslag på resmål så att jag får inspiration till var jag kan resa| Sam|
+| KAN-99 | Som deltagare vill jag kunna lämna en resa så att jag inte längre deltar i planeringen.| Olena|
 
 ### Blev inte klart
 
-<!-- Vad och varför? Det är inget misslyckande, men det ska förklaras. -->
 
 > **Exempel:** #9 Projektskelett blev klart, men databasen körs bara lokalt hos Amir. Vi underskattade hur lång tid Docker-uppsättningen tog.
 
 | Issue | Story | Varför inte klar | Vad händer med den? |
 |---|---|---|---|
-| | | | |
+| KAN-50| Som användare vill jag öppna ett resmål och läsa mer så att jag kan avgöra om det passar mig| | Pågående arbete|
+| KAN-51| Som användare vill jag se förslag på platser att besöka(aktiviteter) när jag väljer en destination, så att jag vet vad jag kan göra där.|                  | Pågående arbete                  |
+| KAN-52  | Som användare vill jag lägga till ett resmål eller en aktivitet i en reseplan så att förslagen blir en del av min planering|                  | Pågående arbete                   |
+| KAN-108  | Validera aktivitetsdatum och visa aktivitetens skapare  |                  | Pågående arbete                  |
+| KAN-110| Authorization (Behörighetskontroll) för aktiviteter inom en resa|                  | Pågående arbete                   |
 
 ### Demoplan
 
-> 1.Anders skapar en resa till Italien och lägger till flera destinationer, till exempel Rom och Florens. Han visar hur resan sparas i Journi.
+> 1.Anders skapar en resa till Sverige och lägger till flera destinationer. Han visar hur resan sparas i Journi.
 
 > 2.Dhannea öppnar resan och lägger till aktiviteter med datum, tid och beskrivning.
 
-> 3.Sam lägger till anteckningar med viktig information om resan.
+> 3.Sam lägger till anteckningar med viktig information om resan. Kan ta bort sina egna antekningar.
 
-> 4.Olena visar hur resans ägare bjuder in en annan användare, som sedan accepterar inbjudan och får tillgång till resan.
+> 4.Olena visar hur resans ägare bjuder in en annan användare, som sedan accepterar inbjudan och får tillgång till resan. Ägaren kan ta bort en deltagare och en deltagare kan lämna resan själv.
 
-> 5.Arvid loggar in som deltagare och visar att resan finns under Mina resor och att informationen finns kvar efter omladdning.
+
 
 ### Frågor till läraren
 
-<!-- Något ni vill ha feedback på eller är osäkra på? -->
+>Inga frågor
 
 -
 

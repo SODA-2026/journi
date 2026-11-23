@@ -42,7 +42,7 @@ Försöka hitta kompromisser vid behov för att undvika långa diskussioner.
 | KAN-51 | Som användare vill jag se aktiviteter som passar ett valt resmål så att jag vet vad jag kan göra där | M | |
 | KAN-52 | Som användare vill jag lägga till ett resmål eller en aktivitet i en reseplan så att förslagen blir en del av min planering | M | |
 | KAN-43 | Som inloggad användare vill jag spara en reseplan till mitt konto så att den finns kvar nästa gång jag kommer tillbaka. | M | |
-| KAN-23 | Som användare vill jag se förslag på resmål och aktiviteter för att enklare planera. | M | |
+| KAN-23 | Som användare vill jag se förslag på resmål och aktiviteter för att enklare planera. (arkiverad)| M | |
 | KAN-49 | Som användare vill jag se en lista med förslag på resmål så att jag får inspiration till var jag kan resa | M | |
 | KAN-50 | Som användare vill jag öppna ett resmål och läsa mer så att jag kan avgöra om det passar mig | M | |
 | KAN-30 | Som användare vill jag kunna lägga till aktiviteter med datum, tid och beskrivning så att jag kan planera vad jag ska göra under r... | M | Dhannea |
