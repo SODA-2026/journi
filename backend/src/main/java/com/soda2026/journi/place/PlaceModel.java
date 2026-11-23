@@ -35,9 +35,10 @@ public class PlaceModel {
     @Column(name = "address")
     private String address;
 
+    @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "category", nullable = false)
-    private String category;
+    private PlaceCategory category;
 
     public PlaceModel() {
     }
@@ -84,11 +85,11 @@ public class PlaceModel {
         this.address = address;
     }
 
-    public String getCategory() {
+    public PlaceCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(PlaceCategory category) {
         this.category = category;
     }
 
