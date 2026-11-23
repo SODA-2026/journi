@@ -18,7 +18,7 @@ export function ExplorePage() {
     return (
         <>
             <PageHeader
-                title="Städer"
+                title="Utforska"
                 description="Upptäck städer och hitta inspiration till din nästa resa"
             />
 
