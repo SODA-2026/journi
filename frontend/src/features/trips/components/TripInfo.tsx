@@ -36,7 +36,7 @@ export function TripInfo() {
     // without it TripActivities gets a new array every time - endless loop of requests
     const destinationOptions = useMemo(
         () =>
-            trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
+            trip?.destinations.map((d) => ({ id: d.id, label: d.city, cityId: d.cityId })) ?? [],
         [trip],
     );
   

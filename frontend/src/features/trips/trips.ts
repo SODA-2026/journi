@@ -45,6 +45,7 @@ export interface TripDestination {
     id: number;
     city: string;
     country: string;
+    cityId: number;
 }
 
 export interface TripInfoType {
