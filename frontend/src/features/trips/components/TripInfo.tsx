@@ -1,21 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
 import { getTripInfo, reorderTripDestinations } from "../TripFetch";
-import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
+import { useAuth } from "../../../context/AuthContext";
+import { SentInvitations } from "../../invitations/SentInvitations";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
+import { TripMembers } from "../../trip-members/TripMembers";
+import { LeaveTripButton } from "./LeaveTripButton";
 
-export function TripInfo() {
+export function TripInfo({ tripId }: { tripId: number }) {
+    const { user } = useAuth();
     const [error, setError] = useState("");
     const [reorderError, setReorderError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
 
-    let params = useParams();
-    const tripId = Number(params.id);
 
     useEffect(() => {
         getTripInfo(tripId)
@@ -39,7 +41,7 @@ export function TripInfo() {
             trip?.destinations.map((d) => ({ id: d.id, label: d.city, cityId: d.cityId })) ?? [],
         [trip],
     );
-  
+
     if (isLoading) {
         return (
             <div className="rounded-xl border border-[#d6e1d9] bg-white px-6 py-8 text-[#526c62]">
@@ -49,7 +51,7 @@ export function TripInfo() {
     }
 
 
-    
+
 
     if (error)
         return (
@@ -92,10 +94,17 @@ export function TripInfo() {
                 <header className="border-b border-[#d6e1d9] bg-[#f8faf7] px-5 py-6 sm:px-8">
                     <p className="mb-1 text-sm font-medium uppercase tracking-wide text-[#526c62]">Resedetaljer</p>
                     <h1 className="text-3xl font-bold tracking-tight text-[#1d4237]">{trip.title}</h1>
+                    <p className="mt-1 font-medium text-[#235e4f]">
+                        {user?.id === trip.ownerId ? "Du är skapare" : "Du är inbjuden deltagare"}
+                    </p>
+                    <p>Skapare: {trip.ownerName}</p>
                     <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[#526c62]">
                         <p><span className="font-medium text-[#1d4237]">Startdatum:</span> {formatDate(trip.startDate)}</p>
                         <p><span className="font-medium text-[#1d4237]">Slutdatum:</span> {formatDate(trip.endDate)}</p>
                     </div>
+                    {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
+                    {user?.id === trip.ownerId && <TripMembers key={trip.id} tripId={trip.id} />}
+                    {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
                 </header>
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -151,7 +160,7 @@ export function TripInfo() {
                              <TripActivities
                                tripId={tripId}
                                destinations={destinationOptions}
-                             />                        
+                             />
                          </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
                             <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Anteckningar</h2>
