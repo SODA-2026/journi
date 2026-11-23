@@ -71,15 +71,26 @@ Målet med sprinten är att användaren ska kunna planera och hantera sin resa g
 
 ### Feedback
 
-> **Exempel:** Läraren frågade hur man vet vem som ska göra nästa disk. I deras kollektiv turas man om varje vecka i stället för att tilldela.
+-Vi ska ha en diskution kringgående vad vi vil fokusera på av resterande tid.
 
--
--
+-Appen är tillräcklig.
+
 
 ### Ändringar i backloggen
 
 <!-- Nya stories, ändrad prioritet, stories som tagits bort. Länka issues. -->
 
-> **Exempel:** Ny story #15 "Turordning per vecka" som Must. "Tilldela en syssla" (#5) sänks till Should.
+KAN-107
+KAN-104
+KAN-99
+KAN-108
+KAN-110
+KAN-111
+KAN-112
+KAN-113
+KAN-102
 
--
+
+KAN-23 Som användare vill jag se förslag på resemål och aktiviteter för att enklare planera (uppdelad),
+KAN-22 Som användare vill jag ha en egen profil att spara mina reseplaner på(dubblering),
+KAN-47 Som användare vill jag ändra och ta bort sparade reseplaner så att min lista är aktuell (dubblering).

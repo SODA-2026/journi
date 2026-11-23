@@ -17,15 +17,9 @@
 
 ## Förra retrons åtgärder
 
-> **Exempel:**
->
-> | Åtgärd | Blev den av? | Hjälpte den? |
-> |---|---|---|
-> | PR:er granskas inom 24 timmar | Ja, nästan alltid | Ja, mycket färre PR:er som låg och väntade |
-
 | Åtgärd | Blev den av? | Hjälpte den? |
 |---|---|---|
-| | | |
+| -| -| -|
 
 ## Vad gick bra?
 
@@ -38,13 +32,19 @@
 
 ## Vad gick mindre bra?
 
-> **Exempel:**
-> - PR:er låg ogranskade i upp till två dagar.
-> - Vi tog in för mycket. Två stories blev inte klara.
-> - Ingen visste att Amir satt fast med Docker förrän torsdag.
 
--
--
+> - Vad gick bra:
+- Vi fick igång sprintin denna veckan och fick göra klart ett stor del av sprintmålet.
+- Hög vilja till att vara produktiv.
+
+
+
+> - Vad gick mindre bra:
+- Små ändringar och nya ideer/förslag som kändes som att vi blev lite back men det fixades sig i slutet.
+- Fortsatta långa disskusioner som kan upplevas överflödigt.
+- Vid genomgången av projektet upptäcktes att vissa acceptanskriterier hade missats och att en del funktionalitet inte hade dokumenterats i separata Jira-kort..
+- Tid slösades på uppgifter som inte var med i sprintmålet
+- Vissa kort var inte optimalt formulerade vilket skapade förvirring och hinder som vi inte löste ordentiligt
 
 ## Åtgärder till nästa sprint
 
@@ -60,13 +60,10 @@
 
 | Åtgärd | Ansvarig |
 |---|---|
-| | |
-| | |
+| Ta ansvar för sin egen Jira-kort förtydliga AK| |
+| Bryt ut kort vid behov!| |
+| Diskutera mindre!|          |
+
 
 ## Ändringar i Definition of Done eller gruppkontrakt
-
-<!-- Om ni ändrar något: uppdatera dokumentet och skriv här vad och varför. -->
-
-> **Exempel:** Ny punkt i gruppkontraktet: "Pull requests granskas inom 24 timmar."
-
 -
