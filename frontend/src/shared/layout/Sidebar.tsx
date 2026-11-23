@@ -14,7 +14,7 @@ const navigationLinks = [
     { to: "/trips", label: "Mina resor", Icon: Luggage },
     { to: "/invitations", label: "Inbjudningar", Icon: Mail },
     { to: "/trips/new", label: "Skapa resa", Icon: Plus },
-    { to: "/cities", label: "Städer", Icon: MapPin },
+    { to: "/explore", label: "Utforska", Icon: MapPin },
 ];
 
 export function Sidebar({ collapsed, onNavigate }: SidebarProps) {

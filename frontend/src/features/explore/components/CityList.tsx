@@ -67,10 +67,7 @@ export function CityList({ countryNames }: CityListProps) {
                     <p className="text-sm text-[#1d4237]/70">
                         {countryNames[city.countryId]}
                     </p>
-                    <p>
-                        shortDescription
-                        {/* {city.shortDescription} */}
-                    </p>
+                    <p>{city.shortDescription}</p>
 
                     <img /* className="city-image" src="{city.image}" */
                         
