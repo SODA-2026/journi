@@ -82,24 +82,31 @@ export function AddToTripModal({
                         </select>
                         <button
                             type="button"
-                            disabled={!selectedTripId}
+                            disabled={!selectedTripId || isLoading}
                             className="mt-4 w-full rounded-lg bg-[#235e4f] px-4 py-2 text-white disabled:opacity-50"
                             onClick={async () => {
                                 if (!selectedTripId) return;
-                                
 
-                                setSuccess(true);
+                                try {
+                                    setIsLoading(true);
 
-                                setTimeout(() => {
-                                    setSuccess(false);
-                                    onClose();
-                                }, 1500);
+                                    await onAdd(selectedTripId, itemId);
 
-                                await onAdd(selectedTripId, itemId);
-                                onClose();
+                                    setSuccess(true);
+
+                                    setTimeout(() => {
+                                        setSuccess(false);
+                                        onClose();
+                                    }, 1500);
+
+                                } catch (error) {
+                                    console.error(error);
+                                } finally {
+                                    setIsLoading(false);
+                                }
                             }}
                         >
-                            Lägg till i plan
+                            {isLoading ? "Lägger till..." : "Lägg till i plan"}
                         </button>
                         {success && (
                             <p className="text-green-600">

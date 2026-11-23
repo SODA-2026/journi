@@ -10,6 +10,7 @@ import { SentInvitations } from "../../invitations/SentInvitations";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
 import { AddToTripModal } from "../../../shared/components/AddToTripModal";
+import { getPlaces } from "../../places/PlaceFetch";
 
 export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
@@ -18,6 +19,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
     const [showModal, setShowModal] = useState(false);
+    const [places, setPlaces] = useState<Place[]>([]);
 
 
     useEffect(() => {
@@ -33,6 +35,12 @@ export function TripInfo({ tripId }: { tripId: number }) {
             })
             .finally(() => setIsLoading(false));
     }, [tripId]);
+
+    useEffect(() => {
+    getPlaces()
+        .then(setPlaces)
+        .catch(console.error);
+}, []);
 
 
     // useMemo keeps the array stable between renders
