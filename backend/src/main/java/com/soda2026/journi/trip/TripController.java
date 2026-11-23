@@ -2,10 +2,8 @@
 
  import com.soda2026.journi.trip.dto.CreateTripRequest;
  import com.soda2026.journi.trip.dto.TripInfoDTO;
- import com.soda2026.journi.trip.dto.TripInfoDTO;
  import com.soda2026.journi.trip.dto.TripResponse;
  import com.soda2026.journi.trip.dto.TripSummaryDTO;
- import com.soda2026.journi.user.UserService;
  import jakarta.validation.Valid;
  import org.springframework.http.HttpStatus;
  import org.springframework.http.ResponseEntity;
@@ -32,7 +30,7 @@
 
      @GetMapping("/mine")
      public ResponseEntity<List<TripSummaryDTO>> myTrips(@AuthenticationPrincipal UserPrincipal user) {
-         return ResponseEntity.ok(tripService.findTripsByOwnerId(user.getId()));
+         return ResponseEntity.ok(tripService.findMyTrips(user.getId()));
      }
 
      @DeleteMapping("/{id}")

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
-import { LayoutDashboard, Luggage, LogOut, UserRound, Plus, MapPin } from "lucide-react";
+import { LayoutDashboard, Luggage, LogOut, Mail, UserRound, Plus, MapPin } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 
@@ -12,6 +12,7 @@ interface SidebarProps {
 const navigationLinks = [
     { to: "/dashboard", label: "Översikt", Icon: LayoutDashboard },
     { to: "/trips", label: "Mina resor", Icon: Luggage },
+    { to: "/invitations", label: "Inbjudningar", Icon: Mail },
     { to: "/trips/new", label: "Skapa resa", Icon: Plus },
     { to: "/cities", label: "Städer", Icon: MapPin },
 ];

@@ -8,8 +8,16 @@ export function validate(values: TripFormData): TripFormErrors {
         errors.title = "Title is required";
     }
 
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const todayDate = `${year}-${month}-${day}`;
+
     if (values.startDate === "") {
         errors.startDate = "Start date must be filled!";
+    } else if (values.startDate < todayDate) {
+        errors.startDate = "Startdatum måste vara i dag eller senare.";
     }
 
     if (values.endDate === "") {
