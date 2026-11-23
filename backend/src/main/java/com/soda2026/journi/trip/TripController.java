@@ -1,43 +1,47 @@
  package com.soda2026.journi.trip;
 
  import com.soda2026.journi.trip.dto.CreateTripRequest;
+ import com.soda2026.journi.trip.dto.TripInfoDTO;
  import com.soda2026.journi.trip.dto.TripResponse;
  import com.soda2026.journi.trip.dto.TripSummaryDTO;
- import com.soda2026.journi.user.UserService;
  import jakarta.validation.Valid;
  import org.springframework.http.HttpStatus;
  import org.springframework.http.ResponseEntity;
  import org.springframework.web.bind.annotation.*;
 
  import java.util.List;
+ import com.soda2026.journi.security.UserPrincipal;
+ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
  @RestController
  @RequestMapping("/trips")
  public class TripController {
 
      private final TripService tripService;
-     private final UserService userService;
 
-     public TripController(TripService tripService, UserService userService) {
+     public TripController(TripService tripService) {
          this.tripService = tripService;
-         this.userService = userService;
-     }
-
-     @GetMapping
-     public ResponseEntity<List<TripResponse>> getAll() {
-         return
-                 ResponseEntity.ok(tripService.getAll());
      }
 
      @PostMapping("/create")
-     public ResponseEntity<TripResponse> createTrip(@Valid @RequestBody CreateTripRequest createTripRequest) {
- //        1L = 1 Long
-         return ResponseEntity.status(HttpStatus.CREATED).body(tripService.createTrip(createTripRequest, 1L));
+     public ResponseEntity<TripResponse> createTrip(@Valid @RequestBody CreateTripRequest createTripRequest, @AuthenticationPrincipal UserPrincipal user) {
+         return ResponseEntity.status(HttpStatus.CREATED).body(tripService.createTrip(createTripRequest, user.getId()));
      }
 
-     @GetMapping("/{ownerId}")
-     public ResponseEntity<List<TripSummaryDTO>> findTripsByOwnerId(@PathVariable Long ownerId){
-         return ResponseEntity.ok(tripService.findTripsByOwnerId(ownerId));
+     @GetMapping("/mine")
+     public ResponseEntity<List<TripSummaryDTO>> myTrips(@AuthenticationPrincipal UserPrincipal user) {
+         return ResponseEntity.ok(tripService.findMyTrips(user.getId()));
+     }
+
+     @DeleteMapping("/{id}")
+     public ResponseEntity<Void> deleteTrip(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal user) {
+         tripService.delete(id, user.getId());
+         return ResponseEntity.noContent().build();
+     }
+
+     @GetMapping("/mine/{tripId}")
+     public ResponseEntity<TripInfoDTO> getTripInfo(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long tripId){
+         return ResponseEntity.ok(tripService.getTripInfo(tripId, user.getId()));
      }
 
  }

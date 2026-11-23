@@ -1,9 +1,21 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { validate } from "./TripValidation";
 
 describe("validate", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(2026, 10, 5, 12));
+    });
+
+    afterEach(() => vi.useRealTimers());
+
+    it("rejects a start date in the past", () => {
+        expect(validate({ ...valid, startDate: "2026-11-04" }).startDate).toBeDefined();
+    });
     const valid = {
         title: "Paris",
+        countryId: 1,
+        cityId: 1,
         startDate: "2026-11-05",
         endDate: "2026-11-08",
     };

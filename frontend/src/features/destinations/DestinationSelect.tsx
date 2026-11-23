@@ -7,12 +7,14 @@ type DestinationSelectProps = {
     showErrors: boolean;
     onCountryChange: (countryId: number) => void;
     onCityChange: (cityId: number) => void;
+    onSelectionChange?: (selection: { countryId: number; cityId: number; countryName: string; cityName: string }) => void;
 };
 
 export function DestinationSelect({
     showErrors,
     onCountryChange,
     onCityChange,
+    onSelectionChange,
 }: DestinationSelectProps) {
     const [cities, setCities] = useState<City[]>([]);
     const [countries, setCountries] = useState<Country[]>([]);
@@ -41,6 +43,16 @@ export function DestinationSelect({
         const newCityId = Number(e.target.value);
         setCityId(newCityId);
         onCityChange(newCityId);
+        if (onSelectionChange) {
+            const country = countries.find((c) => c.countryId === countryId);
+            const city = cities.find((c) => c.id === newCityId);
+            onSelectionChange({
+                countryId,
+                cityId: newCityId,
+                countryName: country?.name ?? "",
+                cityName: city?.name ?? "",
+            });
+        }
     }
     function handleCountrySelect(e: React.ChangeEvent<HTMLSelectElement>) {
         const newCountryId = Number(e.target.value);

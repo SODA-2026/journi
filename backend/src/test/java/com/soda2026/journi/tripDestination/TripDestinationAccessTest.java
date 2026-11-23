@@ -1,13 +1,16 @@
 package com.soda2026.journi.tripDestination;
 
-import com.soda2026.journi.suggestion.DestinationKind;
-import com.soda2026.journi.suggestion.SuggestionModel;
-import com.soda2026.journi.suggestion.SuggestionType;
+import com.soda2026.journi.city.CityModel;
+import com.soda2026.journi.country.CountryModel;
 import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.tripDestination.dto.CreateTripDestinationRequest;
 import com.soda2026.journi.tripMember.TripMemberId;
-import com.soda2026.journi.tripMember.TripMemberModel;
-import com.soda2026.journi.tripMember.TripMemberRole;
+import com.soda2026.journi.trip.TripAccessService;
+import com.soda2026.journi.trip.TripRepository;
+import com.soda2026.journi.tripMember.TripMemberRepository;
+import java.util.Optional;
+import java.util.List;
+
 import com.soda2026.journi.user.UserModel;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -21,8 +24,10 @@ import static org.mockito.Mockito.*;
 class TripDestinationAccessTest {
     private final TripDestinationRepository repository = mock(TripDestinationRepository.class);
     private final EntityManager entityManager = mock(EntityManager.class);
+    private final TripRepository trips = mock(TripRepository.class);
+    private final TripMemberRepository members = mock(TripMemberRepository.class);
     private final TripDestinationService service = new TripDestinationService(
-            repository, entityManager, new TripDestinationMapper()
+            repository, entityManager, new TripDestinationMapper(), new TripAccessService(trips, members)
     );
     private final CreateTripDestinationRequest request = new CreateTripDestinationRequest(4L, 0);
     private final Long userId = 7L;
@@ -49,15 +54,6 @@ class TripDestinationAccessTest {
     }
 
     @Test
-    void rejectsViewer() {
-        TripModel trip = stubTripAndUser();
-        when(entityManager.find(TripMemberModel.class, new TripMemberId(10L, 7L)))
-                .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.VIEWER));
-        assertStatus(HttpStatus.FORBIDDEN, userId);
-        verifyNoInteractions(repository);
-    }
-
-    @Test
     void allowsOwner() {
         TripModel trip = stubTripAndUser();
         trip.setOwnerId(7L);
@@ -66,23 +62,35 @@ class TripDestinationAccessTest {
         var response = service.createDestination(10L, request, userId);
 
         assertEquals(Long.valueOf(10L), response.tripId());
-        assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
+        assertEquals(Long.valueOf(4L), response.cityId());
         verify(repository).save(any(TripDestinationModel.class));
-        verify(entityManager, never()).find(eq(TripMemberModel.class), any());
+        verifyNoInteractions(members);
     }
 
     @Test
-    void allowsEditor() {
-        TripModel trip = stubTripAndUser();
-        when(entityManager.find(TripMemberModel.class, new TripMemberId(10L, 7L)))
-                .thenReturn(new TripMemberModel(trip, user(), TripMemberRole.EDITOR));
+    void allowsMemberToCreateDestination() {
+        stubTripAndUser();
+        when(members.existsById(new TripMemberId(10L, 7L))).thenReturn(true);
         stubDestination();
+        assertEquals(10L, service.createDestination(10L, request, userId).tripId());
+        verify(repository).save(any());
+    }
 
-        var response = service.createDestination(10L, request, userId);
+    @Test
+    void rejectsOutsiderReadingDestinations() {
+        stubTripAndUser();
+        var error = assertThrows(ResponseStatusException.class,
+                () -> service.getDestinations(10L, userId));
+        assertEquals(HttpStatus.FORBIDDEN, error.getStatusCode());
+        verifyNoInteractions(repository);
+    }
 
-        assertEquals(Long.valueOf(10L), response.tripId());
-        assertEquals(Long.valueOf(4L), response.sourceSuggestionId());
-        verify(repository).save(any(TripDestinationModel.class));
+    @Test
+    void allowsMemberReadingDestinations() {
+        stubTripAndUser();
+        when(members.existsById(new TripMemberId(10L, 7L))).thenReturn(true);
+        when(repository.findAllByTrip_IdOrderByOrderIndexAsc(10L)).thenReturn(List.of());
+        assertTrue(service.getDestinations(10L, userId).isEmpty());
     }
 
     private void assertStatus(HttpStatus expected, Long requester) {
@@ -107,17 +115,19 @@ class TripDestinationAccessTest {
         trip.setId(10L);
         trip.setOwnerId(99L);
         when(entityManager.find(TripModel.class, 10L)).thenReturn(trip);
+        when(trips.findById(10L)).thenReturn(Optional.of(trip));
         return trip;
     }
 
     private void stubDestination() {
-        SuggestionModel city = new SuggestionModel();
+        CountryModel country = new CountryModel();
+        country.setId(1L);
+        country.setName("Sverige");
+        CityModel city = new CityModel();
         city.setId(4L);
-        city.setType(SuggestionType.DESTINATION);
-        city.setDestinationKind(DestinationKind.CITY);
-        city.setCountry("Sverige");
+        city.setCountry(country);
         city.setName("Malmö");
-        when(entityManager.find(SuggestionModel.class, 4L)).thenReturn(city);
+        when(entityManager.find(CityModel.class, 4L)).thenReturn(city);
         when(repository.save(any(TripDestinationModel.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }

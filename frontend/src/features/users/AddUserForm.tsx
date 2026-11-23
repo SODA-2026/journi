@@ -1,8 +1,14 @@
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router";
 import React, { useState } from 'react';
-import { createUser, type UserRequestDTO } from "./UserFetch";
+import { type UserRequestDTO } from "./UserFetch";
 
 
 export function AddUserForm() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
   const [formData, setFormData] = useState<UserRequestDTO>({
     email: '',
     name: '',
@@ -19,12 +25,15 @@ export function AddUserForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPending(true);
+    setError("");
     try {
-      const savedUser = await createUser(formData);
-      alert('User Created Successfully!');
-      console.log('Saved User Response:', savedUser);
+      await register(formData);
+      navigate("/trips");
     } catch (err) {
-      console.error('Failed to create user:', err);
+      setError(err instanceof Error ? err.message : "Kunde inte skapa konto");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -47,10 +56,12 @@ export function AddUserForm() {
       <input
         type="password"
         name="password"
+        aria-describedby="password-requirements"
         value={formData.password}
         onChange={handleChange}
         placeholder="Password"
       />
+      <p id="password-requirements">Lösenordet måste innehålla minst 8 tecken.</p>
       <input
         type="text"
         name="profileImage"
@@ -58,7 +69,8 @@ export function AddUserForm() {
         onChange={handleChange}
         placeholder="Profile Image URL"
       />
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={pending}>Submit</button>
+      {error && <p role="alert">{error}</p>}
     </form>
   );
 }

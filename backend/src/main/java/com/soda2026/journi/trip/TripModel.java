@@ -1,6 +1,7 @@
 package com.soda2026.journi.trip;
 
 import jakarta.persistence.*;
+import com.soda2026.journi.user.UserModel;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,6 +19,10 @@ public class TripModel {
 
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private UserModel owner;
 
     @Column(name = "title", nullable = false, length = 150)
     private String title;
@@ -45,6 +50,10 @@ public class TripModel {
 
     public Long getOwnerId() {
         return ownerId;
+    }
+
+    public UserModel getOwner() {
+        return owner;
     }
 
     public void setOwnerId(Long ownerId) {

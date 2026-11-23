@@ -5,6 +5,11 @@ export interface CreateTripRequest {
     endDate: string;
     countryId: number;
     cityId: number;
+    destinations?: TripDestinationInput[];
+}
+
+export interface TripDestinationInput {
+    cityId: number;
 }
 
 export interface TripResponse {
@@ -30,8 +35,27 @@ export interface TripFormErrors {
 }
 
 export interface TripSummary {
+    ownerId: number;
+    ownerName: string;
     tripId: number;
     title: string;
     createdAt: string;
-    updatedAt: string;
+    startDate: string;
+}
+
+export interface TripDestination {
+    id: number;
+    city: string;
+    country: string;
+}
+
+export interface TripInfoType {
+    ownerId: number;
+    ownerName: string;
+    id: number;
+    title: string;
+    startDate: string;
+    endDate: string;
+    createdAt: string;
+    destinations: TripDestination[];
 }

@@ -1,13 +1,16 @@
  package com.soda2026.journi.tripMember;
 
  import org.springframework.data.jpa.repository.JpaRepository;
+ import org.springframework.data.jpa.repository.EntityGraph;
 
  import java.util.List;
 
  public interface TripMemberRepository extends JpaRepository<TripMemberModel, TripMemberId> {
 
+     @EntityGraph(attributePaths = "user")
      List<TripMemberModel> findAllById_TripIdOrderById_UserIdAsc(Long tripId);
- }
+
+     boolean existsById_TripIdAndId_UserId(Long tripId, Long userId); }
 
  /*
   * Databasåtkomst
