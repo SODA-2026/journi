@@ -14,6 +14,13 @@ public class CityService {
         this.cityMapper = cityMapper;
     }
 
+    public List<CityResponseDTO> getAll() {
+        return cityRepository.findAll()
+                .stream()
+                .map(cityMapper::toDto)
+                .toList();
+    }
+
     public List<CityResponseDTO> getAllByCountry(Long countryId) {
         return cityRepository.findAllByCountryId(countryId)
                 .stream()

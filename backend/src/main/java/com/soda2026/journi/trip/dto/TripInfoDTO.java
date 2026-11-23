@@ -9,8 +9,9 @@ import java.util.List;
 
 public record TripInfoDTO(
         Long id,
-        String title,
         Long ownerId,
+        String ownerName,
+        String title,
         LocalDate startDate,
         LocalDate endDate,
         Instant createdAt,

@@ -5,19 +5,20 @@ import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
+import { useAuth } from "../../../context/AuthContext";
+import { SentInvitations } from "../../invitations/SentInvitations";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
 import { AddToTripModal } from "../../../shared/components/AddToTripModal";
 
-export function TripInfo() {
+export function TripInfo({ tripId }: { tripId: number }) {
+    const { user } = useAuth();
     const [error, setError] = useState("");
     const [reorderError, setReorderError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
     const [showModal, setShowModal] = useState(false);
 
-    let params = useParams();
-    const tripId = Number(params.id);
 
     useEffect(() => {
         getTripInfo(tripId)
@@ -113,10 +114,15 @@ export function TripInfo() {
                 <header className="border-b border-[#d6e1d9] bg-[#f8faf7] px-5 py-6 sm:px-8">
                     <p className="mb-1 text-sm font-medium uppercase tracking-wide text-[#526c62]">Resedetaljer</p>
                     <h1 className="text-3xl font-bold tracking-tight text-[#1d4237]">{trip.title}</h1>
+                    <p className="mt-1 font-medium text-[#235e4f]">
+                        {user?.id === trip.ownerId ? "Du är skapare" : "Du är inbjuden deltagare"}
+                    </p>
+                    <p>Skapare: {trip.ownerName}</p>
                     <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[#526c62]">
                         <p><span className="font-medium text-[#1d4237]">Startdatum:</span> {formatDate(trip.startDate)}</p>
                         <p><span className="font-medium text-[#1d4237]">Slutdatum:</span> {formatDate(trip.endDate)}</p>
                     </div>
+                    {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
                 </header>
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -228,7 +234,7 @@ export function TripInfo() {
                     className="rounded bg-blue-600 px-4 py-2 text-white"
                 >
                     Testa AddToTripModal
-                    
+
                 </button>
 
 
