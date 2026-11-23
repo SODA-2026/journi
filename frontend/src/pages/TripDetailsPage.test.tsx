@@ -6,13 +6,17 @@ import { ApiError } from "../api/ApiClient";
 import { getSentInvitations, inviteUser } from "../features/invitations/InvitationApi";
 import { getTripInfo } from "../features/trips/TripFetch";
 import { TripDetailsPage } from "./TripDetailsPage";
+import { getTripMembers } from "../features/trip-members/TripMemberApi";
+
+vi.mock("../features/trip-members/TripMemberApi", () => ({ getTripMembers: vi.fn() }));
 
 vi.mock("../features/invitations/InvitationApi", () => ({
     getSentInvitations: vi.fn(),
     inviteUser: vi.fn(),
 }));
 vi.mock("../features/trips/TripFetch", () => ({ getTripInfo: vi.fn() }));
-vi.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { id: 1 } }) }));
+const auth = vi.hoisted(() => ({ user: { id: 1 } }));
+vi.mock("../context/AuthContext", () => ({ useAuth: () => auth }));
 
 const trip = {
     id: 10,
@@ -26,6 +30,8 @@ const trip = {
 };
 
 beforeEach(() => {
+    auth.user.id = 1;
+    vi.mocked(getTripMembers).mockResolvedValue([]);
     vi.mocked(getSentInvitations).mockResolvedValue([]);
 });
 
@@ -51,6 +57,7 @@ it("hides the previous trip and invitation form while the next trip loads", asyn
     renderTripRoute();
     await screen.findByRole("heading", { name: trip.title });
     expect(screen.getByRole("button", { name: "Skicka inbjudan" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Lämna resan" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("link", { name: "Next trip" }));
 
@@ -110,4 +117,13 @@ it("shows only this trip's invitees and refreshes the list after sending", async
     expect(await screen.findByText("Till guest@example.com")).toBeInTheDocument();
     expect(screen.getByText("Väntar på svar")).toBeInTheDocument();
     expect(screen.queryByText("Till other@example.com")).not.toBeInTheDocument();
+});
+
+
+it("shows leaving only to participants and hides owner actions", async () => {
+    auth.user.id = 2;
+    vi.mocked(getTripInfo).mockResolvedValue(trip);
+    renderTripRoute();
+    expect(await screen.findByRole("button", { name: "Lämna resan" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Skicka inbjudan" })).not.toBeInTheDocument();
 });
