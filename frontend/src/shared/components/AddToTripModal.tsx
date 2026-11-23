@@ -25,6 +25,8 @@ export function AddToTripModal({
 }: AddToTripModalProps) {
     const [trips, setTrips] = useState<TripSummary[]>([]);
     const [selectedTripId, setSelectedTripId] = useState<number>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -84,17 +86,26 @@ export function AddToTripModal({
                             className="mt-4 w-full rounded-lg bg-[#235e4f] px-4 py-2 text-white disabled:opacity-50"
                             onClick={async () => {
                                 if (!selectedTripId) return;
+                                
 
-                                await onAdd(
-                                    selectedTripId,
-                                    itemId
-                                );
+                                setSuccess(true);
 
+                                setTimeout(() => {
+                                    setSuccess(false);
+                                    onClose();
+                                }, 1500);
+
+                                await onAdd(selectedTripId, itemId);
                                 onClose();
                             }}
                         >
                             Lägg till i plan
                         </button>
+                        {success && (
+                            <p className="text-green-600">
+                                Har lagts till i resan.
+                            </p>
+                        )}
                     </div>
                 )}
 
