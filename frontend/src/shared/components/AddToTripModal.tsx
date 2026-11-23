@@ -40,7 +40,7 @@ export function AddToTripModal({
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
             <div className="w-full max-w-md rounded-xl bg-white p-6">
                 <h2 className="mb-4 text-xl font-bold">
-                    Lägg till {itemName} i resa
+                    Lägg till {itemType === "city" ? "stad" : "plats"} i resa
                 </h2>
 
                 {trips.length === 0 ? (

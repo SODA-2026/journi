@@ -242,6 +242,10 @@ export function TripInfo() {
                     itemName="Eiffeltornet"
                     itemType="place"
                     onClose={() => setShowModal(false)}
+                    onAdd={ async (tripId, itemId) => {
+                        console.log("trip:", tripId);
+                        console.log("item:", itemId);
+                    } }
                 />
             </article>
         </div>
