@@ -61,7 +61,7 @@ export function AppRoutes() {
                     <Route path="/trips" element={<MyTripsPage />} />
                     <Route path="/trips/new" element={<CreateTripPage />} />
                     <Route path="/trips/:id" element={<TripDetailsPage />} />
-                    <Route path="/cities" element={<ExplorePage />} />
+                    <Route path="/explore" element={<ExplorePage />} />
                 </Route>
             </Route>
         </Routes>
