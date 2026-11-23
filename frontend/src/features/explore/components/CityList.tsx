@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
 
-import type { City } from "../destination";
-import { getCities } from "../DestinationApi";
+import type { City } from "../../destinations/destination";
+import { getAllCities } from "../ExploreApi";
 
 type CityListProps = {
-    countryId: number;
+    countryNames: Record<number, string>;
 };
 
-export function CityList({ countryId }: CityListProps) {
+export function CityList({ countryNames }: CityListProps) {
     const [cities, setCities] = useState<City[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // The page remounts this component with a new key when the country changes,
-    // so the initial state above is correct for each fetch.
     useEffect(() => {
         let cancelled = false;
 
-        getCities(countryId)
+        getAllCities()
             .then((data) => {
                 if (!cancelled) setCities(data);
             })
@@ -29,11 +27,10 @@ export function CityList({ countryId }: CityListProps) {
                 if (!cancelled) setIsLoading(false);
             });
 
-        // Ignore the response if the user picks another country first
         return () => {
             cancelled = true;
         };
-    }, [countryId]);
+    }, []);
 
     if (isLoading) {
         return <p className="text-lg text-[#1d4237]/70">Laddar städer...</p>;
@@ -51,7 +48,7 @@ export function CityList({ countryId }: CityListProps) {
         return (
             <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-[#9fb0aa] px-6 py-10 text-center">
                 <p className="text-lg text-[#1d4237]">
-                    Det finns inga tillagda städer i detta land än
+                    Det finns inga tillagda städer än
                 </p>
             </div>
         );
@@ -67,13 +64,16 @@ export function CityList({ countryId }: CityListProps) {
                     <h3 className="text-lg font-semibold text-[#1d4237]">
                         {city.name}
                     </h3>
+                    <p className="text-sm text-[#1d4237]/70">
+                        {countryNames[city.countryId]}
+                    </p>
                     <p>
-                       shortDescription
+                        shortDescription
                         {/* {city.shortDescription} */}
                     </p>
 
                     <img /* className="city-image" src="{city.image}" */
-                       
+                        
                     />
                 </li>
             ))}
