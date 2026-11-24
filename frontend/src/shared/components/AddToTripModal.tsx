@@ -18,7 +18,6 @@ type AddToTripModalProps = {
 export function AddToTripModal({
     isOpen,
     itemId,
-    itemName,
     itemType,
     onClose,
     onAdd,

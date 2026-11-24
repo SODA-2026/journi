@@ -94,22 +94,22 @@ export function TripInfo({ tripId }: { tripId: number }) {
         }
     };
 
-    const handleAddDestination = async (cityId: number,) => {
-        if (!trip) return;
+    // const handleAddDestination = async (cityId: number,) => {
+    //     if (!trip) return;
 
-        try {
-            await addTripDestination(
-                trip.id,
-                cityId,
-                trip.destinations.length,
-            );
+    //     try {
+    //         await addTripDestination(
+    //             trip.id,
+    //             cityId,
+    //             trip.destinations.length,
+    //         );
 
-            const updatedTrip = await getTripInfo(trip.id);
-            setTrip(updatedTrip);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    //         const updatedTrip = await getTripInfo(trip.id);
+    //         setTrip(updatedTrip);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     const handleAddPlace = async (tripId: number, placeId: number):Promise<void> => {
             if(!selectedPlace) return;
