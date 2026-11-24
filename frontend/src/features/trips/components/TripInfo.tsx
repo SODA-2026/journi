@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
-import { getTripInfo, reorderTripDestinations } from "../TripFetch";
+import type { Place } from "../../places/places";
+import { getTripInfo, reorderTripDestinations, addTripDestination, addTripPlaceActivity } from "../TripFetch";
+import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
@@ -8,6 +10,9 @@ import { useAuth } from "../../../context/AuthContext";
 import { SentInvitations } from "../../invitations/SentInvitations";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
+import { AddToTripModal } from "../../../shared/components/AddToTripModal";
+import { getPlaces } from "../../places/PlaceFetch";
+import { TripMembers } from "../../trip-members/TripMembers";
 import { LeaveTripButton } from "./LeaveTripButton";
 import { TripEvents } from "./TripEvents";
 import { TripMembers } from "../../trip-members/TripMembers";
@@ -18,6 +23,9 @@ export function TripInfo({ tripId }: { tripId: number }) {
     const [reorderError, setReorderError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
+    const [showModal, setShowModal] = useState(false);
+    const [places, setPlaces] = useState<Place[]>([]);
+    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
     const [eventsVersion, setEventsVersion] = useState(0);
 
 
@@ -35,6 +43,12 @@ export function TripInfo({ tripId }: { tripId: number }) {
             .finally(() => setIsLoading(false));
     }, [tripId]);
 
+    useEffect(() => {
+    getPlaces()
+        .then(setPlaces)
+        .catch(console.error);
+}, []);
+
 
     // useMemo keeps the array stable between renders
     // without it TripActivities gets a new array every time - endless loop of requests
@@ -51,9 +65,6 @@ export function TripInfo({ tripId }: { tripId: number }) {
             </div>
         );
     }
-
-
-
 
     if (error)
         return (
@@ -85,6 +96,35 @@ export function TripInfo({ tripId }: { tripId: number }) {
             setReorderError("Kunde inte ändra destinationernas ordning");
         }
     };
+
+    // const handleAddDestination = async (cityId: number,) => {
+    //     if (!trip) return;
+
+    //     try {
+    //         await addTripDestination(
+    //             trip.id,
+    //             cityId,
+    //             trip.destinations.length,
+    //         );
+
+    //         const updatedTrip = await getTripInfo(trip.id);
+    //         setTrip(updatedTrip);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
+
+    const handleAddPlace = async (tripId: number, placeId: number):Promise<void> => {
+            if(!selectedPlace) return;
+
+            await addTripPlaceActivity(
+                tripId,
+                placeId,
+            );
+
+            console.log("Aktivitet Skapad");
+
+    }
 
     return (
         <div className="mx-auto max-w-4xl">
@@ -178,6 +218,17 @@ export function TripInfo({ tripId }: { tripId: number }) {
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}
                 </footer>
+
+                {selectedPlace && (
+                    <AddToTripModal
+                        isOpen={showModal}
+                        itemId={selectedPlace?.placeId ?? 0}
+                        itemName={selectedPlace?.name ?? ""}
+                        itemType="place"
+                        onClose={() => setShowModal(false)}
+                        onAdd={handleAddPlace}
+                    />
+                )}
             </article>
         </div>
     );

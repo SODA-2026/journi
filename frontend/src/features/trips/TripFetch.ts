@@ -77,3 +77,30 @@ export function reorderTripDestinations(
         body: JSON.stringify(destinationIds),
     });
 }
+
+export function addTripDestination(
+    tripId: number,
+    cityId: number,
+    orderIndex: number,
+): Promise<unknown> {
+    return api(`/api/trips/${tripId}/destinations`, {
+        method: "POST",
+        body: JSON.stringify({
+            cityId,
+            orderIndex,
+        }),
+    });
+}
+
+export function addTripPlaceActivity(
+    tripId: number,
+    placeId: number,
+): Promise<void> {
+    return api(`/api/activities/trips/${tripId}/places`, {
+        method: "POST",
+        body: JSON.stringify({
+            placeId,
+        }),
+    })
+}
+

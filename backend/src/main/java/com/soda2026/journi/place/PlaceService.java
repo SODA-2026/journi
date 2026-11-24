@@ -15,6 +15,13 @@ public class PlaceService {
         this.placeMapper = placeMapper;
     }
 
+    public List<PlaceResponseDTO> getAllPlaces() {
+        return placeRepository.findAll()
+                .stream()
+                .map(placeMapper::toDto)
+                .toList();
+    }
+
     public List<PlaceResponseDTO> getPlacesByCity(Long cityId) {
         return placeRepository.findByCityId(cityId).stream()
                 .map(placeMapper::toDto)
