@@ -43,6 +43,8 @@
      public TripSummaryDTO toTripSummaryDTO(TripModel trip){
          return new TripSummaryDTO(
                  trip.getId(),
+                 trip.getOwnerId(),
+                 trip.getOwner().getName(),
                  trip.getTitle(),
                  trip.getCreatedAt(),
                  trip.getStartDate()
@@ -52,8 +54,9 @@
      public TripInfoDTO toTripInfoDTO(TripModel tripModel, List<TripDestinationModel> destinations){
          return new TripInfoDTO(
                  tripModel.getId(),
-                 tripModel.getTitle(),
                  tripModel.getOwnerId(),
+                 tripModel.getOwner().getName(),
+                 tripModel.getTitle(),
                  tripModel.getStartDate(),
                  tripModel.getEndDate(),
                  tripModel.getCreatedAt(),

@@ -77,6 +77,18 @@ npm run dev
 
 Frontend startas därefter av Vite på den lokala adress som visas i terminalen.
 
+### Ladda demodata (valfritt)
+
+`backend/scripts/demo-data.sql` fyller databasen med användare, resor, destinationer, aktiviteter, inbjudningar och anteckningar för att kunna testa appen med innehåll. Kör skriptet när backend har startat minst en gång, eftersom det återanvänder länder, städer och platser från migrering V6.
+
+```bash
+mysql -u <användarnamn> -p <databasnamn> < backend/scripts/demo-data.sql
+```
+
+I MySQL Workbench öppnar du filen och kör den mot rätt databas.
+
+Alla demokonton har lösenordet `password123`; den främsta är `test@example.com`. Resornas datum räknas från dagen skriptet körs. **Skriptet raderar alla befintliga användare och resor**, så kör det bara mot en utvecklingsdatabas.
+
 ## Dokumentation
 
 | Dokument | Innehåll |

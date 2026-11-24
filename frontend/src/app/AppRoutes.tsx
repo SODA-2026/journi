@@ -4,10 +4,12 @@ import { useAuth } from "../context/AuthContext";
 import { HomePage } from "./HomePage";
 import { LoginForm } from "../features/users/LoginForm";
 import { CreateAccountPage } from "../features/users/RegisterPage";
+import { InvitationsPage } from "../pages/InvitationsPage";
 import { MyDashboard } from "../pages/MyDashboard";
 import { MyTripsPage } from "../pages/MyTripsPage";
 import { CreateTripPage } from "../pages/CreateTripPage";
 import { TripDetailsPage } from "../pages/TripDetailsPage";
+import { ExplorePage } from "../features/explore/ExplorePage";
 
 import { NavBar } from "../shared/NavBar";
 import { AppLayout } from "../shared/layout/AppLayout";
@@ -56,6 +58,7 @@ export function AppRoutes() {
             <Route element={<Protected />}>
                 <Route element={<AppLayout />}>
                     <Route path="/dashboard" element={<MyDashboard />} />
+                    <Route path="/invitations" element={<InvitationsPage />} />
                     <Route path="/trips" element={<MyTripsPage />} />
                     <Route path="/trips/new" element={<CreateTripPage />} />
                     <Route path="/trips/:id" element={<TripDetailsPage />} />
@@ -63,6 +66,7 @@ export function AppRoutes() {
                         path="/trips/edit/:id"
                         element={<UpdateTripPage />}
                     />
+                    <Route path="/explore" element={<ExplorePage />} />
                 </Route>
             </Route>
         </Routes>

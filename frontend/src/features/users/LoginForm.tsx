@@ -2,6 +2,10 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
 
+// Prefill the login form from .env.local when running `vite dev`.
+const devEmail = import.meta.env.DEV ? import.meta.env.VITE_DEV_EMAIL : "";
+const devPassword = import.meta.env.DEV ? import.meta.env.VITE_DEV_PASSWORD : "";
+
 export function LoginForm() {
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -28,9 +32,9 @@ export function LoginForm() {
             <h1>Logga in</h1>
             <fieldset disabled={pending}>
                 <label htmlFor="login-email">E-post</label>
-                <input id="login-email" name="email" type="email" autoComplete="username" required />
+                <input id="login-email" name="email" type="email" autoComplete="username" defaultValue={devEmail} required />
                 <label htmlFor="login-password">Lösenord</label>
-                <input id="login-password" name="password" type="password" autoComplete="current-password" required />
+                <input id="login-password" name="password" type="password" autoComplete="current-password" defaultValue={devPassword} required />
                 <button type="submit">{pending ? "Loggar in…" : "Logga in"}</button>
             </fieldset>
             {error && <p role="alert">{error}</p>}

@@ -13,6 +13,24 @@ export function getTripInfo(tripId: number): Promise<TripInfoType> {
 
 const apiUrl = "http://localhost:8080/trips";
 
+export function leaveTrip(tripId: number): Promise<void> {
+    return api(`/api/trips/${tripId}/members/me`, { method: "DELETE" });
+}
+
+export interface TripEvent {
+    id: number;
+    memberName: string;
+    createdAt: string;
+    eventType: "MEMBER_JOINED" | "MEMBER_LEFT" | "MEMBER_REMOVED";
+    actorId: number | null;
+    actorName: string | null;
+    memberId: number | null;
+}
+
+export function getTripEvents(tripId: number): Promise<TripEvent[]> {
+    return api(`/api/trips/${tripId}/members/events`);
+}
+  
 export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     return api("/trips/create", { method: "POST", body: JSON.stringify(data) });
 }
@@ -78,3 +96,30 @@ export function reorderTripDestinations(
         body: JSON.stringify(destinationIds),
     });
 }
+
+export function addTripDestination(
+    tripId: number,
+    cityId: number,
+    orderIndex: number,
+): Promise<unknown> {
+    return api(`/api/trips/${tripId}/destinations`, {
+        method: "POST",
+        body: JSON.stringify({
+            cityId,
+            orderIndex,
+        }),
+    });
+}
+
+export function addTripPlaceActivity(
+    tripId: number,
+    placeId: number,
+): Promise<void> {
+    return api(`/api/activities/trips/${tripId}/places`, {
+        method: "POST",
+        body: JSON.stringify({
+            placeId,
+        }),
+    })
+}
+

@@ -11,7 +11,8 @@ public class PlaceMapper {
                 placeModel.getName(),
                 placeModel.getShortDescription(),
                 //notera att man hämtar stadens id för i model är det en joinColoumn
-                placeModel.getCity().getId()
+                placeModel.getCity().getId(),
+                placeModel.getCategory()
         );
     }
 }

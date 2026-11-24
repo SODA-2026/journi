@@ -18,8 +18,13 @@ public class CityController {
         this.cityService = cityService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<CityResponseDTO>> getAll() {
+        return ResponseEntity.ok(cityService.getAll());
+    }
+
     @GetMapping("/{countryId}")
-    public ResponseEntity<List<CityResponseDTO>> getAll(@PathVariable Long countryId) {
+    public ResponseEntity<List<CityResponseDTO>> getAllByCountry(@PathVariable Long countryId) {
         return ResponseEntity.ok(cityService.getAllByCountry(countryId));
     }
 }

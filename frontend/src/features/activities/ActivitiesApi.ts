@@ -1,11 +1,8 @@
 import type {
     ActivityFormData,
     ActivityResponse,
-    CreateActivityRequest,
 } from "./ActivitiesTypes";
 import { api } from "../../api/ApiClient";
-
-const apiUrl = "http://localhost:8080/api/activities";
 
 // export async function createActivity(tripId: number, data: CreateActivityRequest ) {
 //     const res = await fetch(`${apiUrl}/trips/${tripId}`, {

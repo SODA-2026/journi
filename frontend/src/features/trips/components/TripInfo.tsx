@@ -1,21 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
-import { getTripInfo, reorderTripDestinations } from "../TripFetch";
+import type { Place } from "../../places/places";
+import { getTripInfo, reorderTripDestinations, addTripDestination, addTripPlaceActivity } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
 import { ApiError } from "../../../api/ApiClient";
+import { useAuth } from "../../../context/AuthContext";
+import { SentInvitations } from "../../invitations/SentInvitations";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
+import { AddToTripModal } from "../../../shared/components/AddToTripModal";
+import { getPlaces } from "../../places/PlaceFetch";
+import { TripMembers } from "../../trip-members/TripMembers";
+import { LeaveTripButton } from "./LeaveTripButton";
+import { TripEvents } from "./TripEvents";
+import { TripMembers } from "../../trip-members/TripMembers";
 
-export function TripInfo() {
+export function TripInfo({ tripId }: { tripId: number }) {
+    const { user } = useAuth();
     const [error, setError] = useState("");
     const [reorderError, setReorderError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
+    const [showModal, setShowModal] = useState(false);
+    const [places, setPlaces] = useState<Place[]>([]);
+    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
+    const [eventsVersion, setEventsVersion] = useState(0);
 
-    let params = useParams();
-    const tripId = Number(params.id);
 
     useEffect(() => {
         getTripInfo(tripId)
@@ -31,12 +43,19 @@ export function TripInfo() {
             .finally(() => setIsLoading(false));
     }, [tripId]);
 
+    useEffect(() => {
+    getPlaces()
+        .then(setPlaces)
+        .catch(console.error);
+}, []);
+
+
     // useMemo keeps the array stable between renders
     // without it TripActivities gets a new array every time - endless loop of requests
     const destinationOptions = useMemo(
         () =>
-            trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
-        [trip]
+            trip?.destinations.map((d) => ({ id: d.id, label: d.city, cityId: d.cityId })) ?? [],
+        [trip],
     );
 
     if (isLoading) {
@@ -95,6 +114,35 @@ export function TripInfo() {
         }
     };
 
+    // const handleAddDestination = async (cityId: number,) => {
+    //     if (!trip) return;
+
+    //     try {
+    //         await addTripDestination(
+    //             trip.id,
+    //             cityId,
+    //             trip.destinations.length,
+    //         );
+
+    //         const updatedTrip = await getTripInfo(trip.id);
+    //         setTrip(updatedTrip);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
+
+    const handleAddPlace = async (tripId: number, placeId: number):Promise<void> => {
+            if(!selectedPlace) return;
+
+            await addTripPlaceActivity(
+                tripId,
+                placeId,
+            );
+
+            console.log("Aktivitet Skapad");
+
+    }
+
     return (
         <div className="mx-auto max-w-4xl">
             <Link
@@ -127,6 +175,11 @@ export function TripInfo() {
                             {formatDate(trip.endDate)}
                         </p>
                     </div>
+                    {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
+                    {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
+                    {user?.id === trip.ownerId && (
+                        <TripMembers key={trip.id} tripId={trip.id} onRemoved={() => setEventsVersion((current) => current + 1)} />
+                    )}
                 </header>
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -219,9 +272,22 @@ export function TripInfo() {
                     </div>
                 </div>
 
+                <TripEvents key={trip.id} tripId={trip.id} refreshVersion={eventsVersion} />
+
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}
                 </footer>
+
+                {selectedPlace && (
+                    <AddToTripModal
+                        isOpen={showModal}
+                        itemId={selectedPlace?.placeId ?? 0}
+                        itemName={selectedPlace?.name ?? ""}
+                        itemType="place"
+                        onClose={() => setShowModal(false)}
+                        onAdd={handleAddPlace}
+                    />
+                )}
             </article>
         </div>
     );
