@@ -1,5 +1,6 @@
  package com.soda2026.journi.tripActivity;
 
+ import com.soda2026.journi.tripActivity.dto.AddPlaceActivityDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
  import jakarta.validation.Valid;
@@ -49,5 +50,18 @@
          return ResponseEntity.status(HttpStatus.CREATED)
                  .body(tripActivityService.createActivity(tripId, request));
      }
+
+     @PostMapping("/trips/{tripId}/places")
+     @ResponseStatus(HttpStatus.NO_CONTENT)
+     public void addPlaceActivity(
+             @PathVariable Long tripId,
+             @RequestBody AddPlaceActivityDTO request
+     ) {
+         tripActivityService.addPlaceToActivity(
+                 tripId,
+                 request
+         );
+     }
+
 
  }
