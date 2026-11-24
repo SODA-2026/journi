@@ -4,12 +4,14 @@ import type {
     TripInfoType,
     TripResponse,
     TripSummary,
+    TripUpdateRequest,
 } from "./trips";
-
 
 export function getTripInfo(tripId: number): Promise<TripInfoType> {
     return api(`/trips/mine/${tripId}`);
 }
+
+const apiUrl = "http://localhost:8080/trips";
 
 export function leaveTrip(tripId: number): Promise<void> {
     return api(`/api/trips/${tripId}/members/me`, { method: "DELETE" });
@@ -32,6 +34,16 @@ export function getTripEvents(tripId: number): Promise<TripEvent[]> {
 export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     return api("/trips/create", { method: "POST", body: JSON.stringify(data) });
 }
+
+export function updateTripFetch(
+    tripId: number,
+    data: TripUpdateRequest
+): Promise<TripUpdateRequest> {
+    return api(`/trips/mine/${tripId}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+}
 /* export async function createTrip(
     data: CreateTripRequest
 ): Promise<TripResponse> {
@@ -49,9 +61,17 @@ export function createTrip(data: CreateTripRequest): Promise<TripResponse> {
 
     return response.json();
 } */
+export async function getTripsByOwner(ownerId: number): Promise<TripSummary[]> {
+    const response = await fetch(`${apiUrl}/${ownerId}`, {
+        method: "GET",
+    });
+    if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+}
 export async function deleteTrip(id: number): Promise<void> {
     return api(`/trips/${id}`, { method: "DELETE" });
-
 
     /* const response = await fetch(`http://localhost:8080/trips/${id}`, {
          method: "DELETE",
@@ -62,15 +82,14 @@ export async function deleteTrip(id: number): Promise<void> {
      }
 
      */
-
 }
 export function getMyTrips(): Promise<TripSummary[]> {
-     return api("/trips/mine");
-    }
+    return api("/trips/mine");
+}
 
 export function reorderTripDestinations(
     tripId: number,
-    destinationIds: number[],
+    destinationIds: number[]
 ): Promise<unknown> {
     return api(`/api/trips/${tripId}/destinations/reorder`, {
         method: "PUT",

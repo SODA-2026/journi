@@ -60,3 +60,9 @@ export interface TripInfoType {
     createdAt: string;
     destinations: TripDestination[];
 }
+
+export interface TripUpdateRequest {
+    title: string;
+    startDate: string;
+    endDate: string;
+}

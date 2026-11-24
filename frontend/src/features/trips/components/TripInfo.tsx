@@ -69,26 +69,43 @@ export function TripInfo({ tripId }: { tripId: number }) {
     if (error)
         return (
             <div className="mx-auto max-w-3xl">
-                <Link to="/trips" className="mb-5 inline-flex items-center text-sm font-medium text-[#235e4f] hover:text-[#1d4237] hover:underline">
+                <Link
+                    to="/trips"
+                    className="mb-5 inline-flex items-center text-sm font-medium text-[#235e4f] hover:text-[#1d4237] hover:underline"
+                >
                     ← Tillbaka till mina resor
                 </Link>
-                <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-6 py-5 text-red-700">
+                <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-6 py-5 text-red-700"
+                >
                     {error}
                 </div>
             </div>
         );
     if (!trip) {
-        return <p className="rounded-xl border border-[#d6e1d9] bg-white px-6 py-8 text-[#526c62]">Resan finns inte</p>;
+        return (
+            <p className="rounded-xl border border-[#d6e1d9] bg-white px-6 py-8 text-[#526c62]">
+                Resan finns inte
+            </p>
+        );
     }
 
     const moveDestination = async (index: number, direction: -1 | 1) => {
         const nextIndex = index + direction;
-        if (!trip || nextIndex < 0 || nextIndex >= trip.destinations.length) return;
+        if (!trip || nextIndex < 0 || nextIndex >= trip.destinations.length)
+            return;
         const updated = [...trip.destinations];
-        [updated[index], updated[nextIndex]] = [updated[nextIndex], updated[index]];
+        [updated[index], updated[nextIndex]] = [
+            updated[nextIndex],
+            updated[index],
+        ];
         setTrip({ ...trip, destinations: updated });
         try {
-            await reorderTripDestinations(trip.id, updated.map((destination) => destination.id));
+            await reorderTripDestinations(
+                trip.id,
+                updated.map((destination) => destination.id)
+            );
             setReorderError("");
         } catch (err) {
             console.error(err);
@@ -128,21 +145,35 @@ export function TripInfo({ tripId }: { tripId: number }) {
 
     return (
         <div className="mx-auto max-w-4xl">
-            <Link to="/trips" className="mb-5 inline-flex items-center text-sm font-medium text-[#235e4f] hover:text-[#1d4237] hover:underline">
+            <Link
+                to="/trips"
+                className="mb-5 inline-flex items-center text-sm font-medium text-[#235e4f] hover:text-[#1d4237] hover:underline"
+            >
                 ← Tillbaka till mina resor
             </Link>
+            <Link to={`/trips/edit/${tripId}`}>redigera resa</Link>
 
             <article className="overflow-hidden rounded-2xl border border-[#d6e1d9] bg-white shadow-sm">
                 <header className="border-b border-[#d6e1d9] bg-[#f8faf7] px-5 py-6 sm:px-8">
-                    <p className="mb-1 text-sm font-medium uppercase tracking-wide text-[#526c62]">Resedetaljer</p>
-                    <h1 className="text-3xl font-bold tracking-tight text-[#1d4237]">{trip.title}</h1>
-                    <p className="mt-1 font-medium text-[#235e4f]">
-                        {user?.id === trip.ownerId ? "Du är skapare" : "Du är inbjuden deltagare"}
+                    <p className="mb-1 text-sm font-medium uppercase tracking-wide text-[#526c62]">
+                        Resedetaljer
                     </p>
-                    <p>Skapare: {trip.ownerName}</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-[#1d4237]">
+                        {trip.title}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[#526c62]">
-                        <p><span className="font-medium text-[#1d4237]">Startdatum:</span> {formatDate(trip.startDate)}</p>
-                        <p><span className="font-medium text-[#1d4237]">Slutdatum:</span> {formatDate(trip.endDate)}</p>
+                        <p>
+                            <span className="font-medium text-[#1d4237]">
+                                Startdatum:
+                            </span>{" "}
+                            {formatDate(trip.startDate)}
+                        </p>
+                        <p>
+                            <span className="font-medium text-[#1d4237]">
+                                Slutdatum:
+                            </span>{" "}
+                            {formatDate(trip.endDate)}
+                        </p>
                     </div>
                     {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
                     {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
@@ -153,9 +184,14 @@ export function TripInfo({ tripId }: { tripId: number }) {
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
                     <section>
-                        <h2 className="mb-3 text-xl font-bold text-[#1d4237]">Destinationer</h2>
+                        <h2 className="mb-3 text-xl font-bold text-[#1d4237]">
+                            Destinationer
+                        </h2>
                         {reorderError && (
-                            <p role="alert" className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            <p
+                                role="alert"
+                                className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                            >
                                 {reorderError}
                             </p>
                         )}
@@ -166,16 +202,27 @@ export function TripInfo({ tripId }: { tripId: number }) {
                         ) : (
                             <ol className="flex flex-col gap-2">
                                 {trip.destinations.map((d, index) => (
-                                    <li key={d.id} className="flex items-center justify-between gap-3 rounded-lg border border-[#d6e1d9] px-4 py-3">
+                                    <li
+                                        key={d.id}
+                                        className="flex items-center justify-between gap-3 rounded-lg border border-[#d6e1d9] px-4 py-3"
+                                    >
                                         <div className="min-w-0 text-[#1d4237]">
-                                            <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#e7efea] text-sm font-semibold">{index + 1}</span>
-                                            <span className="font-medium">{d.city}</span>
-                                            <span className="text-[#526c62]">, {d.country}</span>
+                                            <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#e7efea] text-sm font-semibold">
+                                                {index + 1}
+                                            </span>
+                                            <span className="font-medium">
+                                                {d.city}
+                                            </span>
+                                            <span className="text-[#526c62]">
+                                                , {d.country}
+                                            </span>
                                         </div>
                                         <div className="flex shrink-0 gap-2">
                                             <button
                                                 type="button"
-                                                onClick={() => moveDestination(index, -1)}
+                                                onClick={() =>
+                                                    moveDestination(index, -1)
+                                                }
                                                 disabled={index === 0}
                                                 aria-label={`Flytta ${d.city} uppåt`}
                                                 className="h-10 w-10 rounded-lg border border-[#9fb0aa] text-[#1d4237] transition hover:border-[#235e4f] hover:bg-[#e7efea] disabled:cursor-not-allowed disabled:opacity-40"
@@ -184,8 +231,13 @@ export function TripInfo({ tripId }: { tripId: number }) {
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => moveDestination(index, 1)}
-                                                disabled={index === trip.destinations.length - 1}
+                                                onClick={() =>
+                                                    moveDestination(index, 1)
+                                                }
+                                                disabled={
+                                                    index ===
+                                                    trip.destinations.length - 1
+                                                }
                                                 aria-label={`Flytta ${d.city} nedåt`}
                                                 className="h-10 w-10 rounded-lg border border-[#9fb0aa] text-[#1d4237] transition hover:border-[#235e4f] hover:bg-[#e7efea] disabled:cursor-not-allowed disabled:opacity-40"
                                             >
@@ -200,15 +252,22 @@ export function TripInfo({ tripId }: { tripId: number }) {
 
                     <div className="flex flex-col gap-5">
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
-                            <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Aktiviteter</h2>
-                             <TripActivities
-                               tripId={tripId}
-                               destinations={destinationOptions}
-                             />
-                         </section>
+                            <h2 className="mb-2 text-lg font-bold text-[#1d4237]">
+                                Aktiviteter
+                            </h2>
+                            <TripActivities
+                                tripId={tripId}
+                                destinations={destinationOptions}
+                            />
+                        </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
-                            <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Anteckningar</h2>
-                <TripNotes tripId={tripId} tripOwnerId={trip.ownerId} />
+                            <h2 className="mb-2 text-lg font-bold text-[#1d4237]">
+                                Anteckningar
+                            </h2>
+                            <TripNotes
+                                tripId={tripId}
+                                tripOwnerId={trip.ownerId}
+                            />
                         </section>
                     </div>
                 </div>
