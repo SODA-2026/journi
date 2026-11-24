@@ -32,6 +32,15 @@
          return service.getMembers(tripId, user.getId());
      }
 
+     @DeleteMapping("/me")
+     @ResponseStatus(HttpStatus.NO_CONTENT)
+     public void leaveTrip(
+             @PathVariable("tripId") @Positive Long tripId,
+             @AuthenticationPrincipal UserPrincipal user
+     ) {
+         service.leaveTrip(tripId, user.getId());
+     }
+
      @DeleteMapping("/{userId}")
      @ResponseStatus(HttpStatus.NO_CONTENT)
      public void removeMember(
@@ -45,6 +54,7 @@
 
  /*
   * GET lists members; DELETE removes a non-owner member.
+  * DELETE /me lets the authenticated participant leave without accepting a target user id.
   * Memberships are created through accepted invitations.
   * Role changes and ownership transfers are not exposed by this API.
   */

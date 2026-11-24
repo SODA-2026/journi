@@ -12,6 +12,8 @@ import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
 import { AddToTripModal } from "../../../shared/components/AddToTripModal";
 import { getPlaces } from "../../places/PlaceFetch";
+import { TripMembers } from "../../trip-members/TripMembers";
+import { LeaveTripButton } from "./LeaveTripButton";
 
 export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
@@ -52,7 +54,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
             trip?.destinations.map((d) => ({ id: d.id, label: d.city })) ?? [],
         [trip],
     );
-  
+
     if (isLoading) {
         return (
             <div className="rounded-xl border border-[#d6e1d9] bg-white px-6 py-8 text-[#526c62]">
@@ -118,7 +120,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
             );
 
             console.log("Aktivitet Skapad");
-            
+
     }
 
     return (
@@ -140,6 +142,8 @@ export function TripInfo({ tripId }: { tripId: number }) {
                         <p><span className="font-medium text-[#1d4237]">Slutdatum:</span> {formatDate(trip.endDate)}</p>
                     </div>
                     {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
+                    {user?.id === trip.ownerId && <TripMembers key={trip.id} tripId={trip.id} />}
+                    {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
                 </header>
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -187,50 +191,6 @@ export function TripInfo({ tripId }: { tripId: number }) {
                                 ))}
                             </ol>
                         )}
-                        <div className="mt-6 rounded-lg border p-4">
-                            <h3 className="mb-3 font-bold">Teststäder</h3>
-                            <div className="flex flex-col gap-4">
-                                <button
-                                    onClick={() => handleAddDestination(1)}
-                                    className="text-lg px-2 py-2 rounded-lg bg-[#235e4f] text-base text-white hover:bg-[#1d4237]"
-                                    >
-                                    Lägg till Stockholm
-                                </button>
-
-                                <button
-                                    onClick={() => handleAddDestination(2)}
-                                    className="text-lg px-2 py-2 rounded-lg bg-[#235e4f] text-base text-white hover:bg-[#1d4237]"
-                                >
-                                    Lägg till Göteborg
-                                </button>
-
-                                <button
-                                    onClick={() => handleAddDestination(3)}
-                                    className="text-lg px-2 py-2 rounded-lg bg-[#235e4f] text-base text-white hover:bg-[#1d4237]"
-                                >
-                                    Lägg till Malmö
-                                </button>
-                            </div>
-                        </div>
-                        <div className="mt-6 rounded-lg border p-4">
-                            <h3 className="mb-3 font-bold">
-                                Testplatser
-                            </h3>
-
-                            {places.map((place) => (
-                                <div key={place.placeId}>
-                                    <h3>{place.name}</h3>
-                                    <p>{place.shortDescription}</p>
-                                    <button onClick={() => {
-                                        setSelectedPlace(place);
-                                        setShowModal(true);
-                                    }}>
-
-                                        Lägg till i plan
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
                     </section>
 
                     <div className="flex flex-col gap-5">
@@ -239,7 +199,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
                              <TripActivities
                                tripId={tripId}
                                destinations={destinationOptions}
-                             />                        
+                             />
                          </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
                             <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Anteckningar</h2>
