@@ -4,9 +4,10 @@ import { getTripMembers, removeTripMember, type TripMember } from "./TripMemberA
 
 type TripMembersProps = {
     tripId: number;
+    onRemoved?: () => void;
 };
 
-export function TripMembers({ tripId }: TripMembersProps) {
+export function TripMembers({ tripId, onRemoved }: TripMembersProps) {
     const [members, setMembers] = useState<TripMember[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -33,7 +34,12 @@ export function TripMembers({ tripId }: TripMembersProps) {
 
     async function handleRemove(member: TripMember) {
         if (removalInProgress.current) return;
-        if (!window.confirm(`Vill du ta bort ${member.name} från resan? Deltagaren förlorar åtkomsten. Resans innehåll finns kvar.`)) return;
+        const confirmed = window.confirm(
+            `Vill du ta bort ${member.name} från resan? ` +
+            "Deltagaren förlorar åtkomsten. Resans innehåll finns kvar.",
+        );
+        if (!confirmed) return;
+
         removalInProgress.current = true;
         setRemovingMemberId(member.userId);
         setError("");
@@ -42,10 +48,13 @@ export function TripMembers({ tripId }: TripMembersProps) {
             await removeTripMember(tripId, member.userId);
             setMembers((current) => current.filter((item) => item.userId !== member.userId));
             setMessage(`${member.name} har tagits bort från resan.`);
+            onRemoved?.();
         } catch (err) {
-            setError(err instanceof ApiError && err.status === 403
-                ? "Endast resans ägare kan ta bort deltagare."
-                : "Kunde inte ta bort deltagaren. Försök igen eller ladda om sidan.");
+            setError(
+                err instanceof ApiError && err.status === 403
+                    ? "Endast resans ägare kan ta bort deltagare."
+                    : "Kunde inte ta bort deltagaren. Försök igen eller ladda om sidan.",
+            );
         } finally {
             removalInProgress.current = false;
             setRemovingMemberId(null);
@@ -55,10 +64,16 @@ export function TripMembers({ tripId }: TripMembersProps) {
     return (
         <section className="mt-5 rounded-xl border border-[#d6e1d9] bg-white p-4" aria-label="Deltagare">
             <h2 className="text-lg font-bold text-[#1d4237]">Deltagare</h2>
-            {error && <p role="alert" className="mt-3 text-red-700">{error}</p>}
-            {message && <p role="status" className="mt-3 text-[#235e4f]">{message}</p>}
+            {error && (
+                <p role="alert" className="mt-3 text-red-700">{error}</p>
+            )}
+            {message && (
+                <p role="status" className="mt-3 text-[#235e4f]">{message}</p>
+            )}
             {isLoading && <p>Laddar deltagare...</p>}
-            {!isLoading && !error && members.length === 0 && <p>Inga deltagare ännu.</p>}
+            {!isLoading && !error && members.length === 0 && (
+                <p>Inga deltagare ännu.</p>
+            )}
             <ul className="mt-3 space-y-2">
                 {members.map((member) => (
                     <li key={member.userId} className="flex items-center justify-between gap-3">

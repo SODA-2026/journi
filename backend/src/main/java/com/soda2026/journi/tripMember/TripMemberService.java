@@ -3,6 +3,8 @@
  import com.soda2026.journi.trip.TripModel;
  import com.soda2026.journi.trip.TripAccessService;
  import com.soda2026.journi.tripMember.dto.TripMemberResponse;
+ import com.soda2026.journi.tripMember.dto.TripMemberEventResponse;
+ import com.soda2026.journi.user.UserModel;
  import jakarta.persistence.EntityManager;
  import jakarta.validation.constraints.NotNull;
  import jakarta.validation.constraints.Positive;
@@ -51,7 +53,20 @@
          tripAccessService.requireTripOwner(tripId, requesterId);
          TripModel trip = getTrip(tripId);
          requireNonOwnerMember(trip, userId);
-         repository.delete(getMember(tripId, userId));
+         TripMemberModel member = getMember(tripId, userId);
+         UserModel actor = entityManager.find(UserModel.class, requesterId);
+         if (actor == null) {
+             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found");
+         }
+         entityManager.persist(new TripMemberEventModel(
+                 tripId,
+                 userId,
+                 member.getUser().getName(),
+                 TripMemberEventType.MEMBER_REMOVED,
+                 requesterId,
+                 actor.getName()
+         ));
+         repository.delete(member);
      }
 
      @Transactional
@@ -59,7 +74,30 @@
          tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
          TripModel trip = getTrip(tripId);
          requireNonOwnerMember(trip, requesterId);
-         repository.delete(getMember(tripId, requesterId));
+         TripMemberModel member = getMember(tripId, requesterId);
+         entityManager.persist(new TripMemberEventModel(
+                 tripId,
+                 requesterId,
+                 member.getUser().getName(),
+                 TripMemberEventType.MEMBER_LEFT,
+                 requesterId,
+                 member.getUser().getName()
+         ));
+         repository.delete(member);
+     }
+
+     @Transactional(readOnly = true)
+     public List<TripMemberEventResponse> getEvents(@NotNull @Positive Long tripId, Long requesterId) {
+         tripAccessService.requireTripOwnerOrMember(tripId, requesterId);
+         return entityManager.createQuery("""
+                 select event from TripMemberEventModel event where event.tripId = :tripId
+                 order by event.createdAt desc, event.id desc
+                 """, TripMemberEventModel.class)
+                 .setParameter("tripId", tripId)
+                 .setMaxResults(50)
+                 .getResultList().stream()
+                 .map(TripMemberEventResponse::from)
+                 .toList();
      }
 
      private TripModel getTrip(Long tripId) {
