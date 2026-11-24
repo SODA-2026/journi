@@ -1,4 +1,4 @@
-# Daily standup: sprint N
+# Daily standup: sprint 1
 
 <!--
   INSTRUKTION

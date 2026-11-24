@@ -1,8 +1,9 @@
 # Sprint review: sprint 4
 
 
-**Datum:**
-**Deltagare:**
+**Datum:2026-11-23**
+
+**Deltagare:Olena, Dhannea, Anders, Sam, Arvid**
 
 ## Del 1: Förberedelse
 
@@ -15,14 +16,6 @@ Målet med sprinten är att användaren ska kunna planera och hantera sin resa g
 **Uppnåddes sprintmålet?** Ja / Delvis / Nej
 
 ### Blev klart
-
-> **Exempel:**
->
-> | Issue | Story | Visas av |
-> |---|---|---|
-> | #3 | Skapa ett hushåll | Sara |
-> | #4 | Lägga till en syssla | Lina |
-> | #7 | Visa lista med sysslor | Jonas |
 
 | Issue | Story | Visas av |
 |---|---|---|
@@ -37,9 +30,6 @@ Målet med sprinten är att användaren ska kunna planera och hantera sin resa g
 | KAN-99 | Som deltagare vill jag kunna lämna en resa så att jag inte längre deltar i planeringen.| Olena|
 
 ### Blev inte klart
-
-
-> **Exempel:** #9 Projektskelett blev klart, men databasen körs bara lokalt hos Amir. Vi underskattade hur lång tid Docker-uppsättningen tog.
 
 | Issue | Story | Varför inte klar | Vad händer med den? |
 |---|---|---|---|
@@ -71,7 +61,7 @@ Målet med sprinten är att användaren ska kunna planera och hantera sin resa g
 
 ### Feedback
 
--Vi ska ha en diskution kringgående vad vi vil fokusera på av resterande tid.
+Vi ska diskutera vad vi vill fokusera på under den återstående tiden.
 
 -Appen är tillräcklig.
 

@@ -1,4 +1,4 @@
-# Sprint planning: sprint N
+# Sprint planning: sprint 4
 
 
 **Datum: 2026-11-17**
