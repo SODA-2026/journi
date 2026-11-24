@@ -14,6 +14,8 @@ import { AddToTripModal } from "../../../shared/components/AddToTripModal";
 import { getPlaces } from "../../places/PlaceFetch";
 import { TripMembers } from "../../trip-members/TripMembers";
 import { LeaveTripButton } from "./LeaveTripButton";
+import { TripEvents } from "./TripEvents";
+import { TripMembers } from "../../trip-members/TripMembers";
 
 export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
@@ -24,6 +26,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
     const [showModal, setShowModal] = useState(false);
     const [places, setPlaces] = useState<Place[]>([]);
     const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
+    const [eventsVersion, setEventsVersion] = useState(0);
 
 
     useEffect(() => {
@@ -142,8 +145,10 @@ export function TripInfo({ tripId }: { tripId: number }) {
                         <p><span className="font-medium text-[#1d4237]">Slutdatum:</span> {formatDate(trip.endDate)}</p>
                     </div>
                     {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
-                    {user?.id === trip.ownerId && <TripMembers key={trip.id} tripId={trip.id} />}
                     {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
+                    {user?.id === trip.ownerId && (
+                        <TripMembers key={trip.id} tripId={trip.id} onRemoved={() => setEventsVersion((current) => current + 1)} />
+                    )}
                 </header>
 
                 <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -207,6 +212,8 @@ export function TripInfo({ tripId }: { tripId: number }) {
                         </section>
                     </div>
                 </div>
+
+                <TripEvents key={trip.id} tripId={trip.id} refreshVersion={eventsVersion} />
 
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}

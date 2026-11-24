@@ -9,6 +9,9 @@ import com.soda2026.journi.tripDestination.TripDestinationModel;
 import com.soda2026.journi.tripDestination.TripDestinationRepository;
 import com.soda2026.journi.tripMember.TripMemberId;
 import com.soda2026.journi.tripMember.TripMemberRepository;
+import com.soda2026.journi.tripMember.TripMemberEventModel;
+import com.soda2026.journi.tripMember.TripMemberEventType;
+import jakarta.persistence.EntityManager;
 import com.soda2026.journi.user.UserModel;
 import com.soda2026.journi.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +46,7 @@ class InvitationServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final TripMemberRepository tripMemberRepository = mock(TripMemberRepository.class);
     private final TripDestinationRepository tripDestinationRepository = mock(TripDestinationRepository.class);
+    private final EntityManager entityManager = mock(EntityManager.class);
     private final TripAccessService tripAccessService = new TripAccessService(tripRepository, tripMemberRepository);
     private final InvitationService invitationService = new InvitationService(
             invitationRepository,
@@ -51,7 +55,8 @@ class InvitationServiceTest {
             userRepository,
             tripMemberRepository,
             tripAccessService,
-            tripDestinationRepository
+            tripDestinationRepository,
+            entityManager
     );
     private final TripModel trip = new TripModel();
     private final UserModel owner = new UserModel("owner@example.com", "Owner", "hash", null);
@@ -172,6 +177,11 @@ class InvitationServiceTest {
         verify(tripMemberRepository).save(argThat(member ->
                 member.getId().equals(new TripMemberId(10L, 2L))));
         assertEquals(InvitationStatus.ACCEPTED, invitation.getStatus());
+        verify(entityManager).persist(argThat(value -> value instanceof TripMemberEventModel event
+                && event.getEventType() == TripMemberEventType.MEMBER_JOINED
+                && event.getMemberId().equals(2L)
+                && event.getActorId().equals(2L)
+                && event.getMemberName().equals("Guest")));
         assertNotNull(invitation.getRespondedAt());
         when(tripMemberRepository.existsById(new TripMemberId(10L, 2L))).thenReturn(true);
         assertDoesNotThrow(() -> tripAccessService.requireTripOwnerOrMember(10L, 2L));

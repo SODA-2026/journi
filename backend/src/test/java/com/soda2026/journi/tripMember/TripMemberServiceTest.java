@@ -25,6 +25,10 @@ class TripMemberServiceTest {
         trip.setId(10L);
         trip.setOwnerId(1L);
         when(entities.find(TripModel.class, 10L)).thenReturn(trip);
+        UserModel owner = new UserModel();
+        owner.setId(1L);
+        owner.setName("Olena");
+        when(entities.find(UserModel.class, 1L)).thenReturn(owner);
         return trip;
     }
 
@@ -60,6 +64,7 @@ class TripMemberServiceTest {
         TripModel trip = setupTrip();
         UserModel user = new UserModel();
         user.setId(2L);
+        user.setName("Sam");
         TripMemberModel member = new TripMemberModel(trip, user);
         when(repository.findById(new TripMemberId(10L, 2L))).thenReturn(Optional.of(member));
 
@@ -67,6 +72,12 @@ class TripMemberServiceTest {
 
         verify(access).requireTripOwner(10L, 1L);
         verify(repository).delete(member);
+        verify(entities).persist(argThat(value -> value instanceof TripMemberEventModel event
+                && event.getEventType() == TripMemberEventType.MEMBER_REMOVED
+                && event.getActorId().equals(1L)
+                && event.getActorName().equals("Olena")
+                && event.getMemberId().equals(2L)
+                && event.getMemberName().equals("Sam")));
     }
 
     @Test
@@ -76,6 +87,20 @@ class TripMemberServiceTest {
         assertThrows(ResponseStatusException.class,
                 () -> service.removeMember(10L, 2L, 1L));
         verifyNoInteractions(repository);
+        verify(entities, never()).persist(any());
+    }
+
+    @Test
+    void eventFailurePreventsMemberRemoval() {
+        TripModel trip = setupTrip();
+        UserModel user = new UserModel();
+        user.setId(2L);
+        when(repository.findById(new TripMemberId(10L, 2L)))
+                .thenReturn(Optional.of(new TripMemberModel(trip, user)));
+        doThrow(new IllegalStateException("Cannot store event")).when(entities).persist(any());
+
+        assertThrows(IllegalStateException.class, () -> service.removeMember(10L, 2L, 1L));
+        verify(repository, never()).delete(any());
     }
 
     @Test
