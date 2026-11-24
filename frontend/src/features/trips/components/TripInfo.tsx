@@ -15,7 +15,6 @@ import { getPlaces } from "../../places/PlaceFetch";
 import { TripMembers } from "../../trip-members/TripMembers";
 import { LeaveTripButton } from "./LeaveTripButton";
 import { TripEvents } from "./TripEvents";
-import { TripMembers } from "../../trip-members/TripMembers";
 
 export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
