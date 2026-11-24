@@ -22,4 +22,9 @@ public class PlaceService {
                 .toList();
     }
 
+    public List<PlaceResponseDTO> getPlacesByCity(Long cityId) {
+        return placeRepository.findByCityId(cityId).stream()
+                .map(placeMapper::toDto)
+                .toList();
+    }
 }
