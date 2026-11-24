@@ -21,6 +21,11 @@
 
      boolean existsByIdAndTrip_Id(Long id, Long tripId);
 
+     Optional<TripDestinationModel> findByTrip_IdAndCity_Id(
+             Long tripId,
+             Long cityId
+     );
+
  }
 
  /*

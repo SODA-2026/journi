@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
-import { getTripInfo, reorderTripDestinations, addTripDestination } from "../TripFetch";
+import type { Place } from "../../places/places";
+import { getTripInfo, reorderTripDestinations, addTripDestination, addTripPlaceActivity } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
@@ -20,6 +21,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
     const [trip, setTrip] = useState<TripInfoType>();
     const [showModal, setShowModal] = useState(false);
     const [places, setPlaces] = useState<Place[]>([]);
+    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
 
 
     useEffect(() => {
@@ -107,10 +109,17 @@ export function TripInfo({ tripId }: { tripId: number }) {
         }
     };
 
-    const handleAddPlace = async (placeId: number, placeName: string) => {
-        console.log("Skulle lägga till", placeId, placeName);
-        // TODO: Koppla place-API när det finns
-    };
+    const handleAddPlace = async (tripId: number, placeId: number):Promise<void> => {
+            if(!selectedPlace) return;
+
+            await addTripPlaceActivity(
+                tripId,
+                placeId,
+            );
+
+            console.log("Aktivitet Skapad");
+            
+    }
 
     return (
         <div className="mx-auto max-w-4xl">
@@ -208,17 +217,19 @@ export function TripInfo({ tripId }: { tripId: number }) {
                                 Testplatser
                             </h3>
 
-                            <button
-                                onClick={() => handleAddPlace(111, "Bryggen")}
-                            >
-                                Lägg till Bryggen
-                            </button>
+                            {places.map((place) => (
+                                <div key={place.placeId}>
+                                    <h3>{place.name}</h3>
+                                    <p>{place.shortDescription}</p>
+                                    <button onClick={() => {
+                                        setSelectedPlace(place);
+                                        setShowModal(true);
+                                    }}>
 
-                            <button
-                                onClick={() => console.log("Lägg till Fisktorget")}
-                            >
-                                Lägg till Fisktorget
-                            </button>
+                                        Lägg till i plan
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </section>
 
@@ -237,30 +248,20 @@ export function TripInfo({ tripId }: { tripId: number }) {
                     </div>
                 </div>
 
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="rounded bg-blue-600 px-4 py-2 text-white"
-                >
-                    Testa AddToTripModal
-
-                </button>
-
-
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}
                 </footer>
 
-                <AddToTripModal
-                    isOpen={showModal}
-                    itemId={1}
-                    itemName="Eiffeltornet"
-                    itemType="place"
-                    onClose={() => setShowModal(false)}
-                    onAdd={ async (tripId, itemId) => {
-                        console.log("trip:", tripId);
-                        console.log("item:", itemId);
-                    } }
-                />
+                {selectedPlace && (
+                    <AddToTripModal
+                        isOpen={showModal}
+                        itemId={selectedPlace?.placeId ?? 0}
+                        itemName={selectedPlace?.name ?? ""}
+                        itemType="place"
+                        onClose={() => setShowModal(false)}
+                        onAdd={handleAddPlace}
+                    />
+                )}
             </article>
         </div>
     );

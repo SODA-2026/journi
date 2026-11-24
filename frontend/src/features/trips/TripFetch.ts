@@ -74,20 +74,15 @@ export function addTripDestination(
     });
 }
 
-// addTripPlaceActivity
 export function addTripPlaceActivity(
     tripId: number,
     placeId: number,
-    tripDestinationId: number,
-    placeName: string,
-): Promise<unknown> {
-    return api(`/api/activities/trips/${tripId}`, {
+): Promise<void> {
+    return api(`/api/activities/trips/${tripId}/places`, {
         method: "POST",
         body: JSON.stringify({
             placeId,
-            tripDestinationId,
-            placeName,
-        })
+        }),
     })
 }
 

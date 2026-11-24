@@ -108,6 +108,7 @@ export function AddToTripModal({
                         >
                             {isLoading ? "Lägger till..." : "Lägg till i plan"}
                         </button>
+
                         {success && (
                             <p className="text-green-600">
                                 Har lagts till i resan.
