@@ -46,6 +46,7 @@ public class TripNoteService {
         return mapper.toDto(saved);
     }
 
+    @Transactional(readOnly = true)
     public List<TripNoteSummeryDto> getAllTripNotesByTripId(Long tripId, Long userId) {
         // 1. Guard: Does the trip exist and is this user allowed to see it?
         getTripAndVerifyAccess(tripId, userId);
@@ -82,7 +83,8 @@ public class TripNoteService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trip note not found");
         }
 
-        boolean isAuthor = note.getAuthor().getId().equals(currentUserId);
+        UserModel author = note.getAuthor();
+        boolean isAuthor = author != null && author.getId().equals(currentUserId);
         boolean isTripOwner = note.getTrip().getOwnerId().equals(currentUserId);
         boolean hasCurrentAccess = isTripOwner
                 || tripMemberRepository.existsById_TripIdAndId_UserId(tripId, currentUserId);

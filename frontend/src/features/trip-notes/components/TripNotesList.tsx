@@ -31,6 +31,7 @@ export function TripNotesList({
                 return (
                     <li key={note.id}>
                         <p>{note.content}</p>
+                        {note.authorName && <small>Av {note.authorName}</small>}
                         <small>{formatDate(note.createdAt)}</small>
                         {canDelete && (
                             <button

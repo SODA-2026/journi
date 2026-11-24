@@ -164,7 +164,10 @@ export function TripInfo({ tripId }: { tripId: number }) {
                          </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
                             <h2 className="mb-2 text-lg font-bold text-[#1d4237]">Anteckningar</h2>
-                <TripNotes tripId={tripId} tripOwnerId={trip.ownerId} />
+                            <TripNotes 
+                                tripId={tripId} 
+                                tripOwnerId={trip.ownerId} 
+                            />
                         </section>
                     </div>
                 </div>
