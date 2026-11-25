@@ -22,6 +22,8 @@ public class PlaceController {
     @GetMapping
     public List<PlaceResponseDTO> getAllPlaces() {
         return placeService.getAllPlaces();
+    }
+
     @GetMapping("/city/{cityId}")
     public List<PlaceResponseDTO> getPlaceByCity(@PathVariable Long cityId) {
         return placeService.getPlacesByCity(cityId);
