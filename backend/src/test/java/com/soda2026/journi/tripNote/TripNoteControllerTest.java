@@ -22,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -103,6 +104,7 @@ class TripNoteControllerTest {
                 .andExpect(jsonPath("$.id").doesNotExist())
                 .andExpect(jsonPath("$.tripId").value(10))
                 .andExpect(jsonPath("$.authorId").value(42))
+                .andExpect(jsonPath("$.authorName").value("User 42"))
                 .andExpect(jsonPath("$.content").value("Pack bags"))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
@@ -162,11 +164,27 @@ class TripNoteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].content").value("Newest"))
+                .andExpect(jsonPath("$[0].authorName").value("User 42"))
                 .andExpect(jsonPath("$[1].content").value("Older"))
+                .andExpect(jsonPath("$[1].authorName").value("User 7"))
                 .andExpect(jsonPath("$[0].id").doesNotExist())
                 .andExpect(jsonPath("$[0].createdAt").isNotEmpty());
 
         verify(notes).findAllByTrip_IdOrderByUpdatedAtDesc(10L);
+    }
+
+    @Test
+    void listsNoteWithDeletedAuthorWithNullAuthorId() throws Exception {
+        TripModel trip = givenTrip(42L);
+        when(notes.findAllByTrip_IdOrderByUpdatedAtDesc(10L)).thenReturn(List.of(
+                new TripNoteModel(trip, null, "Author deleted")));
+
+        mvc.perform(get("/trips/10/notes").with(user(principal)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].content").value("Author deleted"))
+                .andExpect(jsonPath("$[0].authorId").value(nullValue()))
+                .andExpect(jsonPath("$[0].authorName").value(nullValue()));
     }
 
     @Test
@@ -215,6 +233,31 @@ class TripNoteControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(notes).delete(note);
+    }
+
+    @Test
+    void tripOwnerCanDeleteNoteWithDeletedAuthor() throws Exception {
+        TripModel trip = givenTrip(42L);
+        TripNoteModel note = new TripNoteModel(trip, null, "Orphaned");
+        when(notes.findById(5L)).thenReturn(Optional.of(note));
+
+        mvc.perform(delete("/trips/10/notes/5").with(user(principal)).with(csrf()))
+                .andExpect(status().isNoContent());
+
+        verify(notes).delete(note);
+    }
+
+    @Test
+    void memberCannotDeleteNoteWithDeletedAuthor() throws Exception {
+        TripModel trip = givenTrip(7L);
+        TripNoteModel note = new TripNoteModel(trip, null, "Orphaned");
+        when(notes.findById(5L)).thenReturn(Optional.of(note));
+        when(members.existsById_TripIdAndId_UserId(10L, 42L)).thenReturn(true);
+
+        mvc.perform(delete("/trips/10/notes/5").with(user(principal)).with(csrf()))
+                .andExpect(status().isForbidden());
+
+        verify(notes, never()).delete(any());
     }
 
     @Test

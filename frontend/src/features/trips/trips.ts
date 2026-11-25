@@ -47,6 +47,7 @@ export interface TripDestination {
     id: number;
     city: string;
     country: string;
+    cityId: number;
 }
 
 export interface TripInfoType {
@@ -58,4 +59,10 @@ export interface TripInfoType {
     endDate: string;
     createdAt: string;
     destinations: TripDestination[];
+}
+
+export interface TripUpdateRequest {
+    title: string;
+    startDate: string;
+    endDate: string;
 }

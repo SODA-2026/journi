@@ -1,5 +1,6 @@
  package com.soda2026.journi.tripActivity;
 
+ import com.soda2026.journi.place.PlaceModel;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
  import com.soda2026.journi.user.UserModel;
@@ -29,18 +30,19 @@
          return models.stream().map(this::toDto).toList();
      }
 
-     public TripActivityModel toEntity(TripActivityRequestDTO dto, TripDestinationModel tripDestination) {
+     public TripActivityModel toEntity(TripActivityRequestDTO dto, TripDestinationModel tripDestination, PlaceModel place) {
          TripActivityModel model = new TripActivityModel();
-         updateEntity(dto, model, tripDestination);
+         updateEntity(dto, model, tripDestination, place);
          return model;
      }
 
-     public void updateEntity(TripActivityRequestDTO dto, TripActivityModel model, TripDestinationModel tripDestination) {
+     public void updateEntity(TripActivityRequestDTO dto, TripActivityModel model, TripDestinationModel tripDestination, PlaceModel place) {
          model.setName(dto.name());
          model.setActivityDate(dto.activityDate());
          model.setStartTime(dto.startTime());
          model.setDescription(dto.description());
          model.setTripDestination(tripDestination);
+         model.setPlace(place);
      }
 
 //     public TripActivityModel toEntity(TripActivityRequestDTO tripActivityRequestDTO, TripDestinationModel tripDestinationModel) {

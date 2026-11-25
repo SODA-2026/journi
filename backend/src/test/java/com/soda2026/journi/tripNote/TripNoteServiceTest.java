@@ -41,6 +41,7 @@ class TripNoteServiceTest {
         assertEquals("Pack bags", captor.getValue().getContent());
         assertEquals(10L, response.getTripId());
         assertEquals(1L, response.getAuthorId());
+        assertEquals("User 1", response.getAuthorName());
         assertEquals("Pack bags", response.getContent());
         assertNotNull(response.getCreatedAt());
         verify(members, never()).existsById_TripIdAndId_UserId(anyLong(), anyLong());
@@ -93,7 +94,9 @@ class TripNoteServiceTest {
 
         assertEquals(2, result.size());
         assertEquals("Newest", result.get(0).content());
+        assertEquals("User 1", result.get(0).authorName());
         assertEquals("Older", result.get(1).content());
+        assertEquals("User 2", result.get(1).authorName());
         verify(notes).findAllByTrip_IdOrderByUpdatedAtDesc(10L);
         verify(members, never()).existsById_TripIdAndId_UserId(anyLong(), anyLong());
     }
@@ -109,6 +112,20 @@ class TripNoteServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("Note", result.getFirst().content());
+    }
+
+    @Test
+    void listsNoteWithDeletedAuthor() {
+        TripModel trip = existingTrip();
+        TripNoteModel note = new TripNoteModel(trip, null, "Author deleted");
+        when(notes.findAllByTrip_IdOrderByUpdatedAtDesc(10L)).thenReturn(List.of(note));
+
+        var result = service.getAllTripNotesByTripId(10L, 1L);
+
+        assertEquals(1, result.size());
+        assertEquals("Author deleted", result.getFirst().content());
+        assertNull(result.getFirst().authorId());
+        assertNull(result.getFirst().authorName());
     }
 
     @Test
@@ -152,6 +169,30 @@ class TripNoteServiceTest {
 
         verify(notes).delete(note);
         verify(members, never()).existsById_TripIdAndId_UserId(anyLong(), anyLong());
+    }
+
+    @Test
+    void tripOwnerCanDeleteNoteWithDeletedAuthor() {
+        TripModel trip = existingTrip();
+        TripNoteModel note = new TripNoteModel(trip, null, "Orphaned");
+        when(notes.findById(5L)).thenReturn(Optional.of(note));
+
+        service.delete(10L, 5L, 1L);
+
+        verify(notes).delete(note);
+    }
+
+    @Test
+    void memberCannotDeleteNoteWithDeletedAuthor() {
+        TripModel trip = existingTrip();
+        TripNoteModel note = new TripNoteModel(trip, null, "Orphaned");
+        when(notes.findById(5L)).thenReturn(Optional.of(note));
+        when(members.existsById_TripIdAndId_UserId(10L, 2L)).thenReturn(true);
+
+        assertError(HttpStatus.FORBIDDEN, "Not allowed to delete this note",
+                () -> service.delete(10L, 5L, 2L));
+
+        verify(notes, never()).delete(any());
     }
 
     @Test
@@ -213,6 +254,7 @@ class TripNoteServiceTest {
     private UserModel user(Long id) {
         UserModel user = new UserModel();
         user.setId(id);
+        user.setName("User " + id);
         return user;
     }
 

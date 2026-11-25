@@ -2,6 +2,7 @@
 
  import com.soda2026.journi.security.UserPrincipal;
  import com.soda2026.journi.tripMember.dto.TripMemberResponse;
+ import com.soda2026.journi.tripMember.dto.TripMemberEventResponse;
  import jakarta.validation.constraints.Positive;
  import org.springframework.http.HttpStatus;
  import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +31,14 @@
              @AuthenticationPrincipal UserPrincipal user
      ) {
          return service.getMembers(tripId, user.getId());
+     }
+
+     @GetMapping("/events")
+     public List<TripMemberEventResponse> getEvents(
+             @PathVariable("tripId") @Positive Long tripId,
+             @AuthenticationPrincipal UserPrincipal user
+     ) {
+         return service.getEvents(tripId, user.getId());
      }
 
      @DeleteMapping("/me")

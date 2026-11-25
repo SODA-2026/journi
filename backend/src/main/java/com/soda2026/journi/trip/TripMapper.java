@@ -1,9 +1,6 @@
  package com.soda2026.journi.trip;
 
- import com.soda2026.journi.trip.dto.CreateTripRequest;
- import com.soda2026.journi.trip.dto.TripInfoDTO;
- import com.soda2026.journi.trip.dto.TripResponse;
- import com.soda2026.journi.trip.dto.TripSummaryDTO;
+ import com.soda2026.journi.trip.dto.*;
  import com.soda2026.journi.tripDestination.TripDestinationMapper;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
  import com.soda2026.journi.tripDestination.TripDestinationRepository;
@@ -69,6 +66,14 @@
 
 
          );
+     }
+
+     public UpdateTripResponseDTO toUpdateTripResponseDTO(TripModel trip){
+         return new UpdateTripResponseDTO(
+                 trip.getTitle(),
+                 trip.getStartDate(),
+                 trip.getEndDate()
+                 );
      }
 
 

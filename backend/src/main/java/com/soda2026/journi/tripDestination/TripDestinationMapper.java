@@ -20,7 +20,8 @@
          return new TripDestinationSummaryDTO(
                  tripDestinationModel.getId(),
                  tripDestinationModel.getCity().getName(),
-                 tripDestinationModel.getCity().getCountry().getName()
+                 tripDestinationModel.getCity().getCountry().getName(),
+                 tripDestinationModel.getCity().getId()
          );
      }
  }

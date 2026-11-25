@@ -11,6 +11,9 @@ import com.soda2026.journi.tripDestination.TripDestinationRepository;
 import com.soda2026.journi.tripMember.TripMemberId;
 import com.soda2026.journi.tripMember.TripMemberModel;
 import com.soda2026.journi.tripMember.TripMemberRepository;
+import com.soda2026.journi.tripMember.TripMemberEventModel;
+import com.soda2026.journi.tripMember.TripMemberEventType;
+import jakarta.persistence.EntityManager;
 import com.soda2026.journi.user.UserModel;
 import com.soda2026.journi.user.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -33,6 +36,7 @@ public class InvitationService {
     private final TripMemberRepository tripMemberRepository;
     private final TripAccessService tripAccessService;
     private final TripDestinationRepository tripDestinationRepository;
+    private final EntityManager entityManager;
 
     public InvitationService(
             InvitationRepository invitationRepository,
@@ -41,7 +45,8 @@ public class InvitationService {
             UserRepository userRepository,
             TripMemberRepository tripMemberRepository,
             TripAccessService tripAccessService,
-            TripDestinationRepository tripDestinationRepository
+            TripDestinationRepository tripDestinationRepository,
+            EntityManager entityManager
     ) {
         this.invitationRepository = invitationRepository;
         this.invitationMapper = invitationMapper;
@@ -50,6 +55,7 @@ public class InvitationService {
         this.tripMemberRepository = tripMemberRepository;
         this.tripAccessService = tripAccessService;
         this.tripDestinationRepository = tripDestinationRepository;
+        this.entityManager = entityManager;
     }
 
     // After waiting for the trip lock, duplicate checks must see the latest committed invitations.
@@ -124,6 +130,14 @@ public class InvitationService {
             TripMemberId memberId = new TripMemberId(invitation.getTrip().getId(), userId);
             if (!tripMemberRepository.existsById(memberId)) {
                 tripMemberRepository.save(new TripMemberModel(invitation.getTrip(), invitation.getInvitee()));
+                entityManager.persist(new TripMemberEventModel(
+                        invitation.getTrip().getId(),
+                        userId,
+                        invitation.getInvitee().getName(),
+                        TripMemberEventType.MEMBER_JOINED,
+                        userId,
+                        invitation.getInvitee().getName()
+                ));
             }
         }
 

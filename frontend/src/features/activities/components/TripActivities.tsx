@@ -5,10 +5,12 @@ import type { ActivityResponse } from "../ActivitiesTypes";
 import { getActivities } from "../ActivitiesApi";
 import { ActivityForm } from "./ActivityForm";
 import { ActivityList } from "./ActivityList";
+import PlaceSuggestions from "../../places/components/PlaceSuggestions";
 
 interface DestinationOption {
     id: number;
     label: string;
+    cityId: number;
 }
 
 interface TripActivitiesProps {
@@ -86,6 +88,12 @@ export function TripActivities({ tripId, destinations, tripStartDate, tripEndDat
                     destinations={destinations}
                 />
             )}
+
+            {/* New suggestions of places for every destinations */}
+
+            {destinations.map((d) => (
+                <PlaceSuggestions key={d.id} cityId={d.cityId}/>
+            ))}
         </div>
     );
 }
