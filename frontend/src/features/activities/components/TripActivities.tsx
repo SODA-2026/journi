@@ -26,7 +26,7 @@ export function TripActivities({ tripId, destinations }: TripActivitiesProps) {
     // Loading data during slow fetching
     useEffect(() => {
         let cancelled = false;
-
+        refreshActivities();
         Promise.all(destinations.map((d) => getActivities(tripId, d.id)))
             .then((lists) => {
                 if (!cancelled) setActivities(lists.flat());
@@ -52,19 +52,21 @@ export function TripActivities({ tripId, destinations }: TripActivitiesProps) {
         );
     }
 
+    const refreshActivities = async () => {
+        // Refetch all activities after creation
+        const lists = await Promise.all(
+            destinations.map((d) => getActivities(tripId, d.id)),
+        );
+        setActivities(lists.flat());
+        setError("");
+    }
+
     return (
         <div className="flex flex-col gap-5">
             <ActivityForm
                 tripId={tripId}
                 destinations={destinations}
-                onCreated={async () => {
-                    // Refetch all activities after creation
-                    const lists = await Promise.all(
-                        destinations.map((d) => getActivities(tripId, d.id)),
-                    );
-                    setActivities(lists.flat());
-                    setError("");
-                }}
+                onCreated={refreshActivities}
             />
 
             {loading ? (
@@ -88,7 +90,7 @@ export function TripActivities({ tripId, destinations }: TripActivitiesProps) {
             {/* New suggestions of places for every destinations */}
 
             {destinations.map((d) => (
-                <PlaceSuggestions key={d.id} cityId={d.cityId}/>
+                <PlaceSuggestions key={d.id} cityId={d.cityId} cityName={d.label} tripId={tripId} onActivityAdded={refreshActivities}/>
             ))}
         </div>
     );

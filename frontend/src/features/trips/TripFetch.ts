@@ -111,6 +111,15 @@ export function addTripDestination(
     });
 }
 
+export function deleteTripDestination(
+    tripId: number,
+    destinationId: number,
+): Promise<void> {
+    return api(`/api/trips/${tripId}/destinations/${destinationId}`, {
+        method: "DELETE",
+    });
+}
+
 export function addTripPlaceActivity(
     tripId: number,
     placeId: number,
@@ -122,4 +131,3 @@ export function addTripPlaceActivity(
         }),
     })
 }
-

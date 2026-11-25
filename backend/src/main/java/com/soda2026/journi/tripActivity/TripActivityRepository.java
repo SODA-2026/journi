@@ -8,4 +8,6 @@
  public interface TripActivityRepository extends JpaRepository<TripActivityModel, Long> {
 
   List<TripActivityModel> findByTripDestinationIdOrderByActivityDateAscStartTimeAsc(Long tripDestination);
+
+  void deleteAllByTripDestination_Id(Long tripDestinationId);
  }

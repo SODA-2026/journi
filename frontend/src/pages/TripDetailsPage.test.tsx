@@ -4,7 +4,7 @@ import { Link, MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { ApiError } from "../api/ApiClient";
 import { getSentInvitations, inviteUser } from "../features/invitations/InvitationApi";
-import { getTripInfo, getTripEvents } from "../features/trips/TripFetch";
+import { getTripInfo, getTripEvents, deleteTripDestination } from "../features/trips/TripFetch";
 import { TripDetailsPage } from "./TripDetailsPage";
 import { getTripMembers, removeTripMember } from "../features/trip-members/TripMemberApi";
 
@@ -14,7 +14,11 @@ vi.mock("../features/invitations/InvitationApi", () => ({
     getSentInvitations: vi.fn(),
     inviteUser: vi.fn(),
 }));
-vi.mock("../features/trips/TripFetch", () => ({ getTripInfo: vi.fn(), getTripEvents: vi.fn() }));
+vi.mock("../features/trips/TripFetch", () => ({
+    getTripInfo: vi.fn(),
+    getTripEvents: vi.fn(),
+    deleteTripDestination: vi.fn(),
+}));
 const auth = vi.hoisted(() => ({ user: { id: 1 } }));
 vi.mock("../context/AuthContext", () => ({ useAuth: () => auth }));
 
@@ -73,6 +77,21 @@ it("shows the leave button to an invited participant", async () => {
     renderTripRoute();
     expect(await screen.findByRole("button", { name: "Lämna resan" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Skicka inbjudan" })).not.toBeInTheDocument();
+});
+
+it("removes a confirmed destination from the trip", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    vi.mocked(getTripInfo).mockResolvedValue({
+        ...trip,
+        destinations: [{ id: 20, city: "Malmö", country: "Sweden", cityId: 5 }],
+    });
+    vi.mocked(deleteTripDestination).mockResolvedValue(undefined);
+    renderTripRoute();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Ta bort Malmö" }));
+
+    expect(await screen.findByText("Inga destinationer är tillagda ännu")).toBeInTheDocument();
+    expect(deleteTripDestination).toHaveBeenCalledWith(10, 20);
 });
 
 it("shows departures to remaining participants and refreshes on returning to the tab", async () => {
