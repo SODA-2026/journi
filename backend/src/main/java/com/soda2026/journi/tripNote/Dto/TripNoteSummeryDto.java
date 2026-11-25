@@ -6,7 +6,8 @@ public record TripNoteSummeryDto(
         Long id,
         String content,
         LocalDateTime createdAt,
-        Long authorId
+        Long authorId,
+        String authorName
 ) {
 
 }

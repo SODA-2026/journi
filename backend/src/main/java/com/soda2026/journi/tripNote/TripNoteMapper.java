@@ -14,7 +14,8 @@
          return new TripNoteResponseDto(
                  note.getId(),
                  note.getTrip().getId(),
-                 note.getAuthor().getId(),
+                 authorId(note),
+                 authorName(note),
                  note.getContent(),
                  note.getCreatedAt(),
                  note.getUpdatedAt()
@@ -30,7 +31,17 @@
                  note.getId(),
                  note.getContent(),
                  note.getCreatedAt(),
-                 note.getAuthor().getId()
+                 authorId(note),
+                 authorName(note)
          );
+     }
+
+     // author_id is nullable (ON DELETE SET NULL), so the author can be gone.
+     private Long authorId(TripNoteModel note) {
+         return note.getAuthor() == null ? null : note.getAuthor().getId();
+     }
+
+     private String authorName(TripNoteModel note) {
+         return note.getAuthor() == null ? null : note.getAuthor().getName();
      }
  }

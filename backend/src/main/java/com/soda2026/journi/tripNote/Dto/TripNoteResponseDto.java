@@ -7,6 +7,7 @@
      private Long id;
      private Long tripId;
      private Long authorId;
+     private String authorName;
      private String content;
      private LocalDateTime createdAt;
      private LocalDateTime updatedAt;
@@ -14,10 +15,11 @@
      public TripNoteResponseDto() {
      }
 
-     public TripNoteResponseDto(Long id, Long tripId, Long authorId, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+     public TripNoteResponseDto(Long id, Long tripId, Long authorId, String authorName, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
          this.id = id;
          this.tripId = tripId;
          this.authorId = authorId;
+         this.authorName = authorName;
          this.content = content;
          this.createdAt = createdAt;
          this.updatedAt = updatedAt;
@@ -33,6 +35,10 @@
 
      public Long getAuthorId() {
          return authorId;
+     }
+
+     public String getAuthorName() {
+         return authorName;
      }
 
      public String getContent() {
