@@ -2,6 +2,7 @@ package com.soda2026.journi.tripActivity;
 
 import com.soda2026.journi.place.PlaceModel;
 import com.soda2026.journi.tripDestination.TripDestinationModel;
+import com.soda2026.journi.user.UserModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -41,6 +42,10 @@ public class TripActivityModel {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TripActivityStatus status = TripActivityStatus.PLANNED;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false)
+    private UserModel createdBy;
 
     public TripActivityModel() {
     }
@@ -107,5 +112,13 @@ public class TripActivityModel {
 
     public void setStatus(TripActivityStatus status) {
         this.status = status;
+    }
+
+    public UserModel getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UserModel createdBy) {
+        this.createdBy = createdBy;
     }
 }

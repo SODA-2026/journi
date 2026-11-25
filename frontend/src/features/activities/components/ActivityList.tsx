@@ -76,6 +76,12 @@ export function ActivityList({ activities, destinations}: ActivityListProps){
                                 {a.description && (
                                     <p className="text-[#526c62]">{a.description}</p>
                                 )}
+                                <p>
+                                    {activities.createdByName
+                                        ? 
+                                    }
+
+                                </p>
 
                             </li>
                         ))}

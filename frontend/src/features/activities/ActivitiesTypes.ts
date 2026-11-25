@@ -14,7 +14,9 @@ export interface ActivityResponse {
     activityDate: string;
     startTime: string | null; // optional
     description: string | null;
-    status: "PROPOSED" | "PLANNED" | "CANCELLED";
+    status: "PROPOSED" | "PLANNED" | "CANCELLED";¨
+    createdById: number || null;
+    createdByName: string || null;
 }
 
 export interface ActivityFormData{
