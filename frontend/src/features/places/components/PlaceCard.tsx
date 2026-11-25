@@ -24,7 +24,9 @@ export default function PlaceCard({place}: PlaceCardProps ) {
             </div>
 
             <p className="place-card_discription">
-                {place.shortDescription}
+                {place.shortDescription && (
+                    <p>{place.shortDescription} </p>
+                )}
             </p>
 
         </div>

@@ -82,7 +82,7 @@ export function ActivityForm({
             name: formData.name.trim(),
         };
 
-        const newErrors = validate(dataToSubmit);
+        const newErrors = validate(dataToSubmit, tripStartDate, tripEndDate);
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {

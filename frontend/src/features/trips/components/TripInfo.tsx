@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
 import type { Place } from "../../places/places";
-import { getTripInfo, reorderTripDestinations, addTripDestination, addTripPlaceActivity } from "../TripFetch";
+import {
+    getTripInfo,
+    reorderTripDestinations,
+    addTripDestination,
+    addTripPlaceActivity,
+} from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
@@ -24,9 +29,8 @@ export function TripInfo({ tripId }: { tripId: number }) {
     const [trip, setTrip] = useState<TripInfoType>();
     const [showModal, setShowModal] = useState(false);
     const [places, setPlaces] = useState<Place[]>([]);
-    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
+    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
     const [eventsVersion, setEventsVersion] = useState(0);
-
 
     useEffect(() => {
         getTripInfo(tripId)
@@ -43,17 +47,18 @@ export function TripInfo({ tripId }: { tripId: number }) {
     }, [tripId]);
 
     useEffect(() => {
-    getPlaces()
-        .then(setPlaces)
-        .catch(console.error);
-}, []);
-
+        getPlaces().then(setPlaces).catch(console.error);
+    }, []);
 
     // useMemo keeps the array stable between renders
     // without it TripActivities gets a new array every time - endless loop of requests
     const destinationOptions = useMemo(
         () =>
-            trip?.destinations.map((d) => ({ id: d.id, label: d.city, cityId: d.cityId })) ?? [],
+            trip?.destinations.map((d) => ({
+                id: d.id,
+                label: d.city,
+                cityId: d.cityId,
+            })) ?? [],
         [trip],
     );
 
@@ -103,7 +108,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
         try {
             await reorderTripDestinations(
                 trip.id,
-                updated.map((destination) => destination.id)
+                updated.map((destination) => destination.id),
             );
             setReorderError("");
         } catch (err) {
@@ -130,17 +135,16 @@ export function TripInfo({ tripId }: { tripId: number }) {
     //     }
     // };
 
-    const handleAddPlace = async (tripId: number, placeId: number):Promise<void> => {
-            if(!selectedPlace) return;
+    const handleAddPlace = async (
+        tripId: number,
+        placeId: number,
+    ): Promise<void> => {
+        if (!selectedPlace) return;
 
-            await addTripPlaceActivity(
-                tripId,
-                placeId,
-            );
+        await addTripPlaceActivity(tripId, placeId);
 
-            console.log("Aktivitet Skapad");
-
-    }
+        console.log("Aktivitet Skapad");
+    };
 
     return (
         <div className="mx-auto max-w-4xl">
@@ -174,10 +178,20 @@ export function TripInfo({ tripId }: { tripId: number }) {
                             {formatDate(trip.endDate)}
                         </p>
                     </div>
-                    {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
-                    {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
                     {user?.id === trip.ownerId && (
-                        <TripMembers key={trip.id} tripId={trip.id} onRemoved={() => setEventsVersion((current) => current + 1)} />
+                        <SentInvitations tripId={trip.id} />
+                    )}
+                    {user && user.id !== trip.ownerId && (
+                        <LeaveTripButton tripId={trip.id} />
+                    )}
+                    {user?.id === trip.ownerId && (
+                        <TripMembers
+                            key={trip.id}
+                            tripId={trip.id}
+                            onRemoved={() =>
+                                setEventsVersion((current) => current + 1)
+                            }
+                        />
                     )}
                 </header>
 
@@ -257,6 +271,8 @@ export function TripInfo({ tripId }: { tripId: number }) {
                             <TripActivities
                                 tripId={tripId}
                                 destinations={destinationOptions}
+                                tripStartDate={trip.startDate}
+                                tripEndDate={trip.endDate}
                             />
                         </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">
@@ -271,7 +287,11 @@ export function TripInfo({ tripId }: { tripId: number }) {
                     </div>
                 </div>
 
-                <TripEvents key={trip.id} tripId={trip.id} refreshVersion={eventsVersion} />
+                <TripEvents
+                    key={trip.id}
+                    tripId={trip.id}
+                    refreshVersion={eventsVersion}
+                />
 
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}
