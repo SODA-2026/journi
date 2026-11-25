@@ -160,6 +160,8 @@ export function TripInfo({ tripId }: { tripId: number }) {
                              <TripActivities
                                tripId={tripId}
                                destinations={destinationOptions}
+                               tripStartDate={trip.startDate}
+                               tripEndDate={trip.endDate}
                              />
                          </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">

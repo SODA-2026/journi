@@ -77,8 +77,9 @@ export function ActivityList({ activities, destinations}: ActivityListProps){
                                     <p className="text-[#526c62]">{a.description}</p>
                                 )}
                                 <p>
-                                    {activities.createdByName
-                                        ? 
+                                    {a.createdByName
+                                        ? `Skapad av ${a.createdByName}`
+                                        : "Okänd skapare"
                                     }
 
                                 </p>
