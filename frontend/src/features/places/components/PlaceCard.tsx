@@ -1,5 +1,4 @@
 import type { Places, PlaceCategory } from "../PlacesTypes";
-import { addTripPlaceActivity } from "../../trips/TripFetch";
 
 const CATEGORY_LABELS: Record<PlaceCategory, string> = {
     TOURIST_ATTRACTION: 'Sevärdhet',
@@ -15,7 +14,7 @@ interface PlaceCardProps {
     onActivityAdded: () => Promise<void>;
 }
 
-export default function PlaceCard({place, tripId, onActivityAdded}: PlaceCardProps ) {   
+export default function PlaceCard({place, tripId, onActivityAdded}: PlaceCardProps ) {
 
     const handleAddPlace = async () => {
             await addTripPlaceActivity(
@@ -39,11 +38,13 @@ export default function PlaceCard({place, tripId, onActivityAdded}: PlaceCardPro
                     </button>
                 </div>
 
-                <p className="place-card_discription">
-                    {place.shortDescription}
-                </p>
-                
-            </div>
+            <p className="place-card_discription">
+                {place.shortDescription && (
+                    <p>{place.shortDescription} </p>
+                )}
+            </p>
+
+        </div>
     )
 
 }

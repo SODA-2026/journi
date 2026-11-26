@@ -3,6 +3,7 @@
  import com.soda2026.journi.place.PlaceModel;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
+ import com.soda2026.journi.user.UserModel;
  import org.springframework.stereotype.Component;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
  import java.util.List;
@@ -11,14 +12,17 @@
  public class TripActivityMapper {
 
      public TripActivityResponseDTO toDto(TripActivityModel tripActivityModel) {
-        return new TripActivityResponseDTO(
+         UserModel creator = tripActivityModel.getCreatedBy();
+
+         return new TripActivityResponseDTO(
                 tripActivityModel.getId(),
                 tripActivityModel.getTripDestination().getId(),
                 tripActivityModel.getName(),
                 tripActivityModel.getActivityDate(),
                 tripActivityModel.getStartTime(),
                 tripActivityModel.getDescription(),
-                tripActivityModel.getStatus()
+                tripActivityModel.getStatus(),
+                creator != null ? creator.getId() : null, creator != null ? creator.getName() : null
         );
      }
 

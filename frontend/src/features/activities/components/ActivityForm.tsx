@@ -6,6 +6,7 @@ import type {
 } from "../ActivitiesTypes";
 import { validate } from "../../activities/ActivityValidation";
 import { createActivity } from "../ActivitiesApi";
+import { ApiError } from "../../../api/ApiClient";
 
 interface DestinationOption {
     id: number;
@@ -16,6 +17,8 @@ interface ActivityFormProps {
     tripId: number;
     destinations: DestinationOption[];
     onCreated?: (activity: ActivityResponse) => void;
+    tripStartDate?: string; 
+    tripEndDate?: string;
 }
 
 const emptyForm: ActivityFormData = {
@@ -30,6 +33,8 @@ export function ActivityForm({
     tripId,
     destinations,
     onCreated,
+    tripStartDate,
+    tripEndDate
 }: ActivityFormProps) {
     const [formData, setFormData] = useState<ActivityFormData>({
         ...emptyForm,
@@ -77,7 +82,7 @@ export function ActivityForm({
             name: formData.name.trim(),
         };
 
-        const newErrors = validate(dataToSubmit);
+        const newErrors = validate(dataToSubmit, tripStartDate, tripEndDate);
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {
@@ -89,13 +94,18 @@ export function ActivityForm({
 
         try {
             const savedActivity = await createActivity(tripId, dataToSubmit);
-            setSuccessMessage(`Activity "${savedActivity.name}" added!`);
+            setSuccessMessage(`Aktivitet "${savedActivity.name}" tillagd!`);
             setFormData({ ...emptyForm });
             setErrors({});
             onCreated?.(savedActivity);
         } catch (err) {
-            console.error("Failed to add activity: ", err);
-            setSubmitError("Unable to add an activity. Please try again.");
+            console.error("Kunde inte lägga till en aktivitet: ", err);
+
+            if(err instanceof ApiError && err.status === 400){
+                setSubmitError(err.message)
+            } else{
+                setSubmitError("Kunde inte lägga till aktiviteten. Försök igen.")
+            }
         } finally {
             requestInProgress.current = false;
             setSubmitting(false);
@@ -174,6 +184,8 @@ export function ActivityForm({
                             type="date"
                             name="activityDate"
                             id="activityDate"
+                            min={tripStartDate}
+                            max={tripEndDate}
                             value={formData.activityDate}
                             onChange={handleChange}
                             className="w-full rounded-lg border border-[#9fb0aa] bg-white px-3 py-2 text-base text-[#1d4237] focus:border-[#235e4f] focus:outline-none focus:ring-2 focus:ring-[#235e4f]/20"
