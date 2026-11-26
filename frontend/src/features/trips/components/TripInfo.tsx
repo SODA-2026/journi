@@ -6,6 +6,7 @@ import {
     reorderTripDestinations,
     addTripDestination,
     addTripPlaceActivity,
+    deleteTripDestination
 } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
@@ -15,7 +16,6 @@ import { useAuth } from "../../../context/AuthContext";
 import { SentInvitations } from "../../invitations/SentInvitations";
 import { TripActivities } from "../../activities/components/TripActivities";
 import { TripNotes } from "../../trip-notes/components/TripNotes";
-import { AddToTripModal } from "../../../shared/components/AddToTripModal";
 import { getPlaces } from "../../places/PlaceFetch";
 import { TripMembers } from "../../trip-members/TripMembers";
 import { LeaveTripButton } from "./LeaveTripButton";
@@ -24,13 +24,13 @@ import { TripEvents } from "./TripEvents";
 export function TripInfo({ tripId }: { tripId: number }) {
     const { user } = useAuth();
     const [error, setError] = useState("");
-    const [reorderError, setReorderError] = useState("");
+    const [destinationError, setDestinationError] = useState("");
+    const [deletingDestinationId, setDeletingDestinationId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [trip, setTrip] = useState<TripInfoType>();
-    const [showModal, setShowModal] = useState(false);
     const [places, setPlaces] = useState<Place[]>([]);
-    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
     const [eventsVersion, setEventsVersion] = useState(0);
+
 
     useEffect(() => {
         getTripInfo(tripId)
@@ -47,18 +47,17 @@ export function TripInfo({ tripId }: { tripId: number }) {
     }, [tripId]);
 
     useEffect(() => {
-        getPlaces().then(setPlaces).catch(console.error);
-    }, []);
+    getPlaces()
+        .then(setPlaces)
+        .catch(console.error);
+}, []);
+
 
     // useMemo keeps the array stable between renders
     // without it TripActivities gets a new array every time - endless loop of requests
     const destinationOptions = useMemo(
         () =>
-            trip?.destinations.map((d) => ({
-                id: d.id,
-                label: d.city,
-                cityId: d.cityId,
-            })) ?? [],
+            trip?.destinations.map((d) => ({ id: d.id, label: d.city, cityId: d.cityId })) ?? [],
         [trip],
     );
 
@@ -110,40 +109,36 @@ export function TripInfo({ tripId }: { tripId: number }) {
                 trip.id,
                 updated.map((destination) => destination.id),
             );
-            setReorderError("");
+            setDestinationError("");
         } catch (err) {
             console.error(err);
             setTrip({ ...trip, destinations: trip.destinations });
-            setReorderError("Kunde inte ändra destinationernas ordning");
+            setDestinationError("Kunde inte ändra destinationernas ordning");
         }
     };
 
-    // const handleAddDestination = async (cityId: number,) => {
-    //     if (!trip) return;
+    const removeDestination = async (destinationId: number, city: string) => {
+        if (!window.confirm(`Ta bort ${city} och dess aktiviteter från resan?`)) return;
 
-    //     try {
-    //         await addTripDestination(
-    //             trip.id,
-    //             cityId,
-    //             trip.destinations.length,
-    //         );
+        setDeletingDestinationId(destinationId);
+        try {
+            await deleteTripDestination(trip.id, destinationId);
+            setTrip((current) => current && ({
+                ...current,
+                destinations: current.destinations.filter((destination) => destination.id !== destinationId),
+            }));
+            setDestinationError("");
+        } catch (err) {
+            console.error(err);
+            setDestinationError("Kunde inte ta bort destinationen. Försök igen.");
+        } finally {
+            setDeletingDestinationId(null);
+        }
+    };
 
-    //         const updatedTrip = await getTripInfo(trip.id);
-    //         setTrip(updatedTrip);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
-    const handleAddPlace = async (
-        tripId: number,
-        placeId: number,
-    ): Promise<void> => {
-        if (!selectedPlace) return;
-
-        await addTripPlaceActivity(tripId, placeId);
-
-        console.log("Aktivitet Skapad");
+    const refreshTrip = async () => {
+        const updatedTrip = await getTripInfo(tripId);
+        setTrip(updatedTrip);
     };
 
     return (
@@ -178,20 +173,10 @@ export function TripInfo({ tripId }: { tripId: number }) {
                             {formatDate(trip.endDate)}
                         </p>
                     </div>
+                    {user?.id === trip.ownerId && <SentInvitations tripId={trip.id} />}
+                    {user && user.id !== trip.ownerId && <LeaveTripButton tripId={trip.id} />}
                     {user?.id === trip.ownerId && (
-                        <SentInvitations tripId={trip.id} />
-                    )}
-                    {user && user.id !== trip.ownerId && (
-                        <LeaveTripButton tripId={trip.id} />
-                    )}
-                    {user?.id === trip.ownerId && (
-                        <TripMembers
-                            key={trip.id}
-                            tripId={trip.id}
-                            onRemoved={() =>
-                                setEventsVersion((current) => current + 1)
-                            }
-                        />
+                        <TripMembers key={trip.id} tripId={trip.id} onRemoved={() => setEventsVersion((current) => current + 1)} />
                     )}
                 </header>
 
@@ -200,12 +185,12 @@ export function TripInfo({ tripId }: { tripId: number }) {
                         <h2 className="mb-3 text-xl font-bold text-[#1d4237]">
                             Destinationer
                         </h2>
-                        {reorderError && (
+                        {destinationError && (
                             <p
                                 role="alert"
                                 className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                             >
-                                {reorderError}
+                                {destinationError}
                             </p>
                         )}
                         {trip.destinations.length === 0 ? (
@@ -236,7 +221,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
                                                 onClick={() =>
                                                     moveDestination(index, -1)
                                                 }
-                                                disabled={index === 0}
+                                                disabled={deletingDestinationId !== null || index === 0}
                                                 aria-label={`Flytta ${d.city} uppåt`}
                                                 className="h-10 w-10 rounded-lg border border-[#9fb0aa] text-[#1d4237] transition hover:border-[#235e4f] hover:bg-[#e7efea] disabled:cursor-not-allowed disabled:opacity-40"
                                             >
@@ -247,14 +232,20 @@ export function TripInfo({ tripId }: { tripId: number }) {
                                                 onClick={() =>
                                                     moveDestination(index, 1)
                                                 }
-                                                disabled={
-                                                    index ===
-                                                    trip.destinations.length - 1
-                                                }
+                                                disabled={deletingDestinationId !== null || index === trip.destinations.length - 1}
                                                 aria-label={`Flytta ${d.city} nedåt`}
                                                 className="h-10 w-10 rounded-lg border border-[#9fb0aa] text-[#1d4237] transition hover:border-[#235e4f] hover:bg-[#e7efea] disabled:cursor-not-allowed disabled:opacity-40"
                                             >
                                                 🠋
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeDestination(d.id, d.city)}
+                                                disabled={deletingDestinationId !== null}
+                                                aria-label={`Ta bort ${d.city}`}
+                                                className="h-10 rounded-lg border border-red-300 px-3 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                            >
+                                                Ta bort
                                             </button>
                                         </div>
                                     </li>
@@ -287,26 +278,12 @@ export function TripInfo({ tripId }: { tripId: number }) {
                     </div>
                 </div>
 
-                <TripEvents
-                    key={trip.id}
-                    tripId={trip.id}
-                    refreshVersion={eventsVersion}
-                />
+                <TripEvents key={trip.id} tripId={trip.id} refreshVersion={eventsVersion} />
 
                 <footer className="border-t border-[#d6e1d9] px-5 py-4 text-sm text-[#526c62] sm:px-8">
                     Skapad: {formatDate(trip.createdAt)}
                 </footer>
 
-                {selectedPlace && (
-                    <AddToTripModal
-                        isOpen={showModal}
-                        itemId={selectedPlace?.placeId ?? 0}
-                        itemName={selectedPlace?.name ?? ""}
-                        itemType="place"
-                        onClose={() => setShowModal(false)}
-                        onAdd={handleAddPlace}
-                    />
-                )}
             </article>
         </div>
     );

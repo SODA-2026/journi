@@ -6,9 +6,12 @@ import PlaceCard from "./PlaceCard";
 
 interface PlaceSuggestionsProps {
     cityId?: number | null;
+    cityName: string;
+    tripId: number;
+    onActivityAdded: () => Promise<void>;
 }
 
-export default function PlaceSuggestions({ cityId }: PlaceSuggestionsProps) {
+export default function PlaceSuggestions({ cityId, cityName, tripId, onActivityAdded }: PlaceSuggestionsProps) {
     const [places, setPlaces] = useState<Places[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -42,7 +45,7 @@ export default function PlaceSuggestions({ cityId }: PlaceSuggestionsProps) {
 
     return(
         <section>
-            <h3>Förslag på platser</h3>
+            <h3 className="mb-1 text-lg font-bold text-[#1d4237]">Platser i {cityName}</h3>
 
             {!cityId && <p>Välj en destination för att se förslag</p>}
             {cityId && loading && <p>Hämtar förslag...</p>}
@@ -52,7 +55,7 @@ export default function PlaceSuggestions({ cityId }: PlaceSuggestionsProps) {
             )}
 
             {places.map((place) => (
-                <PlaceCard key={place.placeId} place={place}></PlaceCard>
+                <PlaceCard key={place.placeId} place={place} tripId={tripId} onActivityAdded={onActivityAdded}></PlaceCard>
             ))}
             {/* Det ska kanske finnas ett knappt för att lägga till föreslagna aktiviteter här */}
         </section>
