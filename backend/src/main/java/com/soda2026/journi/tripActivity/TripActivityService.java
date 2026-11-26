@@ -4,10 +4,12 @@
  import com.soda2026.journi.place.PlaceRepository;
  import com.soda2026.journi.trip.TripModel;
  import com.soda2026.journi.trip.TripRepository;
+   import com.soda2026.journi.trip.TripAccessService;
  import com.soda2026.journi.tripActivity.TripActivityMapper;
  import com.soda2026.journi.tripActivity.TripActivityRepository;
  import com.soda2026.journi.tripActivity.dto.AddPlaceActivityDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
+  import com.soda2026.journi.tripActivity.dto.UpdateActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
  import com.soda2026.journi.tripDestination.TripDestinationRepository;
@@ -28,14 +30,16 @@
      private final PlaceRepository placeRepository;
      private final TripRepository tripRepository;
      private final TripDestinationService tripDestinationService;
+     private final TripAccessService tripAccessService;
 
-     public TripActivityService(TripActivityRepository repository, TripActivityMapper mapper, TripDestinationRepository tripDestinationRepository, PlaceRepository placeRepository, TripRepository tripRepository, TripDestinationService tripDestinationService) {
+     public TripActivityService(TripActivityRepository repository, TripActivityMapper mapper, TripDestinationRepository tripDestinationRepository, PlaceRepository placeRepository, TripRepository tripRepository, TripDestinationService tripDestinationService, TripAccessService tripAccessService) {
          this.repository = repository;
          this.mapper = mapper;
          this.tripDestinationRepository = tripDestinationRepository;
          this.placeRepository = placeRepository;
          this.tripRepository = tripRepository;
          this.tripDestinationService = tripDestinationService;
+         this.tripAccessService = tripAccessService;
      }
 
 
@@ -67,6 +71,18 @@
                                  ));
          TripActivityModel saved = repository.save(mapper.toEntity(request, destination, place));
          return mapper.toDto(saved);
+     }
+
+     @Transactional
+     public TripActivityResponseDTO updateActivity(Long activityId, Long userId, UpdateActivityRequestDTO dto) {
+         TripActivityModel activity = repository.findById(activityId)
+                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
+
+         Long tripId = activity.getTripDestination().getTrip().getId();
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
+
+         mapper.updateEntity(dto, activity);
+         return mapper.toDto(repository.save(activity));
      }
 
      @Transactional

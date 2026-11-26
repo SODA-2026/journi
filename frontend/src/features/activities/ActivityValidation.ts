@@ -1,10 +1,15 @@
 import type { ActivityFormData, ActivityFormErrors } from "./ActivitiesTypes";
 
-export function validate(data: ActivityFormData): ActivityFormErrors {
+export interface EditableActivityFields {
+    name: string;
+    activityDate: string;
+    startTime: string;
+    description: string;
+}
+
+export function validateEditableFields(data: EditableActivityFields): ActivityFormErrors {
     const errors: ActivityFormErrors = {};
 
-    if (!data.tripDestinationId)
-        errors.tripDestinationId = "Select a destination";
     if (!data.name.trim()) errors.name = "Name is required";
     else if (data.name.length > 255)
         errors.name = "Name must be at most 255 characters";
@@ -13,6 +18,15 @@ export function validate(data: ActivityFormData): ActivityFormErrors {
         errors.startTime = "Invalid time (HH:MM)";
     if (data.description.length > 2000)
         errors.description = "Description must be at most 2000 characters";
+
+    return errors;
+}
+
+export function validate(data: ActivityFormData): ActivityFormErrors {
+    const errors = validateEditableFields(data);
+
+    if (!data.tripDestinationId)
+        errors.tripDestinationId = "Select a destination";
 
     return errors;
 }

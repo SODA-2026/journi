@@ -17,6 +17,13 @@ export interface ActivityResponse {
     status: "PROPOSED" | "PLANNED" | "CANCELLED";
 }
 
+export interface UpdateActivityRequest {
+    name: string;
+    activityDate: string;
+    startTime: string | null;
+    description: string | null;
+}
+
 export interface ActivityFormData{
     tripDestinationId: number;
     name: string;

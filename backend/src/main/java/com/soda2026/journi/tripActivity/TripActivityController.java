@@ -3,7 +3,10 @@
  import com.soda2026.journi.tripActivity.dto.AddPlaceActivityDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
+ import com.soda2026.journi.tripActivity.dto.UpdateActivityRequestDTO;
+ import com.soda2026.journi.security.UserPrincipal;
  import jakarta.validation.Valid;
+ import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.http.HttpStatus;
  import org.springframework.http.ResponseEntity;
  import org.springframework.web.bind.annotation.*;
@@ -49,6 +52,13 @@
                                                            @Valid @RequestBody TripActivityRequestDTO request){
          return ResponseEntity.status(HttpStatus.CREATED)
                  .body(tripActivityService.createActivity(tripId, request));
+     }
+
+     @PutMapping("/{id}")
+     public ResponseEntity<TripActivityResponseDTO> update(@PathVariable Long id,
+                                                           @Valid @RequestBody UpdateActivityRequestDTO request,
+                                                           @AuthenticationPrincipal UserPrincipal user) {
+         return ResponseEntity.ok(tripActivityService.updateActivity(id, user.getId(), request));
      }
 
      @PostMapping("/trips/{tripId}/places")

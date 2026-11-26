@@ -1,6 +1,7 @@
 import type {
     ActivityFormData,
     ActivityResponse,
+    UpdateActivityRequest,
 } from "./ActivitiesTypes";
 import { api } from "../../api/ApiClient";
 
@@ -49,4 +50,20 @@ export function getActivities(
     return api(
         `/api/activities/trips/${tripId}?tripDestinationId=${tripDestinationId}`,
     );
+}
+
+export function updateActivity(
+    id: number,
+    data: UpdateActivityRequest,
+): Promise<ActivityResponse> {
+    return api(`/api/activities/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+}
+
+export function deleteActivity(id: number): Promise<void> {
+    return api(`/api/activities/${id}`, {
+        method: "DELETE",
+    });
 }
