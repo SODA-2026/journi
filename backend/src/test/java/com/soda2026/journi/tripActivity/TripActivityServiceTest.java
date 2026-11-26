@@ -183,6 +183,21 @@ class TripActivityServiceTest {
     }
 
     @Test
+    void updateActivity_rejectsDateOutsideTrip() {
+        TripActivityModel activity = existingActivity();
+        when(repository.findById(100L)).thenReturn(Optional.of(activity));
+        UpdateActivityRequestDTO outsideTrip = new UpdateActivityRequestDTO(
+                "Utanför resan", LocalDate.of(2027, 5, 16), LocalTime.of(10, 0), "Beskrivning");
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.updateActivity(100L, 1L, outsideTrip));
+
+        assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
+        verify(mapper, never()).updateEntity(any(UpdateActivityRequestDTO.class), any());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
     void missingActivityIsNotFound() {
         when(repository.findById(999L)).thenReturn(Optional.empty());
 
@@ -192,5 +207,44 @@ class TripActivityServiceTest {
         assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
         verifyNoInteractions(access);
         verify(repository, never()).save(any());
+    }
+
+    // --- KAN-34: delete authorization ---
+
+    @Test
+    void ownerCanDeleteActivity() {
+        TripActivityModel activity = existingActivity();
+        when(repository.findById(100L)).thenReturn(Optional.of(activity));
+
+        service.delete(100L, 1L);
+
+        verify(access).requireTripOwnerOrMember(5L, 1L);
+        verify(repository).deleteById(100L);
+    }
+
+    @Test
+    void outsiderCannotDeleteActivity() {
+        TripActivityModel activity = existingActivity();
+        when(repository.findById(100L)).thenReturn(Optional.of(activity));
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "Trip access denied"))
+                .when(access).requireTripOwnerOrMember(5L, 3L);
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.delete(100L, 3L));
+
+        assertEquals(HttpStatus.FORBIDDEN, error.getStatusCode());
+        verify(repository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void deletingMissingActivityIsNotFound() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.delete(999L, 1L));
+
+        assertEquals(HttpStatus.NOT_FOUND, error.getStatusCode());
+        verifyNoInteractions(access);
+        verify(repository, never()).deleteById(anyLong());
     }
 }

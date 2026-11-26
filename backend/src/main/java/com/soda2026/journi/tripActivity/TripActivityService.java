@@ -106,8 +106,9 @@
          TripActivityModel activity = repository.findById(activityId)
                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
 
-         Long tripId = activity.getTripDestination().getTrip().getId();
-         tripAccessService.requireTripOwnerOrMember(tripId, userId);
+         TripModel trip = activity.getTripDestination().getTrip();
+         tripAccessService.requireTripOwnerOrMember(trip.getId(), userId);
+         validateActivityDate(trip, dto.activityDate());
 
          mapper.updateEntity(dto, activity);
          return mapper.toDto(repository.save(activity));
@@ -123,7 +124,12 @@
                  repository.findByTripDestinationIdOrderByActivityDateAscStartTimeAsc(tripDestinationId));
      }
 
-     public void delete(Long id) {
+     @Transactional
+     public void delete(Long id, Long userId) {
+         TripActivityModel activity = repository.findById(id)
+                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
+         tripAccessService.requireTripOwnerOrMember(
+                 activity.getTripDestination().getTrip().getId(), userId);
          repository.deleteById(id);
      }
 

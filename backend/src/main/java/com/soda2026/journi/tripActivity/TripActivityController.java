@@ -5,12 +5,10 @@
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
  import com.soda2026.journi.tripActivity.dto.UpdateActivityRequestDTO;
- import com.soda2026.journi.security.UserPrincipal;
  import jakarta.validation.Valid;
  import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.http.HttpStatus;
  import org.springframework.http.ResponseEntity;
- import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.web.bind.annotation.*;
  import com.soda2026.journi.tripActivity.TripActivityService;
 
@@ -39,8 +37,8 @@
 
      @DeleteMapping("/{id}")
      @ResponseStatus(HttpStatus.NO_CONTENT)
-     public void delete(@PathVariable Long id) {
-         tripActivityService.delete(id);
+     public void delete(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal user) {
+         tripActivityService.delete(id, user.getId());
      }
 
      @GetMapping("/trips/{tripId}")
