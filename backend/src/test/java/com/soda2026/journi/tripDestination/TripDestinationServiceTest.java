@@ -4,18 +4,55 @@ import com.soda2026.journi.city.CityModel;
 import com.soda2026.journi.country.CountryModel;
 import com.soda2026.journi.trip.TripModel;
 import com.soda2026.journi.tripDestination.dto.CreateTripDestinationRequest;
+import com.soda2026.journi.trip.TripAccessService;
+import com.soda2026.journi.tripActivity.TripActivityRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TripDestinationServiceTest {
     private final TripDestinationRepository repository = mock(TripDestinationRepository.class);
+    private final TripActivityRepository tripActivityRepository = mock(TripActivityRepository.class);
     private final EntityManager entityManager = mock(EntityManager.class);
-    private final TripDestinationService service = new TripDestinationService(repository, entityManager, new TripDestinationMapper(), mock(com.soda2026.journi.trip.TripAccessService.class));
+    private final TripDestinationService service = new TripDestinationService(
+            repository, entityManager, new TripDestinationMapper(),
+            mock(TripAccessService.class), tripActivityRepository
+    );
+
+    @Test
+    void deletesDestinationAndItsActivitiesAndCompactsOrder() {
+        TripModel trip = trip();
+        CountryModel country = country(1L);
+        TripDestinationModel destination = new TripDestinationModel(trip, city(4L, country), 1);
+        TripDestinationModel remaining = new TripDestinationModel(trip, city(5L, country), 2);
+        when(repository.findByIdAndTrip_Id(20L, 10L)).thenReturn(Optional.of(destination));
+        when(repository.findAllByTrip_IdOrderByOrderIndexAsc(10L)).thenReturn(List.of(remaining));
+
+        service.deleteDestination(10L, 20L, 7L);
+
+        verify(tripActivityRepository).deleteAllByTripDestination_Id(20L);
+        verify(repository).delete(destination);
+        verify(repository).flush();
+        verify(repository).saveAll(List.of(remaining));
+        assertEquals(0, remaining.getOrderIndex());
+    }
+
+    @Test
+    void rejectsDeletingDestinationFromAnotherTrip() {
+        when(repository.findByIdAndTrip_Id(20L, 10L)).thenReturn(Optional.empty());
+
+        assertError(HttpStatus.NOT_FOUND, "Destination not found",
+                () -> service.deleteDestination(10L, 20L, 7L));
+
+        verifyNoInteractions(tripActivityRepository);
+        verify(repository, never()).delete(any());
+    }
 
     @Test void rejectsCityFromAnotherCountry() {
         TripModel trip = trip();

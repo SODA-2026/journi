@@ -13,6 +13,7 @@
  import org.springframework.web.bind.annotation.ResponseStatus;
  import org.springframework.web.bind.annotation.RestController;
  import org.springframework.web.bind.annotation.PutMapping;
+ import org.springframework.web.bind.annotation.DeleteMapping;
 
  import java.util.List;
  import com.soda2026.journi.security.UserPrincipal;
@@ -54,6 +55,16 @@
       ) {
           return service.reorderDestinations(tripId, destinationIds, user.getId());
       }
+
+     @DeleteMapping("/{destinationId}")
+     @ResponseStatus(HttpStatus.NO_CONTENT)
+     public void deleteDestination(
+             @PathVariable("tripId") @Positive Long tripId,
+             @PathVariable("destinationId") @Positive Long destinationId,
+             @AuthenticationPrincipal UserPrincipal user
+     ) {
+         service.deleteDestination(tripId, destinationId, user.getId());
+     }
  }
 
  /*

@@ -21,6 +21,7 @@
  import java.util.HashSet;
  import java.util.ArrayList;
  import com.soda2026.journi.trip.TripAccessService;
+ import com.soda2026.journi.tripActivity.TripActivityRepository;
 
  @Service
  @Validated
@@ -29,17 +30,20 @@
      private final EntityManager entityManager;
      private final TripDestinationMapper mapper;
      private final TripAccessService tripAccessService;
+     private final TripActivityRepository tripActivityRepository;
 
      public TripDestinationService(
              TripDestinationRepository repository,
              EntityManager entityManager,
              TripDestinationMapper mapper,
-             TripAccessService tripAccessService
+             TripAccessService tripAccessService,
+             TripActivityRepository tripActivityRepository
      ) {
          this.repository = repository;
          this.entityManager = entityManager;
          this.mapper = mapper;
          this.tripAccessService = tripAccessService;
+         this.tripActivityRepository = tripActivityRepository;
      }
 
      @Transactional(readOnly = true)
@@ -165,6 +169,31 @@
          repository.saveAll(reordered);
 
          return reordered.stream().map(mapper::toDto).toList();
+     }
+
+     @Transactional
+     public void deleteDestination(
+             @NotNull @Positive Long tripId,
+             @NotNull @Positive Long destinationId,
+             @NotNull @Positive Long userId
+     ) {
+         tripAccessService.requireTripOwnerOrMember(tripId, userId);
+         TripDestinationModel destination = repository
+                 .findByIdAndTrip_Id(destinationId, tripId)
+                 .orElseThrow(() -> new ResponseStatusException(
+                         HttpStatus.NOT_FOUND, "Destination not found"
+                 ));
+
+         tripActivityRepository.deleteAllByTripDestination_Id(destinationId);
+         repository.delete(destination);
+         repository.flush();
+
+         List<TripDestinationModel> remaining =
+                 repository.findAllByTrip_IdOrderByOrderIndexAsc(tripId);
+         for (int i = 0; i < remaining.size(); i++) {
+             remaining.get(i).setOrderIndex(i);
+         }
+         repository.saveAll(remaining);
      }
 
      @Transactional

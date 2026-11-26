@@ -8,6 +8,7 @@ import com.soda2026.journi.tripMember.TripMemberId;
 import com.soda2026.journi.trip.TripAccessService;
 import com.soda2026.journi.trip.TripRepository;
 import com.soda2026.journi.tripMember.TripMemberRepository;
+import com.soda2026.journi.tripActivity.TripActivityRepository;
 import java.util.Optional;
 import java.util.List;
 
@@ -26,8 +27,10 @@ class TripDestinationAccessTest {
     private final EntityManager entityManager = mock(EntityManager.class);
     private final TripRepository trips = mock(TripRepository.class);
     private final TripMemberRepository members = mock(TripMemberRepository.class);
+    private final TripActivityRepository tripActivities = mock(TripActivityRepository.class);
     private final TripDestinationService service = new TripDestinationService(
-            repository, entityManager, new TripDestinationMapper(), new TripAccessService(trips, members)
+            repository, entityManager, new TripDestinationMapper(), new TripAccessService(trips, members),
+            tripActivities
     );
     private final CreateTripDestinationRequest request = new CreateTripDestinationRequest(4L, 0);
     private final Long userId = 7L;
@@ -83,6 +86,15 @@ class TripDestinationAccessTest {
                 () -> service.getDestinations(10L, userId));
         assertEquals(HttpStatus.FORBIDDEN, error.getStatusCode());
         verifyNoInteractions(repository);
+    }
+
+    @Test
+    void rejectsOutsiderDeletingDestination() {
+        stubTripAndUser();
+        var error = assertThrows(ResponseStatusException.class,
+                () -> service.deleteDestination(10L, 20L, userId));
+        assertEquals(HttpStatus.FORBIDDEN, error.getStatusCode());
+        verifyNoInteractions(repository, tripActivities);
     }
 
     @Test
