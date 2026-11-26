@@ -14,6 +14,8 @@ const activity: ActivityResponse = {
     startTime: "10:00:00",
     description: "Kaffe",
     status: "PLANNED",
+    createdById: 1,
+    createdByName: "Olena",
 };
 
 function renderList(onUpdate = vi.fn(), onDelete = vi.fn()) {

@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
 import type { Place } from "../../places/places";
-import { getTripInfo, reorderTripDestinations, deleteTripDestination, addTripPlaceActivity } from "../TripFetch";
+import {
+    getTripInfo,
+    reorderTripDestinations,
+    addTripDestination,
+    addTripPlaceActivity,
+    deleteTripDestination
+} from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
@@ -101,7 +107,7 @@ export function TripInfo({ tripId }: { tripId: number }) {
         try {
             await reorderTripDestinations(
                 trip.id,
-                updated.map((destination) => destination.id)
+                updated.map((destination) => destination.id),
             );
             setDestinationError("");
         } catch (err) {
@@ -256,6 +262,8 @@ export function TripInfo({ tripId }: { tripId: number }) {
                             <TripActivities
                                 tripId={tripId}
                                 destinations={destinationOptions}
+                                tripStartDate={trip.startDate}
+                                tripEndDate={trip.endDate}
                             />
                         </section>
                         <section className="rounded-xl border border-[#d6e1d9] p-5">

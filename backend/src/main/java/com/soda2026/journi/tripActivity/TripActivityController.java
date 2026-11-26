@@ -1,5 +1,6 @@
  package com.soda2026.journi.tripActivity;
 
+ import com.soda2026.journi.security.UserPrincipal;
  import com.soda2026.journi.tripActivity.dto.AddPlaceActivityDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
@@ -9,6 +10,7 @@
  import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.http.HttpStatus;
  import org.springframework.http.ResponseEntity;
+ import org.springframework.security.core.annotation.AuthenticationPrincipal;
  import org.springframework.web.bind.annotation.*;
  import com.soda2026.journi.tripActivity.TripActivityService;
 
@@ -49,9 +51,10 @@
 
      @PostMapping("/trips/{tripId}")
      public ResponseEntity<TripActivityResponseDTO> create(@PathVariable Long tripId,
-                                                           @Valid @RequestBody TripActivityRequestDTO request){
+                                                           @Valid @RequestBody TripActivityRequestDTO request,
+                                                           @AuthenticationPrincipal UserPrincipal user){
          return ResponseEntity.status(HttpStatus.CREATED)
-                 .body(tripActivityService.createActivity(tripId, request));
+                 .body(tripActivityService.createActivity(tripId, request, user.getId()));
      }
 
      @PutMapping("/{id}")
@@ -65,11 +68,13 @@
      @ResponseStatus(HttpStatus.NO_CONTENT)
      public void addPlaceActivity(
              @PathVariable Long tripId,
-             @RequestBody AddPlaceActivityDTO request
+             @RequestBody AddPlaceActivityDTO request,
+             @AuthenticationPrincipal UserPrincipal user
      ) {
          tripActivityService.addPlaceToActivity(
                  tripId,
-                 request
+                 request,
+                 user.getId()
          );
      }
 

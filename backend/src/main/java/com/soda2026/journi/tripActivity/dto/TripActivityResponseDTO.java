@@ -11,5 +11,7 @@
          LocalDate activityDate,
          LocalTime startTime,
          String description,
-         TripActivityStatus status
+         TripActivityStatus status,
+         Long createdById,
+         String createdByName
          ) {}

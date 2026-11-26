@@ -260,6 +260,14 @@ export function ActivityList({
                                         )}
                                     </>
                                 )}
+                                <p>
+                                    {a.createdByName
+                                        ? `Skapad av ${a.createdByName}`
+                                        : "Okänd skapare"
+                                    }
+
+                                </p>
+
                             </li>
                         ))}
                     </ul>

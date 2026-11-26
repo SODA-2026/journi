@@ -16,9 +16,11 @@ interface DestinationOption {
 interface TripActivitiesProps {
     tripId: number;
     destinations: DestinationOption[];
+    tripStartDate: string;
+    tripEndDate: string;
 }
 
-export function TripActivities({ tripId, destinations }: TripActivitiesProps) {
+export function TripActivities({ tripId, destinations, tripStartDate, tripEndDate }: TripActivitiesProps) {
     const [activities, setActivities] = useState<ActivityResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -81,6 +83,8 @@ export function TripActivities({ tripId, destinations }: TripActivitiesProps) {
             <ActivityForm
                 tripId={tripId}
                 destinations={destinations}
+                tripStartDate={tripStartDate}
+                tripEndDate={tripEndDate}
                 onCreated={refreshActivities}
             />
 
