@@ -1,4 +1,5 @@
 import type { Places, PlaceCategory } from "../PlacesTypes";
+import { addTripPlaceActivity } from "../../trips/TripFetch";
 
 const CATEGORY_LABELS: Record<PlaceCategory, string> = {
     TOURIST_ATTRACTION: 'Sevärdhet',

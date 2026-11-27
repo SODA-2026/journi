@@ -4,8 +4,12 @@
  import com.soda2026.journi.place.PlaceRepository;
  import com.soda2026.journi.trip.TripModel;
  import com.soda2026.journi.trip.TripRepository;
+ import com.soda2026.journi.trip.TripAccessService;
+ import com.soda2026.journi.tripActivity.TripActivityMapper;
+ import com.soda2026.journi.tripActivity.TripActivityRepository;
  import com.soda2026.journi.tripActivity.dto.AddPlaceActivityDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
+  import com.soda2026.journi.tripActivity.dto.UpdateActivityRequestDTO;
  import com.soda2026.journi.tripActivity.dto.TripActivityResponseDTO;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
  import com.soda2026.journi.tripDestination.TripDestinationRepository;
@@ -13,10 +17,12 @@
  import com.soda2026.journi.user.UserModel;
  import com.soda2026.journi.user.UserRepository;
  import org.springframework.http.HttpStatus;
+ import org.springframework.http.HttpStatusCode;
  import org.springframework.stereotype.Service;
  import org.springframework.transaction.annotation.Transactional;
  import org.springframework.web.server.ResponseStatusException;
-
+ import java.time.format.DateTimeFormatter;
+ import java.util.Locale;
  import java.time.LocalDate;
  import java.util.List;
 
@@ -29,8 +35,9 @@
      private final TripRepository tripRepository;
      private final TripDestinationService tripDestinationService;
      private final UserRepository userRepository;
+     private final TripAccessService tripAccessService;
 
-     public TripActivityService(TripActivityRepository repository, TripActivityMapper mapper, TripDestinationRepository tripDestinationRepository, PlaceRepository placeRepository, TripRepository tripRepository, TripDestinationService tripDestinationService, UserRepository userRepository) {
+     public TripActivityService(TripActivityRepository repository, TripActivityMapper mapper, TripDestinationRepository tripDestinationRepository, PlaceRepository placeRepository, TripRepository tripRepository, TripDestinationService tripDestinationService, UserRepository userRepository, TripAccessService tripAccessService) {
          this.repository = repository;
          this.mapper = mapper;
          this.tripDestinationRepository = tripDestinationRepository;
@@ -38,6 +45,7 @@
          this.tripRepository = tripRepository;
          this.tripDestinationService = tripDestinationService;
          this.userRepository = userRepository;
+         this.tripAccessService = tripAccessService;
      }
 
 
@@ -82,16 +90,31 @@
 
      private void validateActivityDate(TripModel trip, LocalDate date) {
          if (date == null) {
-             return; // activity_date is optional in the database
+             return;
          }
 
          LocalDate start = trip.getStartDate();
          LocalDate end = trip.getEndDate();
 
          if (date.isBefore(start) || date.isAfter(end)) {
+             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.forLanguageTag("sv-SE"));
              throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                     "Datumet måste ligga mellan " + start + " och " + end);
+                     "Datumet ligger utanför resan. Välj ett datum mellan "
+                             + start.format(fmt) + " och " + end.format(fmt) + ".");
          }
+     }
+
+     @Transactional
+     public TripActivityResponseDTO updateActivity(Long activityId, Long userId, UpdateActivityRequestDTO dto) {
+         TripActivityModel activity = repository.findById(activityId)
+                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
+
+         TripModel trip = activity.getTripDestination().getTrip();
+         tripAccessService.requireTripOwnerOrMember(trip.getId(), userId);
+         validateActivityDate(trip, dto.activityDate());
+
+         mapper.updateEntity(dto, activity);
+         return mapper.toDto(repository.save(activity));
      }
 
      @Transactional
@@ -104,7 +127,12 @@
                  repository.findByTripDestinationIdOrderByActivityDateAscStartTimeAsc(tripDestinationId));
      }
 
-     public void delete(Long id) {
+     @Transactional
+     public void delete(Long id, Long userId) {
+         TripActivityModel activity = repository.findById(id)
+                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
+         tripAccessService.requireTripOwnerOrMember(
+                 activity.getTripDestination().getTrip().getId(), userId);
          repository.deleteById(id);
      }
 

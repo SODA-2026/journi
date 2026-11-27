@@ -190,7 +190,7 @@ export function ActivityForm({
                             onChange={handleChange}
                             className="w-full rounded-lg border border-[#9fb0aa] bg-white px-3 py-2 text-base text-[#1d4237] focus:border-[#235e4f] focus:outline-none focus:ring-2 focus:ring-[#235e4f]/20"
                         />
-                        {errors.name && (
+                        {errors.activityDate && (
                             <p id="activityDate-error" className="text-sm text-red-700">
                                 {errors.activityDate}
                             </p>

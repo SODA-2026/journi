@@ -2,6 +2,7 @@
 
  import com.soda2026.journi.place.PlaceModel;
  import com.soda2026.journi.tripActivity.dto.TripActivityRequestDTO;
+ import com.soda2026.journi.tripActivity.dto.UpdateActivityRequestDTO;
  import com.soda2026.journi.tripDestination.TripDestinationModel;
  import com.soda2026.journi.user.UserModel;
  import org.springframework.stereotype.Component;
@@ -43,6 +44,13 @@
          model.setDescription(dto.description());
          model.setTripDestination(tripDestination);
          model.setPlace(place);
+     }
+
+     public void updateEntity(UpdateActivityRequestDTO dto, TripActivityModel model) {
+         model.setName(dto.name());
+         model.setActivityDate(dto.activityDate());
+         model.setStartTime(dto.startTime());
+         model.setDescription(dto.description());
      }
 
 //     public TripActivityModel toEntity(TripActivityRequestDTO tripActivityRequestDTO, TripDestinationModel tripDestinationModel) {

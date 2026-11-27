@@ -1,8 +1,8 @@
 // Parent component
 
 import { useEffect, useState } from "react";
-import type { ActivityResponse } from "../ActivitiesTypes";
-import { getActivities } from "../ActivitiesApi";
+import type { ActivityResponse, UpdateActivityRequest } from "../ActivitiesTypes";
+import { deleteActivity, getActivities, updateActivity } from "../ActivitiesApi";
 import { ActivityForm } from "./ActivityForm";
 import { ActivityList } from "./ActivityList";
 import PlaceSuggestions from "../../places/components/PlaceSuggestions";
@@ -54,13 +54,28 @@ export function TripActivities({ tripId, destinations, tripStartDate, tripEndDat
         );
     }
 
-    const refreshActivities = async () => {
-        // Refetch all activities after creation
-        const lists = await Promise.all(
-            destinations.map((d) => getActivities(tripId, d.id)),
-        );
-        setActivities(lists.flat());
-        setError("");
+    // Declared as a function so the effect above can call it even when
+    // the component returns early for an empty destination list.
+    async function refreshActivities() {
+        try {
+            const lists = await Promise.all(
+                destinations.map((d) => getActivities(tripId, d.id)),
+            );
+            setActivities(lists.flat());
+            setError("");
+        } catch (err) {
+            console.error("Failed to refresh activities:", err);
+        }
+    }
+
+    async function handleUpdate(id: number, data: UpdateActivityRequest) {
+        await updateActivity(id, data);
+        await refreshActivities();
+    }
+
+    async function handleDelete(id: number) {
+        await deleteActivity(id);
+        await refreshActivities();
     }
 
     return (
@@ -88,6 +103,10 @@ export function TripActivities({ tripId, destinations, tripStartDate, tripEndDat
                 <ActivityList
                     activities={activities}
                     destinations={destinations}
+                    tripStartDate={tripStartDate}
+                    tripEndDate={tripEndDate}
+                    onUpdate={handleUpdate}
+                    onDelete={handleDelete}
                 />
             )}
 
