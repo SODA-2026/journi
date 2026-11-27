@@ -17,22 +17,22 @@ export function NavBar() {
     const [error, setError] = useState("");
     return (
         <header className="">
-            <nav className="flex items-center justify-between">
-                <div className="flex justify-between border p-4">
+            <nav className="flex items-center justify-between border">
+                <div className="flex justify-between border">
                     <Link to="/" className="text-2xl font-bold text-[#1d4237] flex items-center p-4 gap-2">
-                        <img src={logo} alt="Journi-logo" className="w-10 h-10" />
+                        <img src={logo} alt="Journi-logo" className="w-20 h-20 border" />
                         Journi
                     </Link>
                     <div className="ml-15 flex gap-10 items-center p-4 text-lg">
-                        <Link to="/" className="flex group items-center border-b border-transparent gap-2 p-2 hover:border-current hover:text-amber-600 overflow-hidden">
+                        <Link to="/" className="flex group items-center border-b border-transparent gap-2 p-2 hover:border-current hover:text-amber-600">
                             <img src={home} className="absolute w-6 h-6 group-hover:opacity-0" />
                             <img src={homeColored} className="opacity-0 w-6 h-6 group-hover:opacity-100" />
                             Hem
                         </Link>
-                        <Link to="" className="border-b border-transparent p-2 hover:border-current">
+                        <Link to="" className="border-b border-transparent p-2 hover:border-current hover:text-amber-600">
                             Utforska
                         </Link>
-                        <Link to="" className="border-b border-transparent p-2 hover:border-current">
+                        <Link to="" className="border-b border-transparent p-2 hover:border-current hover:text-amber-600">
                             Om Journi
                         </Link>
                     </div>
