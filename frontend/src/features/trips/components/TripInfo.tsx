@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TripInfoType } from "../trips";
 import type { Place } from "../../places/places";
-import { getTripInfo, reorderTripDestinations, deleteTripDestination, addTripPlaceActivity } from "../TripFetch";
+import { getTripInfo, reorderTripDestinations, deleteTripDestination } from "../TripFetch";
 import { useParams } from "react-router";
 import { formatDate } from "../../../shared/formatDate";
 import { Link } from "react-router";
@@ -130,10 +130,10 @@ export function TripInfo({ tripId }: { tripId: number }) {
         }
     };
 
-    const refreshTrip = async () => {
-        const updatedTrip = await getTripInfo(tripId);
-        setTrip(updatedTrip);
-    };
+    // const refreshTrip = async () => {
+    //     const updatedTrip = await getTripInfo(tripId);
+    //     setTrip(updatedTrip);
+    // };
 
     return (
         <div className="mx-auto max-w-4xl">

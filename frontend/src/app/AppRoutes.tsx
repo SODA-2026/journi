@@ -1,7 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from "react-router";
 import { useAuth } from "../context/AuthContext";
-
-import { HomePage } from "./HomePage";
+import { HomePage } from "../pages/HomePage";
 import { LoginForm } from "../features/users/LoginForm";
 import { CreateAccountPage } from "../features/users/RegisterPage";
 import { InvitationsPage } from "../pages/InvitationsPage";
