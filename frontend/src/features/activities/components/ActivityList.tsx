@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from "react";
-import type { ActivityResponse, UpdateActivityRequest } from "../ActivitiesTypes";
+import type { ActivityResponse, UpdateActivityRequest, ActivityFormErrors } from "../ActivitiesTypes";
+import { ApiError } from "../../../api/ApiClient";
 import {
     validateEditableFields,
     type EditableActivityFields,
@@ -13,6 +14,8 @@ interface DestinationOption {
 interface ActivityListProps {
     activities: ActivityResponse[];
     destinations: DestinationOption[];
+    tripStartDate?: string;
+    tripEndDate?: string;
     onUpdate: (id: number, data: UpdateActivityRequest) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
 }
@@ -40,7 +43,9 @@ const sortKey = (a: ActivityResponse) =>
 
 export function ActivityList({
     activities,
-    destinations,
+    destinations, 
+    tripStartDate, 
+    tripEndDate, 
     onUpdate,
     onDelete,
 }: ActivityListProps) {
@@ -48,6 +53,7 @@ export function ActivityList({
     const [draft, setDraft] = useState<EditableActivityFields>(emptyDraft);
     const [saving, setSaving] = useState(false);
     const [editError, setEditError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<ActivityFormErrors>({});
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [deleteError, setDeleteError] = useState<{
         id: number;
@@ -67,27 +73,28 @@ export function ActivityList({
     ) => {
         const { name, value } = e.target;
         setDraft((prev) => ({ ...prev, [name]: value }));
+        setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+        setEditError("");
     };
 
     const startEditing = (a: ActivityResponse) => {
         setDraft(draftFromActivity(a));
         setEditError("");
         setEditingId(a.id);
+        setFieldErrors({});
     };
 
     const cancelEditing = () => {
         setEditingId(null);
         setEditError("");
+        setFieldErrors({});
     };
 
     const handleSave = async (a: ActivityResponse) => {
         const data = { ...draft, name: draft.name.trim() };
-        const errors = validateEditableFields(data);
-        const firstError = Object.values(errors).find(Boolean);
-        if (firstError) {
-            setEditError(firstError);
-            return;
-        }
+        const errors = validateEditableFields(data, tripStartDate, tripEndDate);
+        setFieldErrors(errors);
+        if (Object.keys(errors).length > 0) return;
 
         setSaving(true);
         setEditError("");
@@ -101,7 +108,9 @@ export function ActivityList({
             setEditingId(null);
         } catch (err) {
             console.error("Failed to update activity:", err);
-            setEditError("Kunde inte spara aktiviteten");
+            setEditError(err instanceof ApiError && err.status === 400
+                ? err.message
+                : "Kunde inte spara aktiviteten");
         } finally {
             setSaving(false);
         }
@@ -172,10 +181,20 @@ export function ActivityList({
                                             aria-label="Date"
                                             type="date"
                                             name="activityDate"
+                                            min={tripStartDate}
+                                            max={tripEndDate}
+                                            aria-invalid={!!fieldErrors.activityDate}
+                                            aria-describedby="activityDate-error-inline"
                                             value={draft.activityDate}
                                             onChange={handleDraftChange}
                                             className="w-full rounded-lg border border-[#9fb0aa] px-3 py-2 text-base text-[#1d4237]"
                                         />
+
+                                        {fieldErrors.activityDate && (
+                                            <p id="activityDate-error-inline" role="alert" className="text-sm text-red-700">
+                                                {fieldErrors.activityDate}
+                                            </p>
+                                        )}
                                         <input
                                             aria-label="Time"
                                             type="time"

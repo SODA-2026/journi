@@ -103,6 +103,8 @@ export function TripActivities({ tripId, destinations, tripStartDate, tripEndDat
                 <ActivityList
                     activities={activities}
                     destinations={destinations}
+                    tripStartDate={tripStartDate}
+                    tripEndDate={tripEndDate}
                     onUpdate={handleUpdate}
                     onDelete={handleDelete}
                 />

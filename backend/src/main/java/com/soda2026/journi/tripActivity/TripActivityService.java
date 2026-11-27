@@ -4,7 +4,7 @@
  import com.soda2026.journi.place.PlaceRepository;
  import com.soda2026.journi.trip.TripModel;
  import com.soda2026.journi.trip.TripRepository;
-   import com.soda2026.journi.trip.TripAccessService;
+ import com.soda2026.journi.trip.TripAccessService;
  import com.soda2026.journi.tripActivity.TripActivityMapper;
  import com.soda2026.journi.tripActivity.TripActivityRepository;
  import com.soda2026.journi.tripActivity.dto.AddPlaceActivityDTO;
@@ -21,7 +21,8 @@
  import org.springframework.stereotype.Service;
  import org.springframework.transaction.annotation.Transactional;
  import org.springframework.web.server.ResponseStatusException;
-
+ import java.time.format.DateTimeFormatter;
+ import java.util.Locale;
  import java.time.LocalDate;
  import java.util.List;
 
@@ -89,15 +90,17 @@
 
      private void validateActivityDate(TripModel trip, LocalDate date) {
          if (date == null) {
-             return; // activity_date is optional in the database
+             return;
          }
 
          LocalDate start = trip.getStartDate();
          LocalDate end = trip.getEndDate();
 
          if (date.isBefore(start) || date.isAfter(end)) {
+             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.forLanguageTag("sv-SE"));
              throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                     "Datumet måste ligga mellan " + start + " och " + end);
+                     "Datumet ligger utanför resan. Välj ett datum mellan "
+                             + start.format(fmt) + " och " + end.format(fmt) + ".");
          }
      }
 

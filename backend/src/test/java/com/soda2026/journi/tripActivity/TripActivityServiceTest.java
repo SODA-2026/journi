@@ -120,6 +120,7 @@ class TripActivityServiceTest {
                 () -> service.createActivity(1L, request, 5L));
 
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        assertTrue(ex.getMessage().contains("Datumet ligger utanför resan"));
         verify(repository, never()).save(any());
     }
 
@@ -193,6 +194,7 @@ class TripActivityServiceTest {
                 () -> service.updateActivity(100L, 1L, outsideTrip));
 
         assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
+        assertTrue(error.getMessage().contains("Datumet ligger utanför resan"));
         verify(mapper, never()).updateEntity(any(UpdateActivityRequestDTO.class), any());
         verify(repository, never()).save(any());
     }

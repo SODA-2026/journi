@@ -10,7 +10,7 @@ const activity: ActivityResponse = {
     id: 100,
     tripDestinationId: 11,
     name: "Fika",
-    activityDate: "2026-07-03",
+    activityDate: "2027-06-03",
     startTime: "10:00:00",
     description: "Kaffe",
     status: "PLANNED",
@@ -23,6 +23,8 @@ function renderList(onUpdate = vi.fn(), onDelete = vi.fn()) {
         <ActivityList
             activities={[activity]}
             destinations={destinations}
+            tripStartDate="2027-05-17"
+            tripEndDate="2027-07-17"
             onUpdate={onUpdate}
             onDelete={onDelete}
         />,
@@ -49,7 +51,7 @@ it("edits an activity inline and submits the four editable fields", async () => 
     await waitFor(() =>
         expect(onUpdate).toHaveBeenCalledWith(100, {
             name: "Lunch",
-            activityDate: "2026-07-03",
+            activityDate: "2027-06-03",
             startTime: "12:30",
             description: "Kaffe",
         }),
@@ -84,4 +86,19 @@ it("does not delete when confirmation is cancelled", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ta bort" }));
 
     expect(onDelete).not.toHaveBeenCalled();
+});
+
+it("shows a clear error when editing to a date outside the trip", async () => {
+    const { onUpdate } = renderList();
+
+    fireEvent.click(screen.getByRole("button", { name: "Redigera" }));
+    fireEvent.change(screen.getByLabelText("Date"), {
+        target: { value: "2027-08-01" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Spara" }));
+
+    const error = await screen.findByRole("alert");
+    expect(error).toHaveTextContent("Datumet ligger utanför resan");
+    expect(error).toHaveTextContent("17 maj 2027");
+    expect(onUpdate).not.toHaveBeenCalled();
 });
