@@ -5,6 +5,7 @@ import { cityCover } from "../cityCovers";
 import { AddToTripModal } from "../../../shared/components/AddToTripModal";
 import { addTripDestination } from "../../trips/TripFetch";
 import { getTripInfo } from "../../trips/TripFetch";
+import { Link } from "react-router";
 
 type CityListProps = {
     countryNames: Record<number, string>;
@@ -17,21 +18,14 @@ export function CityList({ countryNames }: CityListProps) {
     const [showModal, setShowModal] = useState(false);
     const [selectedCity, setSelectedCity] = useState<City | null>(null);
 
-
     const handleAddCity = async (
         tripId: number,
-        cityId: number,
+        cityId: number
     ): Promise<void> => {
-
         const trip = await getTripInfo(tripId);
 
-        await addTripDestination(
-            tripId,
-            cityId,
-            trip.destinations.length,
-        );
+        await addTripDestination(tripId, cityId, trip.destinations.length);
     };
-
 
     useEffect(() => {
         let cancelled = false;
@@ -88,7 +82,9 @@ export function CityList({ countryNames }: CityListProps) {
                         >
                             <img
                                 src={cityCover(city, countryName)}
-                                alt={`${city.name}${countryName ? `, ${countryName}` : ""}`}
+                                alt={`${city.name}${
+                                    countryName ? `, ${countryName}` : ""
+                                }`}
                                 loading="lazy"
                                 className="h-40 w-full object-cover"
                                 onError={(event) => {
@@ -100,33 +96,47 @@ export function CityList({ countryNames }: CityListProps) {
                                     {city.name}
                                 </h3>
                                 {countryName && (
-                                    <p className="text-sm text-[#1d4237]/70">{countryName}</p>
+                                    <p className="text-sm text-[#1d4237]/70">
+                                        {countryName}
+                                    </p>
                                 )}
                                 <p>{city.shortDescription}</p>
-                                <button
-                                    onClick={() => {
-                                        setSelectedCity(city);
-                                        setShowModal(true);
-                                    }}
-                                    className="mt-4 rounded-lg bg-[#235e4f] px-4 py-2 text-white hover:bg-[#1d4237]">
-                                    Lägg till i resa
-                                </button>
+                                <div className="mt-4 flex flex-wrap gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedCity(city);
+                                            setShowModal(true);
+                                        }}
+                                        className="inline-flex h-10 items-center justify-center rounded-lg border border-[#235e4f] bg-[#235e4f] px-4 text-white hover:bg-[#1d4237]"
+                                    >
+                                        Lägg till i resa
+                                    </button>
+                                    <Link
+                                        to={`/cities/${city.id}`}
+                                        className="inline-flex h-10 items-center justify-center rounded-lg border border-[#235e4f] px-4 text-[#235e4f] hover:bg-[#235e4f]/10"
+                                    >
+                                        Visa mer
+                                        <span className="sr-only">
+                                            {" "}
+                                            om {city.name}
+                                        </span>
+                                    </Link>
+                                </div>
                             </div>
                         </li>
                     );
                 })}
             </ul>
             {selectedCity && (
-                    <AddToTripModal
-                        isOpen={showModal}
-                        itemId={selectedCity.id}
-                        itemName={selectedCity.name}
-                        itemType="city"
-                        onClose={() => setShowModal(false)}
-                        onAdd={handleAddCity}
-                    />
-                    )}
-        
+                <AddToTripModal
+                    isOpen={showModal}
+                    itemId={selectedCity.id}
+                    itemName={selectedCity.name}
+                    itemType="city"
+                    onClose={() => setShowModal(false)}
+                    onAdd={handleAddCity}
+                />
+            )}
         </div>
     );
 }

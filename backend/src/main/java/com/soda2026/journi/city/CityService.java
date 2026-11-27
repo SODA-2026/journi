@@ -2,6 +2,7 @@ package com.soda2026.journi.city;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,5 +28,12 @@ public class CityService {
                 .stream()
                 .map(cityMapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CityResponseDTO getCity(Long cityId){
+        return cityMapper.toDto(cityRepository.findById(cityId)
+                .orElseThrow(() -> new RuntimeException("Staden hittades inte")));
+
     }
 }

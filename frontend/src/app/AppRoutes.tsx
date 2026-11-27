@@ -14,6 +14,7 @@ import { ExplorePage } from "../features/explore/ExplorePage";
 import { NavBar } from "../shared/NavBar";
 import { AppLayout } from "../shared/layout/AppLayout";
 import { UpdateTripPage } from "../pages/UpdateTripPage";
+import { CityPage } from "../pages/CityPage";
 
 // Public pages use the top navigation.
 function PublicLayout() {
@@ -67,6 +68,7 @@ export function AppRoutes() {
                         element={<UpdateTripPage />}
                     />
                     <Route path="/explore" element={<ExplorePage />} />
+                    <Route path="/cities/:id" element={<CityPage />} />
                 </Route>
             </Route>
         </Routes>
